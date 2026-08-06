@@ -80,6 +80,8 @@ server {
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto \$http_x_forwarded_proto;
 
+        add_header Cache-Control "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0";
+
         proxy_connect_timeout 300s;
         proxy_send_timeout 300s;
         proxy_read_timeout 300s;
