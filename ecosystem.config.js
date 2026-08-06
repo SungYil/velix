@@ -4,8 +4,7 @@ module.exports = {
   apps: [
     {
       name: 'velix',
-      script: path.join(__dirname, 'node_modules/next/dist/bin/next'),
-      args: 'start -p 3000',
+      script: path.join(__dirname, 'server.js'),
       cwd: __dirname,
       exec_mode: 'fork',
       instances: 1,
@@ -14,7 +13,7 @@ module.exports = {
       max_memory_restart: '1G',
       env: {
         NODE_ENV: 'production',
-        PORT: '3000',
+        PORT: 3000,
       },
     },
   ],
