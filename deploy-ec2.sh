@@ -3,6 +3,10 @@
 # VelixENT AWS EC2 Auto Deployment Script for AWS ALB & moibluu.com
 # =================================================================
 
+# 항상 스크립트가 위치한 디렉토리로 이동
+CDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+cd "$CDIR"
+
 DOMAIN="moibluu.com"
 WWW_DOMAIN="www.moibluu.com"
 
@@ -40,7 +44,8 @@ if [ ! -d ".next" ]; then
     exit 1
 fi
 
-echo "🚀 [6/6] PM2 서비스 초기화 및 구동..."
+echo "🚀 [6/6] PM2 기존 프로세스 초기화 및 ecosystem 구동..."
+pm2 delete velix 2>/dev/null || true
 pm2 kill 2>/dev/null || true
 pm2 start ecosystem.config.js
 pm2 save
