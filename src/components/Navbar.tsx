@@ -1,26 +1,32 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Phone, Menu, X, ChevronDown, ShieldCheck, Sparkles } from 'lucide-react';
+import { ChevronDown, Phone, Menu, X, Sparkles } from 'lucide-react';
 
 export default function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const pathname = usePathname();
+  const [scrolled, setScrolled] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const navRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 20) {
-        setScrolled(true);
-      } else {
-        setScrolled(false);
+      setScrolled(window.scrollY > 20);
+    };
+    const handleClickOutside = (e: MouseEvent) => {
+      if (navRef.current && !navRef.current.contains(e.target as Node)) {
+        setActiveDropdown(null);
       }
     };
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
   }, []);
 
   const navLinks = [
@@ -63,6 +69,7 @@ export default function Navbar() {
 
   return (
     <header
+      ref={navRef}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled ? 'glass-panel py-3 border-b border-white/10 shadow-2xl' : 'bg-gradient-to-b from-black/80 to-transparent py-5'
       }`}
@@ -70,7 +77,7 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 group">
+          <Link href="/" prefetch={false} className="flex items-center gap-2 group">
             <span className="w-9 h-9 rounded-xl bg-gradient-to-tr from-violet-600 via-pink-500 to-amber-400 flex items-center justify-center font-black text-white text-lg shadow-lg group-hover:scale-105 transition-transform">
               V
             </span>
@@ -84,27 +91,36 @@ export default function Navbar() {
             {navLinks.map((menu) => (
               <div
                 key={menu.key}
-                className="relative"
+                className="relative py-2"
                 onMouseEnter={() => setActiveDropdown(menu.key)}
-                onMouseLeave={() => setActiveDropdown(null)}
               >
-                <button className="flex items-center gap-1.5 py-2 text-sm font-semibold text-gray-200 hover:text-purple-400 transition-colors">
-                  {menu.name}
-                  <ChevronDown className="w-4 h-4 opacity-70 group-hover:rotate-180 transition-transform" />
+                <button
+                  type="button"
+                  onClick={() => setActiveDropdown(activeDropdown === menu.key ? null : menu.key)}
+                  className={`flex items-center gap-1.5 text-sm font-semibold transition-colors ${
+                    activeDropdown === menu.key ? 'text-purple-400 font-bold' : 'text-gray-200 hover:text-purple-400'
+                  }`}
+                >
+                  <span>{menu.name}</span>
+                  <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${activeDropdown === menu.key ? 'rotate-180 text-purple-400' : 'opacity-70'}`} />
                 </button>
 
-                {/* Dropdown Menu with Seamless Hover Bridge */}
+                {/* Dropdown Menu */}
                 {activeDropdown === menu.key && (
-                  <div className="absolute top-full left-0 pt-2 w-48 z-50">
-                    <div className="rounded-2xl glass-panel p-2 shadow-2xl border border-white/15 animate-in fade-in slide-in-from-top-2 duration-200">
+                  <div
+                    className="absolute top-full left-0 pt-2 w-48 z-50"
+                    onMouseLeave={() => setActiveDropdown(null)}
+                  >
+                    <div className="rounded-2xl glass-panel p-2 shadow-2xl border border-white/15 animate-in fade-in slide-in-from-top-2 duration-200 bg-black/90 backdrop-blur-xl">
                       {menu.items.map((item) => (
                         <Link
                           key={item.href}
                           href={item.href}
+                          prefetch={false}
                           onClick={() => setActiveDropdown(null)}
                           className={`block px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
                             pathname === item.href
-                              ? 'bg-purple-600/30 text-purple-300 font-bold'
+                              ? 'bg-purple-600/40 text-purple-300 font-bold'
                               : 'text-gray-300 hover:bg-white/10 hover:text-white'
                           }`}
                         >
@@ -126,26 +142,24 @@ export default function Navbar() {
               className="flex items-center gap-2 px-4 py-2 rounded-full glass-panel hover:bg-purple-600/20 text-gray-200 hover:text-white border border-purple-500/30 text-sm font-medium transition-all group"
             >
               <Phone className="w-4 h-4 text-purple-400 group-hover:scale-110 transition-transform" />
-              <span>02-555-0199</span>
+              <span>대표전화: 02-555-0199</span>
             </a>
 
-            {/* Admin Link */}
             <Link
               href="/admin"
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-white/5 hover:bg-white/10 text-gray-400 hover:text-gray-200 border border-white/10 transition-all"
-              title="관리자 페이지"
+              prefetch={false}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-purple-600 hover:bg-purple-500 text-white text-sm font-bold shadow-lg shadow-purple-600/30 transition-all hover:scale-105"
             >
-              <ShieldCheck className="w-4 h-4 text-indigo-400" />
+              <Sparkles className="w-4 h-4" />
               <span>관리자</span>
             </Link>
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="flex md:hidden items-center gap-2">
+          <div className="md:hidden flex items-center gap-2">
             <a
               href="tel:025550199"
-              className="p-2 rounded-xl glass-panel text-purple-400 hover:bg-purple-600/20"
-              aria-label="대표전화 연결"
+              className="p-2 rounded-xl glass-panel text-purple-400 hover:text-white"
             >
               <Phone className="w-5 h-5" />
             </a>
@@ -161,7 +175,7 @@ export default function Navbar() {
 
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden glass-panel border-b border-white/10 px-4 py-6 mt-3 space-y-6 max-h-[85vh] overflow-y-auto animate-in slide-in-from-top duration-300">
+        <div className="md:hidden glass-panel border-b border-white/10 px-4 py-6 mt-3 space-y-6 max-h-[85vh] overflow-y-auto animate-in slide-in-from-top duration-300 bg-black/95">
           {navLinks.map((menu) => (
             <div key={menu.key} className="space-y-2">
               <div className="text-xs font-bold text-purple-400 uppercase tracking-wider px-2">
@@ -172,6 +186,7 @@ export default function Navbar() {
                   <Link
                     key={item.href}
                     href={item.href}
+                    prefetch={false}
                     onClick={() => setMobileMenuOpen(false)}
                     className={`block px-3 py-2 rounded-xl text-sm font-medium ${
                       pathname === item.href
@@ -196,6 +211,7 @@ export default function Navbar() {
             </a>
             <Link
               href="/admin"
+              prefetch={false}
               onClick={() => setMobileMenuOpen(false)}
               className="ml-2 px-4 py-3 rounded-xl bg-white/10 text-gray-300 hover:text-white text-sm font-medium"
             >
