@@ -41,14 +41,16 @@ export NODE_OPTIONS="--max-old-space-size=2048"
 export NEXT_TELEMETRY_DISABLED=1
 export NEXT_PRIVATE_WORKERS=1
 export NEXT_MAX_WORKERS=1
+export UV_THREADPOOL_SIZE=1
 
 echo "Executing npm run build..."
 npm run build
 
-echo "Copying static assets to standalone folder..."
-cp -r public .next/standalone/ || true
-mkdir -p .next/standalone/.next
-cp -r .next/static .next/standalone/.next/
+echo "Copying static assets and build manifests to standalone folder..."
+cp -r public .next/standalone/ 2>/dev/null || true
+cp -r .next/static .next/standalone/.next/ 2>/dev/null || true
+cp .next/BUILD_ID .next/standalone/.next/ 2>/dev/null || true
+cp .next/*.json .next/standalone/.next/ 2>/dev/null || true
 
 echo "Rebuilding better-sqlite3 native binary for Linux..."
 npm rebuild better-sqlite3
