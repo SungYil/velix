@@ -28,15 +28,14 @@ echo "🚀 [4/6] 데이터 및 업로드 디렉토리 권한 생성..."
 mkdir -p data public/uploads
 chmod -R 777 data public/uploads
 
-echo "🚀 [5/6] Next.js 앱 패키지 설치, 빌드 및 네이티브 모듈 재구성..."
+echo "🚀 [5/6] Next.js 앱 패키지 설치, 네이티브 모듈 빌드 및 프로덕션 빌드..."
 npm install
 npm rebuild better-sqlite3
 npm run build
 
-echo "🚀 [6/6] PM2 무중단 서비스 구동..."
-pm2 stop velix 2>/dev/null || true
-pm2 delete velix 2>/dev/null || true
-pm2 start node_modules/next/dist/bin/next --name "velix" -- start --port 3000
+echo "🚀 [6/6] PM2 기존 프로세스 초기화 및 ecosystem 구동..."
+pm2 kill 2>/dev/null || true
+pm2 start ecosystem.config.js
 pm2 save
 
 echo "🚀 [7/7] Nginx 설정 (AWS ALB 헬스체크 및 도메인 호환)..."
@@ -49,7 +48,7 @@ server {
     client_max_body_size 50M;
 
     location / {
-        proxy_pass http://localhost:3000;
+        proxy_pass http://127.0.0.1:3000;
         proxy_http_version 1.1;
         proxy_set_header Upgrade \$http_upgrade;
         proxy_set_header Connection 'upgrade';
