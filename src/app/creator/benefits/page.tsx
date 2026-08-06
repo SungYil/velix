@@ -11,7 +11,7 @@ export default function CreatorBenefitsPage() {
       id: 1,
       title: '최신 방송 스튜디오 & 고성능 장비 지원',
       subtitle: '캠, 마이크, 조명부터 최고사양 PC 세팅까지 무상 지원',
-      description: 'VelixENT 본사 전용 오프라인 방음 스튜디오 시설과 함께 초고화질 방송 진행을 위한 최첨단 방송 기자를 풀세트로 지원합니다.',
+      description: 'VelixMEDIA 본사 전용 오프라인 방음 스튜디오 시설과 함께 초고화질 방송 진행을 위한 최첨단 방송 기자를 풀세트로 지원합니다.',
       image: 'https://images.unsplash.com/photo-1590602847861-f357a9332bbc?auto=format&fit=crop&w=1000&q=80',
       tag: '장비 / 스튜디오',
     },
@@ -54,23 +54,23 @@ export default function CreatorBenefitsPage() {
       {/* Header */}
       <div className="text-center space-y-4">
         <ScrollReveal direction="up">
-          <span className="text-xs uppercase font-bold tracking-widest text-pink-400 bg-pink-500/10 px-4 py-1.5 rounded-full border border-pink-500/20">
+          <span className="text-xs uppercase font-bold tracking-widest text-cyan-400 bg-cyan-500/10 px-4 py-1.5 rounded-full border border-cyan-500/20">
             Creator Benefits
           </span>
         </ScrollReveal>
         <ScrollReveal direction="up" delay={0.1}>
           <h1 className="text-4xl sm:text-6xl font-black text-white">
-            VelixENT 크리에이터 <span className="gradient-text">지원 혜택</span>
+            VelixMEDIA 크리에이터 <span className="gradient-text">지원 혜택</span>
           </h1>
         </ScrollReveal>
         <ScrollReveal direction="up" delay={0.2}>
           <p className="max-w-2xl mx-auto text-base sm:text-lg text-gray-300">
-            오직 벨릭스엔터테인먼트 소속 크리에이터만을 위해 준비된 압도적인 전폭 지원 시스템입니다.
+            오직 벨릭스미디어 소속 크리에이터만을 위해 준비된 압도적인 전폭 지원 시스템입니다.
           </p>
         </ScrollReveal>
       </div>
 
-      {/* Benefits List with Drag/Scroll Motion Reveal Animations */}
+      {/* Benefits List */}
       <div className="space-y-16">
         {benefits.map((b, index) => {
           const isEven = index % 2 === 0;
@@ -80,16 +80,16 @@ export default function CreatorBenefitsPage() {
               direction={isEven ? 'left' : 'right'}
               delay={0.1}
             >
-              <div className={`grid grid-cols-1 lg:grid-cols-12 gap-8 items-center rounded-3xl p-8 sm:p-12 glass-panel border border-white/15 hover:border-purple-500/40 transition-all duration-500 shadow-2xl`}>
+              <div className={`grid grid-cols-1 lg:grid-cols-12 gap-8 items-center rounded-3xl p-8 sm:p-12 glass-panel border border-cyan-500/20 hover:border-cyan-400/40 transition-all duration-500 shadow-2xl`}>
                 {/* Text Content */}
                 <div className={`space-y-4 ${isEven ? 'lg:col-span-7' : 'lg:col-span-7 lg:order-2'}`}>
-                  <span className="text-xs font-bold uppercase tracking-wider text-purple-400 bg-purple-500/20 px-3 py-1 rounded-md inline-block">
+                  <span className="text-xs font-bold uppercase tracking-wider text-cyan-300 bg-cyan-500/20 px-3 py-1 rounded-md inline-block border border-cyan-500/30">
                     {b.tag}
                   </span>
                   <h3 className="text-2xl sm:text-4xl font-black text-white leading-snug">
                     {b.title}
                   </h3>
-                  <h4 className="text-base sm:text-lg font-bold text-pink-400">
+                  <h4 className="text-base sm:text-lg font-bold text-cyan-400">
                     {b.subtitle}
                   </h4>
                   <p className="text-gray-300 text-sm sm:text-base leading-relaxed font-light whitespace-pre-line pt-2">
@@ -116,14 +116,14 @@ export default function CreatorBenefitsPage() {
 
       {/* CTA Section */}
       <ScrollReveal direction="up">
-        <div className="text-center p-12 rounded-3xl glass-panel border border-pink-500/30 bg-gradient-to-r from-purple-900/30 to-pink-900/30 space-y-6">
+        <div className="text-center p-12 rounded-3xl glass-panel border border-cyan-500/30 bg-gradient-to-r from-blue-950/50 to-cyan-950/50 space-y-6">
           <h2 className="text-3xl font-black text-white">망설이지 마시고 지금 지원해보세요!</h2>
           <p className="text-gray-300 text-sm max-w-md mx-auto">
             경력 유무에 상관없이 여러분의 가치를 알아보고 아낌없이 지원해드립니다.
           </p>
           <Link
             href="/creator/apply"
-            className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl bg-gradient-to-r from-purple-600 to-pink-600 text-white font-black hover:opacity-90 shadow-xl hover:scale-105 transition-all"
+            className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl bg-gradient-to-r from-blue-600 via-cyan-600 to-blue-700 text-white font-black hover:opacity-90 shadow-xl hover:scale-105 transition-all border border-cyan-400/40"
           >
             <span>크리에이터 지원서 작성하기</span>
             <ArrowRight className="w-5 h-5" />

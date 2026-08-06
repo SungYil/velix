@@ -21,7 +21,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body className="antialiased selection:bg-purple-600 selection:text-white">
+      <body className="antialiased selection:bg-blue-600 selection:text-white">
         <Navbar />
         <main className="min-h-screen pt-20">
           {children}

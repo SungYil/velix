@@ -12,7 +12,7 @@ export default function FloatingMenu() {
   return (
     <div className="fixed bottom-6 right-6 z-40 flex flex-col gap-3 items-end">
       {/* Floating Button Group */}
-      <div className="flex flex-col gap-2.5 p-2 rounded-2xl glass-panel border border-purple-500/20 shadow-2xl backdrop-blur-xl animate-bounce-subtle">
+      <div className="flex flex-col gap-2.5 p-2 rounded-2xl glass-panel border border-cyan-500/30 shadow-2xl backdrop-blur-xl bg-[#060913]/90">
         {/* KakaoTalk Consultation */}
         <a
           href="https://pf.kakao.com"
@@ -30,7 +30,7 @@ export default function FloatingMenu() {
           href="https://instagram.com"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 hover:opacity-90 text-white font-bold text-xs transition-all shadow-md group hover:scale-105"
+          className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-gradient-to-tr from-blue-600 via-cyan-500 to-indigo-600 hover:opacity-90 text-white font-bold text-xs transition-all shadow-md group hover:scale-105"
           title="인스타그램 방문하기"
         >
           <Camera className="w-4 h-4 text-white group-hover:scale-110 transition-transform" />
@@ -52,10 +52,10 @@ export default function FloatingMenu() {
         {/* Creator / BJ Apply */}
         <Link
           href="/creator/apply"
-          className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-black text-xs transition-all shadow-lg group hover:scale-105 border border-purple-400/40"
+          className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 via-cyan-600 to-blue-700 hover:from-blue-500 hover:to-cyan-500 text-white font-black text-xs transition-all shadow-lg group hover:scale-105 border border-cyan-400/40"
           title="BJ / 크리에이터 지원하기"
         >
-          <UserPlus className="w-4 h-4 text-yellow-300 group-hover:rotate-12 transition-transform" />
+          <UserPlus className="w-4 h-4 text-cyan-200 group-hover:rotate-12 transition-transform" />
           <span className="hidden sm:inline">BJ / 크리에이터 지원</span>
         </Link>
       </div>
@@ -63,7 +63,7 @@ export default function FloatingMenu() {
       {/* Top Scroll Button */}
       <button
         onClick={scrollToTop}
-        className="w-10 h-10 rounded-full glass-panel flex items-center justify-center text-gray-300 hover:text-white hover:border-purple-500/50 transition-all shadow-lg hover:scale-110"
+        className="w-10 h-10 rounded-full glass-panel flex items-center justify-center text-gray-300 hover:text-white border border-cyan-500/30 hover:border-cyan-400 transition-all shadow-lg hover:scale-110"
         title="맨 위로"
       >
         <ChevronUp className="w-5 h-5" />

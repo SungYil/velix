@@ -11,12 +11,12 @@ export default function Home() {
       {/* Hero Section */}
       <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden pt-12">
         {/* Ambient Glowing Background */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-tr from-purple-600/30 via-pink-500/20 to-cyan-500/10 rounded-full blur-[140px] pointer-events-none" />
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] h-[650px] bg-gradient-to-tr from-blue-600/30 via-cyan-500/20 to-purple-600/10 rounded-full blur-[140px] pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center space-y-8">
           <ScrollReveal direction="up" delay={0.1}>
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-panel border border-purple-500/30 text-purple-300 text-xs sm:text-sm font-semibold mb-4">
-              <Sparkles className="w-4 h-4 text-pink-400 animate-spin-slow" />
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-panel border border-cyan-500/30 text-cyan-300 text-xs sm:text-sm font-semibold mb-4 bg-[#080e1e]/80">
+              <Sparkles className="w-4 h-4 text-cyan-400 animate-spin-slow" />
               <span>Next Generation Creator MCN Group</span>
             </div>
           </ScrollReveal>
@@ -30,7 +30,7 @@ export default function Home() {
 
           <ScrollReveal direction="up" delay={0.3}>
             <p className="max-w-2xl mx-auto text-base sm:text-xl text-gray-300 font-light leading-relaxed">
-              VelixENT는 차세대 1인 미디어 크리에이터와 함께 새로운 문화 콘텐츠 생태계를 개척합니다.
+              VelixMEDIA는 차세대 1인 미디어 크리에이터와 함께 새로운 문화 콘텐츠 생태계를 개척합니다.
               독보적인 기획력과 스튜디오 인프라로 무한한 가능성을 경험하세요.
             </p>
           </ScrollReveal>
@@ -39,14 +39,14 @@ export default function Home() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
               <Link
                 href="/creator/apply"
-                className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-purple-600 via-pink-600 to-amber-500 hover:opacity-95 text-white font-black text-base shadow-2xl hover:scale-105 transition-all flex items-center justify-center gap-3 group"
+                className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-blue-600 via-cyan-600 to-blue-700 hover:from-blue-500 hover:to-cyan-500 text-white font-black text-base shadow-2xl hover:scale-105 transition-all flex items-center justify-center gap-3 group border border-cyan-400/30"
               >
                 <span>BJ / 크리에이터 지원하기</span>
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link
                 href="/velixent/about"
-                className="w-full sm:w-auto px-8 py-4 rounded-2xl glass-panel hover:bg-white/10 text-gray-200 font-bold text-base border border-white/15 transition-all flex items-center justify-center gap-2"
+                className="w-full sm:w-auto px-8 py-4 rounded-2xl glass-panel hover:bg-white/10 text-gray-200 font-bold text-base border border-cyan-500/30 transition-all flex items-center justify-center gap-2"
               >
                 <span>회사소개 자세히 보기</span>
               </Link>
@@ -58,17 +58,17 @@ export default function Home() {
       {/* Stats Counter Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <ScrollReveal direction="up">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 p-8 rounded-3xl glass-panel border border-white/10">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 p-8 rounded-3xl glass-panel border border-cyan-500/20 bg-[#080e1e]/60">
             <div className="text-center space-y-1">
               <div className="text-3xl sm:text-5xl font-black gradient-text">150+</div>
               <div className="text-xs sm:text-sm font-semibold text-gray-400">소속 크리에이터</div>
             </div>
             <div className="text-center space-y-1 border-l border-white/10">
-              <div className="text-3xl sm:text-5xl font-black text-purple-400">3,500만+</div>
+              <div className="text-3xl sm:text-5xl font-black text-cyan-400">3,500만+</div>
               <div className="text-xs sm:text-sm font-semibold text-gray-400">총 누적 구독자</div>
             </div>
             <div className="text-center space-y-1 border-l border-white/10">
-              <div className="text-3xl sm:text-5xl font-black text-pink-400">12개</div>
+              <div className="text-3xl sm:text-5xl font-black text-blue-400">12개</div>
               <div className="text-xs sm:text-sm font-semibold text-gray-400">자체 전용 스튜디오</div>
             </div>
             <div className="text-center space-y-1 border-l border-white/10">
@@ -83,7 +83,7 @@ export default function Home() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center space-y-4 mb-16">
           <h2 className="text-3xl sm:text-5xl font-black text-white">
-            EXPLORE <span className="gradient-text">VELIXENT</span>
+            EXPLORE <span className="gradient-text">VELIXMEDIA</span>
           </h2>
           <p className="text-gray-400 text-sm sm:text-base">원하시는 영역으로 바로 이동하여 자세한 정보를 확인하세요.</p>
         </div>
@@ -93,18 +93,18 @@ export default function Home() {
           <ScrollReveal direction="up" delay={0.1}>
             <Link
               href="/velixent/about"
-              className="group block p-8 rounded-3xl glass-panel glass-panel-hover border border-purple-500/20 relative overflow-hidden h-full"
+              className="group block p-8 rounded-3xl glass-panel glass-panel-hover border border-blue-500/20 relative overflow-hidden h-full"
             >
-              <div className="w-12 h-12 rounded-2xl bg-purple-600/20 text-purple-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+              <div className="w-12 h-12 rounded-2xl bg-blue-600/20 text-blue-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                 <ShieldCheck className="w-6 h-6" />
               </div>
-              <h3 className="text-2xl font-black text-white mb-2 group-hover:text-purple-300 transition-colors">
+              <h3 className="text-2xl font-black text-white mb-2 group-hover:text-cyan-300 transition-colors">
                 VelixENT
               </h3>
               <p className="text-xs text-gray-400 leading-relaxed mb-6">
                 회사소개, 대표 인삿말, 조직도 및 오시는 길 카카오맵 정보를 제공합니다.
               </p>
-              <div className="flex items-center text-xs font-bold text-purple-400 gap-1 group-hover:translate-x-2 transition-transform">
+              <div className="flex items-center text-xs font-bold text-cyan-400 gap-1 group-hover:translate-x-2 transition-transform">
                 <span>회사 둘러보기</span>
                 <ArrowRight className="w-4 h-4" />
               </div>
@@ -115,18 +115,18 @@ export default function Home() {
           <ScrollReveal direction="up" delay={0.2}>
             <Link
               href="/creator/benefits"
-              className="group block p-8 rounded-3xl glass-panel glass-panel-hover border border-pink-500/20 relative overflow-hidden h-full"
+              className="group block p-8 rounded-3xl glass-panel glass-panel-hover border border-cyan-500/20 relative overflow-hidden h-full"
             >
-              <div className="w-12 h-12 rounded-2xl bg-pink-600/20 text-pink-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+              <div className="w-12 h-12 rounded-2xl bg-cyan-600/20 text-cyan-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                 <Star className="w-6 h-6" />
               </div>
-              <h3 className="text-2xl font-black text-white mb-2 group-hover:text-pink-300 transition-colors">
+              <h3 className="text-2xl font-black text-white mb-2 group-hover:text-cyan-300 transition-colors">
                 크리에이터
               </h3>
               <p className="text-xs text-gray-400 leading-relaxed mb-6">
                 최신 장비/스튜디오 지원 혜택 및 미디어 크리에이터 공채 지원하기 양식.
               </p>
-              <div className="flex items-center text-xs font-bold text-pink-400 gap-1 group-hover:translate-x-2 transition-transform">
+              <div className="flex items-center text-xs font-bold text-cyan-400 gap-1 group-hover:translate-x-2 transition-transform">
                 <span>지원혜택 & 지원하기</span>
                 <ArrowRight className="w-4 h-4" />
               </div>
@@ -137,9 +137,9 @@ export default function Home() {
           <ScrollReveal direction="up" delay={0.3}>
             <Link
               href="/business/intro"
-              className="group block p-8 rounded-3xl glass-panel glass-panel-hover border border-cyan-500/20 relative overflow-hidden h-full"
+              className="group block p-8 rounded-3xl glass-panel glass-panel-hover border border-blue-500/20 relative overflow-hidden h-full"
             >
-              <div className="w-12 h-12 rounded-2xl bg-cyan-600/20 text-cyan-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+              <div className="w-12 h-12 rounded-2xl bg-blue-600/20 text-blue-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                 <Video className="w-6 h-6" />
               </div>
               <h3 className="text-2xl font-black text-white mb-2 group-hover:text-cyan-300 transition-colors">
@@ -159,18 +159,18 @@ export default function Home() {
           <ScrollReveal direction="up" delay={0.4}>
             <Link
               href="/community/insights"
-              className="group block p-8 rounded-3xl glass-panel glass-panel-hover border border-amber-500/20 relative overflow-hidden h-full"
+              className="group block p-8 rounded-3xl glass-panel glass-panel-hover border border-cyan-500/20 relative overflow-hidden h-full"
             >
-              <div className="w-12 h-12 rounded-2xl bg-amber-600/20 text-amber-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+              <div className="w-12 h-12 rounded-2xl bg-cyan-600/20 text-cyan-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                 <Users className="w-6 h-6" />
               </div>
-              <h3 className="text-2xl font-black text-white mb-2 group-hover:text-amber-300 transition-colors">
+              <h3 className="text-2xl font-black text-white mb-2 group-hover:text-cyan-300 transition-colors">
                 커뮤니티
               </h3>
               <p className="text-xs text-gray-400 leading-relaxed mb-6">
                 트렌드 인사이트 칼럼, 주요 공지사항 및 자주묻는질문(FAQ) 아코디언.
               </p>
-              <div className="flex items-center text-xs font-bold text-amber-400 gap-1 group-hover:translate-x-2 transition-transform">
+              <div className="flex items-center text-xs font-bold text-cyan-400 gap-1 group-hover:translate-x-2 transition-transform">
                 <span>인사이트 & FAQ</span>
                 <ArrowRight className="w-4 h-4" />
               </div>
@@ -182,10 +182,10 @@ export default function Home() {
       {/* Creator Apply CTA Banner */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <ScrollReveal direction="up">
-          <div className="relative rounded-3xl p-10 md:p-16 overflow-hidden glass-panel border border-purple-500/40 bg-gradient-to-r from-purple-900/40 via-indigo-900/30 to-pink-900/30 text-center space-y-6">
+          <div className="relative rounded-3xl p-10 md:p-16 overflow-hidden glass-panel border border-cyan-500/40 bg-gradient-to-r from-blue-950/60 via-slate-900/60 to-cyan-950/60 text-center space-y-6">
             <h2 className="text-3xl sm:text-5xl font-black text-white">
               당신의 특별한 개성을 <br className="sm:hidden" />
-              <span className="gradient-text">VelixENT</span>에서 펼치세요!
+              <span className="gradient-text">VelixMEDIA</span>에서 펼치세요!
             </h2>
             <p className="max-w-xl mx-auto text-sm sm:text-base text-gray-300">
               초보 BJ부터 정통 크리에이터까지 1:1 맞춤 스튜디오, 방송 장비, 개인 퍼스널 브랜딩 솔루션을 전폭 지원합니다.
@@ -193,10 +193,10 @@ export default function Home() {
             <div className="pt-4">
               <Link
                 href="/creator/apply"
-                className="inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-white text-purple-950 font-black text-base hover:bg-gray-100 transition-all shadow-xl hover:scale-105"
+                className="inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-black text-base hover:from-blue-500 hover:to-cyan-400 transition-all shadow-xl hover:scale-105 border border-cyan-300/40"
               >
                 <span>지금 바로 크리에이터 지원하기</span>
-                <ArrowRight className="w-5 h-5 text-purple-600" />
+                <ArrowRight className="w-5 h-5 text-white" />
               </Link>
             </div>
           </div>

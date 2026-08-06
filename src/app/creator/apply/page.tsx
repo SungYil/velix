@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import ScrollReveal from '@/components/ScrollReveal';
-import { Upload, CheckCircle2, AlertCircle, Send, FileVideo, Image as ImageIcon, X, Paperclip } from 'lucide-react';
+import { Send, Upload, CheckCircle2, AlertCircle, FileVideo, Image as ImageIcon, Paperclip, X } from 'lucide-react';
 
 export default function CreatorApplyPage() {
   const [formData, setFormData] = useState({
@@ -28,9 +28,9 @@ export default function CreatorApplyPage() {
   };
 
   const handleFileAdd = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const selectedFiles = Array.from(e.target.files);
-      setFiles((prev) => [...prev, ...selectedFiles]);
+    if (e.target.files) {
+      const selected = Array.from(e.target.files);
+      setFiles((prev) => [...prev, ...selected]);
     }
   };
 
@@ -84,7 +84,7 @@ export default function CreatorApplyPage() {
       {/* Header */}
       <div className="text-center space-y-3">
         <ScrollReveal direction="up">
-          <span className="text-xs uppercase font-bold tracking-widest text-purple-400 bg-purple-500/10 px-4 py-1.5 rounded-full border border-purple-500/20">
+          <span className="text-xs uppercase font-bold tracking-widest text-cyan-400 bg-cyan-500/10 px-4 py-1.5 rounded-full border border-cyan-500/20">
             Creator Application
           </span>
         </ScrollReveal>
@@ -127,7 +127,7 @@ export default function CreatorApplyPage() {
                 });
                 setFiles([]);
               }}
-              className="px-6 py-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-sm transition-all"
+              className="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm transition-all shadow-lg"
             >
               추가 지원서 작성하기
             </button>
@@ -136,7 +136,7 @@ export default function CreatorApplyPage() {
       ) : (
         /* Application Form Container */
         <ScrollReveal direction="up" delay={0.3}>
-          <form onSubmit={handleSubmit} className="rounded-3xl p-8 sm:p-12 glass-panel border border-white/15 shadow-2xl space-y-8">
+          <form onSubmit={handleSubmit} className="rounded-3xl p-8 sm:p-12 glass-panel border border-cyan-500/20 shadow-2xl space-y-8 bg-[#080e1e]/80">
             {errorMsg && (
               <div className="p-4 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 text-sm flex items-center gap-2">
                 <AlertCircle className="w-5 h-5 shrink-0" />
@@ -148,7 +148,7 @@ export default function CreatorApplyPage() {
               {/* Name */}
               <div className="space-y-2">
                 <label className="block text-xs font-bold text-gray-300 uppercase tracking-wider">
-                  성명 / 활동명 <span className="text-purple-400">*</span>
+                  성명 / 활동명 <span className="text-cyan-400">*</span>
                 </label>
                 <input
                   type="text"
@@ -157,20 +157,20 @@ export default function CreatorApplyPage() {
                   value={formData.name}
                   onChange={handleInputChange}
                   placeholder="예: 홍길동"
-                  className="w-full px-4 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 text-sm"
+                  className="w-full px-4 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 text-sm"
                 />
               </div>
 
               {/* Gender */}
               <div className="space-y-2">
                 <label className="block text-xs font-bold text-gray-300 uppercase tracking-wider">
-                  성별 <span className="text-purple-400">*</span>
+                  성별 <span className="text-cyan-400">*</span>
                 </label>
                 <select
                   name="gender"
                   value={formData.gender}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3.5 rounded-xl bg-[#121420] border border-white/10 text-white focus:outline-none focus:border-purple-500 text-sm"
+                  className="w-full px-4 py-3.5 rounded-xl bg-[#101728] border border-white/10 text-white focus:outline-none focus:border-cyan-500 text-sm"
                 >
                   <option value="여성">여성</option>
                   <option value="남성">남성</option>
@@ -181,7 +181,7 @@ export default function CreatorApplyPage() {
               {/* Phone */}
               <div className="space-y-2">
                 <label className="block text-xs font-bold text-gray-300 uppercase tracking-wider">
-                  연락처 (휴대폰) <span className="text-purple-400">*</span>
+                  연락처 (휴대폰) <span className="text-cyan-400">*</span>
                 </label>
                 <input
                   type="tel"
@@ -190,14 +190,14 @@ export default function CreatorApplyPage() {
                   value={formData.phone}
                   onChange={handleInputChange}
                   placeholder="010-0000-0000"
-                  className="w-full px-4 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 text-sm"
+                  className="w-full px-4 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 text-sm"
                 />
               </div>
 
               {/* Email */}
               <div className="space-y-2">
                 <label className="block text-xs font-bold text-gray-300 uppercase tracking-wider">
-                  이메일 주소 <span className="text-purple-400">*</span>
+                  이메일 주소 <span className="text-cyan-400">*</span>
                 </label>
                 <input
                   type="email"
@@ -206,7 +206,7 @@ export default function CreatorApplyPage() {
                   value={formData.email}
                   onChange={handleInputChange}
                   placeholder="example@velixent.com"
-                  className="w-full px-4 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 text-sm"
+                  className="w-full px-4 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 text-sm"
                 />
               </div>
 
@@ -221,7 +221,7 @@ export default function CreatorApplyPage() {
                   value={formData.birthdate}
                   onChange={handleInputChange}
                   placeholder="예: 2000-01-01"
-                  className="w-full px-4 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 text-sm"
+                  className="w-full px-4 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 text-sm"
                 />
               </div>
 
@@ -236,7 +236,7 @@ export default function CreatorApplyPage() {
                   value={formData.residence}
                   onChange={handleInputChange}
                   placeholder="예: 서울 강남구 / 경기 성남시"
-                  className="w-full px-4 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 text-sm"
+                  className="w-full px-4 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 text-sm"
                 />
               </div>
 
@@ -251,7 +251,7 @@ export default function CreatorApplyPage() {
                   value={formData.sns}
                   onChange={handleInputChange}
                   placeholder="예: @velix_official 또는 URL"
-                  className="w-full px-4 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 text-sm"
+                  className="w-full px-4 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 text-sm"
                 />
               </div>
 
@@ -264,7 +264,7 @@ export default function CreatorApplyPage() {
                   name="hasStudio"
                   value={formData.hasStudio}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3.5 rounded-xl bg-[#121420] border border-white/10 text-white focus:outline-none focus:border-purple-500 text-sm"
+                  className="w-full px-4 py-3.5 rounded-xl bg-[#101728] border border-white/10 text-white focus:outline-none focus:border-cyan-500 text-sm"
                 >
                   <option value="Y">보유함 (개인 방송 환경 있음)</option>
                   <option value="N">미보유 (본사 스튜디오/장비 지원 희망)</option>
@@ -283,7 +283,7 @@ export default function CreatorApplyPage() {
                 value={formData.bio}
                 onChange={handleInputChange}
                 placeholder="본인의 매력, 방송 경험 또는 앞으로의 포부를 자유롭게 적어주세요."
-                className="w-full px-4 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 text-sm"
+                className="w-full px-4 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 text-sm"
               />
             </div>
 
@@ -293,7 +293,7 @@ export default function CreatorApplyPage() {
                 프로필 사진 / 동영상 / 포트폴리오 첨부 (다중 첨부 가능)
               </label>
               
-              <div className="relative border-2 border-dashed border-white/20 hover:border-purple-500/50 rounded-2xl p-6 text-center cursor-pointer transition-colors bg-white/5">
+              <div className="relative border-2 border-dashed border-cyan-500/30 hover:border-cyan-400 rounded-2xl p-6 text-center cursor-pointer transition-colors bg-white/5">
                 <input
                   type="file"
                   multiple
@@ -302,7 +302,7 @@ export default function CreatorApplyPage() {
                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                 />
                 <div className="space-y-3 flex flex-col items-center justify-center">
-                  <div className="p-3 rounded-full bg-purple-600/20 text-purple-400">
+                  <div className="p-3 rounded-full bg-cyan-500/20 text-cyan-400">
                     <Upload className="w-6 h-6" />
                   </div>
                   <div>
@@ -320,14 +320,14 @@ export default function CreatorApplyPage() {
               {files.length > 0 && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
                   {files.map((f, idx) => (
-                    <div key={idx} className="flex items-center justify-between p-3 rounded-xl glass-panel border border-white/10 bg-white/5">
+                    <div key={idx} className="flex items-center justify-between p-3 rounded-xl glass-panel border border-cyan-500/20 bg-white/5">
                       <div className="flex items-center gap-2.5 truncate">
                         {f.type.startsWith('video/') ? (
-                          <FileVideo className="w-5 h-5 text-pink-400 shrink-0" />
+                          <FileVideo className="w-5 h-5 text-cyan-400 shrink-0" />
                         ) : f.type.startsWith('image/') ? (
-                          <ImageIcon className="w-5 h-5 text-purple-400 shrink-0" />
+                          <ImageIcon className="w-5 h-5 text-blue-400 shrink-0" />
                         ) : (
-                          <Paperclip className="w-5 h-5 text-amber-400 shrink-0" />
+                          <Paperclip className="w-5 h-5 text-indigo-400 shrink-0" />
                         )}
                         <div className="truncate">
                           <p className="text-xs font-bold text-white truncate">{f.name}</p>
@@ -352,7 +352,7 @@ export default function CreatorApplyPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-4 rounded-2xl bg-gradient-to-r from-purple-600 via-pink-600 to-amber-500 hover:opacity-95 text-white font-black text-base shadow-2xl transition-all flex items-center justify-center gap-2 group disabled:opacity-50"
+                className="w-full py-4 rounded-2xl bg-gradient-to-r from-blue-600 via-cyan-600 to-blue-700 hover:from-blue-500 hover:to-cyan-500 text-white font-black text-base shadow-2xl transition-all flex items-center justify-center gap-2 group disabled:opacity-50 border border-cyan-400/30"
               >
                 {loading ? (
                   <span>제출 중입니다...</span>
