@@ -125,6 +125,8 @@ try {
       order_index INTEGER DEFAULT 0, created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
   `);
+  try { sqliteDb.exec(`ALTER TABLE creator_applications ADD COLUMN files_json TEXT;`); } catch {}
+  try { sqliteDb.exec(`ALTER TABLE business_inquiries ADD COLUMN files_json TEXT;`); } catch {}
 } catch (e) {
   console.warn('SQLite init failed, using JSON store fallback:', e);
   useSqlite = false;

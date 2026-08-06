@@ -55,25 +55,47 @@ export async function POST(req: NextRequest) {
     const firstFile = filesList[0] || { url: '', name: '' };
     const filesJson = JSON.stringify(filesList);
 
-    const stmt = db.prepare(`
-      INSERT INTO creator_applications (name, gender, phone, email, birthdate, residence, sns, has_studio, bio, file_url, file_name, files_json)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `);
+    let result: any;
+    try {
+      const stmt = db.prepare(`
+        INSERT INTO creator_applications (name, gender, phone, email, birthdate, residence, sns, has_studio, bio, file_url, file_name, files_json)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `);
 
-    const result = stmt.run(
-      name,
-      gender || '',
-      phone,
-      email,
-      birthdate || '',
-      residence || '',
-      sns || '',
-      hasStudio || 'N',
-      bio || '',
-      firstFile.url,
-      firstFile.name,
-      filesJson
-    );
+      result = stmt.run(
+        name,
+        gender || '',
+        phone,
+        email,
+        birthdate || '',
+        residence || '',
+        sns || '',
+        hasStudio || 'N',
+        bio || '',
+        firstFile.url,
+        firstFile.name,
+        filesJson
+      );
+    } catch (dbErr: any) {
+      console.warn('12-column insert failed, falling back to 11-column insert:', dbErr.message);
+      const stmtFallback = db.prepare(`
+        INSERT INTO creator_applications (name, gender, phone, email, birthdate, residence, sns, has_studio, bio, file_url, file_name)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `);
+      result = stmtFallback.run(
+        name,
+        gender || '',
+        phone,
+        email,
+        birthdate || '',
+        residence || '',
+        sns || '',
+        hasStudio || 'N',
+        bio || '',
+        filesJson.length > 2 ? filesJson : firstFile.url,
+        firstFile.name
+      );
+    }
 
     return NextResponse.json({ success: true, id: result.lastInsertRowid });
   } catch (error: any) {

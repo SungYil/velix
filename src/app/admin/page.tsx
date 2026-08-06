@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Users,
@@ -22,9 +22,6 @@ import {
   Video as VideoIcon,
   Paperclip,
   ExternalLink,
-  Type,
-  Palette,
-  List,
 } from 'lucide-react';
 
 function getDisplayUrl(url: string) {
@@ -53,123 +50,198 @@ function getDownloadUrl(url: string, filename?: string) {
   return `/api/files?key=${encodeURIComponent(key)}&download=true${filename ? `&filename=${encodeURIComponent(filename)}` : ''}`;
 }
 
-// Rich Text Editor Formatting Toolbar Component
-function RichTextToolbar({
-  onInsertTag,
-  onInsertMedia,
+// Visual WYSIWYG Rich Text Editor Component
+function VisualRichTextEditor({
+  value,
+  onChange,
 }: {
-  onInsertTag: (startTag: string, endTag: string, defaultText?: string) => void;
-  onInsertMedia: () => void;
+  value: string;
+  onChange: (val: string) => void;
 }) {
+  const editorRef = useRef<HTMLDivElement>(null);
+  const isUpdatingRef = useRef(false);
+
+  useEffect(() => {
+    if (editorRef.current && !isUpdatingRef.current) {
+      if (editorRef.current.innerHTML !== (value || '')) {
+        editorRef.current.innerHTML = value || '';
+      }
+    }
+  }, [value]);
+
+  const handleInput = () => {
+    if (editorRef.current) {
+      isUpdatingRef.current = true;
+      onChange(editorRef.current.innerHTML);
+      setTimeout(() => {
+        isUpdatingRef.current = false;
+      }, 50);
+    }
+  };
+
+  const execCmd = (cmd: string, arg: string = '') => {
+    editorRef.current?.focus();
+    document.execCommand(cmd, false, arg);
+    handleInput();
+  };
+
+  const handleInsertMedia = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*,video/*';
+    input.onchange = async (e: any) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      const body = new FormData();
+      body.append('file', file);
+
+      try {
+        const res = await fetch('/api/admin/media/upload', {
+          method: 'POST',
+          body,
+        });
+        const data = await res.json();
+        if (data.success && data.fileUrl) {
+          const htmlTag = data.isVideo
+            ? `<div contenteditable="false" style="margin:16px 0;"><video src="${data.fileUrl}" controls style="max-width:100%; border-radius:16px; border:1px solid rgba(255,255,255,0.2);"></video></div><p><br></p>`
+            : `<div contenteditable="false" style="margin:16px 0;"><img src="${data.fileUrl}" alt="첨부 이미지" style="max-width:100%; border-radius:16px; border:1px solid rgba(255,255,255,0.2);" /></div><p><br></p>`;
+
+          editorRef.current?.focus();
+          document.execCommand('insertHTML', false, htmlTag);
+          handleInput();
+        } else {
+          alert(data.error || '미디어 업로드에 실패했습니다.');
+        }
+      } catch (err: any) {
+        alert('업로드 중 오류가 발생했습니다: ' + err.message);
+      }
+    };
+    input.click();
+  };
+
   return (
-    <div className="flex flex-wrap items-center gap-1.5 p-2 rounded-xl bg-white/5 border border-white/10 mb-2">
-      {/* Bold */}
-      <button
-        type="button"
-        onClick={() => onInsertTag('<b>', '</b>', '굵은 텍스트')}
-        className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-xs"
-        title="굵게 (Bold)"
-      >
-        <b>B</b>
-      </button>
+    <div className="space-y-2">
+      {/* Visual Formatting Toolbar */}
+      <div className="flex flex-wrap items-center gap-1.5 p-2 rounded-xl bg-[#141727] border border-white/15">
+        <button
+          type="button"
+          onClick={() => execCmd('bold')}
+          className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-purple-600/50 text-white font-black text-xs"
+          title="굵게 (Bold)"
+        >
+          <b>B</b>
+        </button>
+        <button
+          type="button"
+          onClick={() => execCmd('italic')}
+          className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-purple-600/50 text-white text-xs italic"
+          title="기울임 (Italic)"
+        >
+          <i>I</i>
+        </button>
+        <button
+          type="button"
+          onClick={() => execCmd('underline')}
+          className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-purple-600/50 text-white text-xs underline"
+          title="밑줄 (Underline)"
+        >
+          <u>U</u>
+        </button>
 
-      {/* Italic */}
-      <button
-        type="button"
-        onClick={() => onInsertTag('<i>', '</i>', '기울임 텍스트')}
-        className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs italic"
-        title="기울임 (Italic)"
-      >
-        <i>I</i>
-      </button>
+        <span className="w-px h-4 bg-white/20 mx-1" />
 
-      {/* Underline */}
-      <button
-        type="button"
-        onClick={() => onInsertTag('<u>', '</u>', '밑줄 텍스트')}
-        className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs underline"
-        title="밑줄 (Underline)"
-      >
-        <u>U</u>
-      </button>
+        <button
+          type="button"
+          onClick={() => execCmd('formatBlock', '<h2>')}
+          className="px-2.5 py-1 rounded-lg bg-purple-600/30 hover:bg-purple-600 text-purple-200 font-bold text-xs"
+        >
+          H1 대제목
+        </button>
+        <button
+          type="button"
+          onClick={() => execCmd('formatBlock', '<h3>')}
+          className="px-2.5 py-1 rounded-lg bg-purple-600/30 hover:bg-purple-600 text-purple-200 font-bold text-xs"
+        >
+          H2 중제목
+        </button>
 
-      <span className="w-px h-4 bg-white/20 mx-1" />
+        <span className="w-px h-4 bg-white/20 mx-1" />
 
-      {/* Headings */}
-      <button
-        type="button"
-        onClick={() => onInsertTag('<h2 style="font-size:22px; font-weight:bold; color:#ffffff; margin:16px 0;">', '</h2>', '대제목')}
-        className="px-2.5 py-1 rounded-lg bg-purple-600/30 hover:bg-purple-600/50 text-purple-300 font-bold text-xs"
-      >
-        H1 대제목
-      </button>
-      <button
-        type="button"
-        onClick={() => onInsertTag('<h3 style="font-size:18px; font-weight:bold; color:#c084fc; margin:12px 0;">', '</h3>', '중제목')}
-        className="px-2.5 py-1 rounded-lg bg-purple-600/30 hover:bg-purple-600/50 text-purple-300 font-bold text-xs"
-      >
-        H2 중제목
-      </button>
+        <select
+          onChange={(e) => {
+            if (e.target.value) {
+              execCmd('fontSize', e.target.value);
+              e.target.value = '';
+            }
+          }}
+          className="px-2 py-1 rounded-lg bg-[#1e2238] text-gray-200 text-xs font-semibold border border-white/10 focus:outline-none cursor-pointer"
+        >
+          <option value="">글자 크기</option>
+          <option value="2">작게 (12px)</option>
+          <option value="3">보통 (14px)</option>
+          <option value="4">크게 (18px)</option>
+          <option value="5">매우 크게 (24px)</option>
+          <option value="6">특대 (32px)</option>
+        </select>
 
-      <span className="w-px h-4 bg-white/20 mx-1" />
+        <select
+          onChange={(e) => {
+            if (e.target.value) {
+              execCmd('foreColor', e.target.value);
+              e.target.value = '';
+            }
+          }}
+          className="px-2 py-1 rounded-lg bg-[#1e2238] text-gray-200 text-xs font-semibold border border-white/10 focus:outline-none cursor-pointer"
+        >
+          <option value="">글자 색상</option>
+          <option value="#c084fc">🟣 보라색</option>
+          <option value="#f472b6">🩷 핑크색</option>
+          <option value="#facc15">🟡 노랑/골드</option>
+          <option value="#34d399">🟢 민트/초록</option>
+          <option value="#60a5fa">🔵 파란색</option>
+          <option value="#ffffff">⚪ 흰색</option>
+        </select>
 
-      {/* Font Size Selector */}
-      <select
-        onChange={(e) => {
-          if (e.target.value) {
-            onInsertTag(`<span style="font-size:${e.target.value}; font-weight:600;">`, '</span>', '글씨 크기');
-            e.target.value = '';
-          }
-        }}
-        className="px-2 py-1 rounded-lg bg-[#1a1d2d] text-gray-200 text-xs font-semibold border border-white/10 focus:outline-none cursor-pointer"
-      >
-        <option value="">글자 크기</option>
-        <option value="12px">작게 (12px)</option>
-        <option value="14px">보통 (14px)</option>
-        <option value="18px">크게 (18px)</option>
-        <option value="24px">매우 크게 (24px)</option>
-        <option value="32px">특대 (32px)</option>
-      </select>
+        <span className="w-px h-4 bg-white/20 mx-1" />
 
-      {/* Text Color Selector */}
-      <select
-        onChange={(e) => {
-          if (e.target.value) {
-            onInsertTag(`<span style="color:${e.target.value};">`, '</span>', '색상 텍스트');
-            e.target.value = '';
-          }
-        }}
-        className="px-2 py-1 rounded-lg bg-[#1a1d2d] text-gray-200 text-xs font-semibold border border-white/10 focus:outline-none cursor-pointer"
-      >
-        <option value="">글자 색상</option>
-        <option value="#a855f7">🟣 보라색</option>
-        <option value="#ec4899">🩷 핑크색</option>
-        <option value="#eab308">🟡 골드/노랑</option>
-        <option value="#10b981">🟢 민트/초록</option>
-        <option value="#3b82f6">🔵 파란색</option>
-        <option value="#ffffff">⚪ 흰색</option>
-      </select>
+        <button
+          type="button"
+          onClick={() => execCmd('insertUnorderedList')}
+          className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-gray-200 text-xs"
+          title="글머리 기호 목록"
+        >
+          • 목록
+        </button>
 
-      <span className="w-px h-4 bg-white/20 mx-1" />
+        <button
+          type="button"
+          onClick={() => execCmd('removeFormat')}
+          className="px-2 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-gray-400 text-xs"
+          title="서식 초기화"
+        >
+          서식 지우기
+        </button>
 
-      {/* Bullet List */}
-      <button
-        type="button"
-        onClick={() => onInsertTag('<ul style="list-style-type:disc; padding-left:20px; margin:12px 0;">\n  <li>', '</li>\n</ul>', '목록 항목')}
-        className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-gray-200 text-xs font-semibold"
-      >
-        • 목록
-      </button>
+        <button
+          type="button"
+          onClick={handleInsertMedia}
+          className="px-3 py-1 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 hover:opacity-90 text-white font-bold text-xs flex items-center gap-1.5 ml-auto shadow-md"
+        >
+          <ImageIcon className="w-3.5 h-3.5" />
+          <span>+ 사진 / 동영상 실시간 본문 삽입</span>
+        </button>
+      </div>
 
-      {/* Media Uploader */}
-      <button
-        type="button"
-        onClick={onInsertMedia}
-        className="px-2.5 py-1 rounded-lg bg-pink-600/40 hover:bg-pink-600/60 text-pink-200 font-bold text-xs flex items-center gap-1 ml-auto"
-      >
-        <ImageIcon className="w-3.5 h-3.5" />
-        <span>+ 사진/동영상 첨부</span>
-      </button>
+      {/* Editable Visual Container */}
+      <div
+        ref={editorRef}
+        contentEditable
+        onInput={handleInput}
+        onBlur={handleInput}
+        className="min-h-[240px] max-h-[500px] overflow-y-auto p-4 rounded-2xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-purple-500 font-sans leading-relaxed transition-colors select-text"
+        style={{ minHeight: '240px' }}
+      />
     </div>
   );
 }
@@ -243,60 +315,6 @@ export default function AdminDashboardPage() {
   const handleLogout = async () => {
     await fetch('/api/admin/logout', { method: 'POST' });
     router.push('/admin/login');
-  };
-
-  // Insert Rich Text Formatting Tag into State
-  const handleInsertTag = (
-    targetSetter: React.Dispatch<React.SetStateAction<any>>,
-    field: string,
-    startTag: string,
-    endTag: string,
-    defaultText: string = '텍스트'
-  ) => {
-    targetSetter((prev: any) => ({
-      ...prev,
-      [field]: (prev[field] || '') + `${startTag}${defaultText}${endTag}`,
-    }));
-  };
-
-  // Upload inline media (Image/Video) into post content
-  const handleInsertMedia = async (
-    targetSetter: React.Dispatch<React.SetStateAction<any>>,
-    field: string = 'content'
-  ) => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*,video/*';
-    input.onchange = async (e: any) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-
-      const body = new FormData();
-      body.append('file', file);
-
-      try {
-        const res = await fetch('/api/admin/media/upload', {
-          method: 'POST',
-          body,
-        });
-        const data = await res.json();
-        if (data.success && data.fileUrl) {
-          const tag = data.isVideo
-            ? `\n<video src="${data.fileUrl}" controls style="max-width:100%; border-radius:16px; margin:16px 0;"></video>\n`
-            : `\n<img src="${data.fileUrl}" alt="첨부 이미지" style="max-width:100%; border-radius:16px; margin:16px 0;" />\n`;
-
-          targetSetter((prev: any) => ({
-            ...prev,
-            [field]: (prev[field] || '') + tag,
-          }));
-        } else {
-          alert(data.error || '미디어 업로드에 실패했습니다.');
-        }
-      } catch (err: any) {
-        alert('업로드 중 오류가 발생했습니다: ' + err.message);
-      }
-    };
-    input.click();
   };
 
   // Delete Handlers
@@ -841,18 +859,10 @@ export default function AdminDashboardPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-gray-400 uppercase mb-1">본문 텍스트 서식 서명 툴바</label>
-                  <RichTextToolbar
-                    onInsertTag={(startTag, endTag, defaultText) => handleInsertTag(setNewInsight, 'content', startTag, endTag, defaultText)}
-                    onInsertMedia={() => handleInsertMedia(setNewInsight, 'content')}
-                  />
-                  <textarea
-                    rows={9}
-                    required
+                  <label className="block text-xs font-bold text-gray-400 uppercase mb-1">본문 내용 (WYSIWYG 실시간 비주얼 에디터)</label>
+                  <VisualRichTextEditor
                     value={newInsight.content}
-                    onChange={(e) => setNewInsight({ ...newInsight, content: e.target.value })}
-                    placeholder="본문 내용을 입력하세요. 상단 서식 툴바(굵게, 크기, 색상, 사진/동영상 첨부)를 활용해 서식을 자유롭게 스타일링할 수 있습니다."
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-purple-500 font-mono"
+                    onChange={(val) => setNewInsight({ ...newInsight, content: val })}
                   />
                 </div>
                 <div>
@@ -934,18 +944,10 @@ export default function AdminDashboardPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-gray-400 uppercase mb-1">공지 내용 서식 툴바</label>
-                  <RichTextToolbar
-                    onInsertTag={(startTag, endTag, defaultText) => handleInsertTag(setNewNotice, 'content', startTag, endTag, defaultText)}
-                    onInsertMedia={() => handleInsertMedia(setNewNotice, 'content')}
-                  />
-                  <textarea
-                    rows={9}
-                    required
+                  <label className="block text-xs font-bold text-gray-400 uppercase mb-1">공지 내용 (WYSIWYG 실시간 비주얼 에디터)</label>
+                  <VisualRichTextEditor
                     value={newNotice.content}
-                    onChange={(e) => setNewNotice({ ...newNotice, content: e.target.value })}
-                    placeholder="공지 내용을 작성해 주세요."
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-purple-500 font-mono"
+                    onChange={(val) => setNewNotice({ ...newNotice, content: val })}
                   />
                 </div>
                 <button
@@ -1021,18 +1023,10 @@ export default function AdminDashboardPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-gray-400 uppercase mb-1">답변 서식 툴바</label>
-                  <RichTextToolbar
-                    onInsertTag={(startTag, endTag, defaultText) => handleInsertTag(setNewFaq, 'answer', startTag, endTag, defaultText)}
-                    onInsertMedia={() => handleInsertMedia(setNewFaq, 'answer')}
-                  />
-                  <textarea
-                    rows={6}
-                    required
+                  <label className="block text-xs font-bold text-gray-400 uppercase mb-1">답변 (WYSIWYG 실시간 비주얼 에디터)</label>
+                  <VisualRichTextEditor
                     value={newFaq.answer}
-                    onChange={(e) => setNewFaq({ ...newFaq, answer: e.target.value })}
-                    placeholder="상세 답변 내용을 작성하세요."
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-purple-500 font-mono"
+                    onChange={(val) => setNewFaq({ ...newFaq, answer: val })}
                   />
                 </div>
                 <button
@@ -1205,17 +1199,10 @@ export default function AdminDashboardPage() {
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-gray-400 uppercase mb-1">본문 내용 서식 툴바</label>
-                <RichTextToolbar
-                  onInsertTag={(startTag, endTag, defaultText) => handleInsertTag(setEditInsightModal, 'content', startTag, endTag, defaultText)}
-                  onInsertMedia={() => handleInsertMedia(setEditInsightModal, 'content')}
-                />
-                <textarea
-                  rows={8}
-                  required
+                <label className="block text-xs font-bold text-gray-400 uppercase mb-1">본문 내용 (WYSIWYG 실시간 비주얼 에디터)</label>
+                <VisualRichTextEditor
                   value={editInsightModal.content}
-                  onChange={(e) => setEditInsightModal({ ...editInsightModal, content: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-purple-500 font-mono"
+                  onChange={(val) => setEditInsightModal({ ...editInsightModal, content: val })}
                 />
               </div>
               <div>
@@ -1270,17 +1257,10 @@ export default function AdminDashboardPage() {
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-gray-400 uppercase mb-1">내용 서식 툴바</label>
-                <RichTextToolbar
-                  onInsertTag={(startTag, endTag, defaultText) => handleInsertTag(setEditNoticeModal, 'content', startTag, endTag, defaultText)}
-                  onInsertMedia={() => handleInsertMedia(setEditNoticeModal, 'content')}
-                />
-                <textarea
-                  rows={8}
-                  required
+                <label className="block text-xs font-bold text-gray-400 uppercase mb-1">내용 (WYSIWYG 실시간 비주얼 에디터)</label>
+                <VisualRichTextEditor
                   value={editNoticeModal.content}
-                  onChange={(e) => setEditNoticeModal({ ...editNoticeModal, content: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-purple-500 font-mono"
+                  onChange={(val) => setEditNoticeModal({ ...editNoticeModal, content: val })}
                 />
               </div>
               <div className="flex items-center justify-end gap-3 pt-4">
@@ -1335,17 +1315,10 @@ export default function AdminDashboardPage() {
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-gray-400 uppercase mb-1">답변 서식 툴바</label>
-                <RichTextToolbar
-                  onInsertTag={(startTag, endTag, defaultText) => handleInsertTag(setEditFaqModal, 'answer', startTag, endTag, defaultText)}
-                  onInsertMedia={() => handleInsertMedia(setEditFaqModal, 'answer')}
-                />
-                <textarea
-                  rows={6}
-                  required
+                <label className="block text-xs font-bold text-gray-400 uppercase mb-1">답변 (WYSIWYG 실시간 비주얼 에디터)</label>
+                <VisualRichTextEditor
                   value={editFaqModal.answer}
-                  onChange={(e) => setEditFaqModal({ ...editFaqModal, answer: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-purple-500 font-mono"
+                  onChange={(val) => setEditFaqModal({ ...editFaqModal, answer: val })}
                 />
               </div>
               <div className="flex items-center justify-end gap-3 pt-4">
