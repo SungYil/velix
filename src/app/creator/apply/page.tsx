@@ -63,7 +63,15 @@ export default function CreatorApplyPage() {
         body,
       });
 
-      const data = await res.json();
+      let data: any = {};
+      const contentType = res.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        data = await res.json();
+      } else {
+        const text = await res.text();
+        throw new Error(`서버 응답 오류 (${res.status}): ${text.replace(/<[^>]*>?/gm, '').substring(0, 80)}`);
+      }
+
       if (!res.ok) {
         throw new Error(data.error || '제출에 실패하였습니다.');
       }
