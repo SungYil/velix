@@ -1,15 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
-import path from 'path';
-import fs from 'fs';
-
-function getProjectRoot() {
-  const cwd = process.cwd();
-  if (cwd.includes('.next/standalone')) {
-    return path.resolve(cwd.split('.next/standalone')[0]);
-  }
-  return cwd;
-}
+import { uploadFileToStorage } from '@/lib/s3';
 
 function isAuthenticated(req: NextRequest) {
   const authCookie = req.cookies.get('velix_admin_auth');
@@ -39,25 +30,8 @@ export async function POST(req: NextRequest) {
     if (thumbnailFile && thumbnailFile.size > 0) {
       const bytes = await thumbnailFile.arrayBuffer();
       const buffer = Buffer.from(bytes);
-
-      const rootDir = getProjectRoot();
-      const uploadsDir = path.join(rootDir, 'public', 'uploads');
-      if (!fs.existsSync(uploadsDir)) {
-        fs.mkdirSync(uploadsDir, { recursive: true });
-      }
-
-      const fileExt = path.extname(thumbnailFile.name) || '.jpg';
-      const uniqueName = `insight_${Date.now()}_${Math.random().toString(36).substring(2, 8)}${fileExt}`;
-      const filePath = path.join(uploadsDir, uniqueName);
-
-      fs.writeFileSync(filePath, buffer);
-      thumbnail = `/uploads/${uniqueName}`;
-
-      const standaloneUploads = path.join(process.cwd(), 'public', 'uploads');
-      if (process.cwd().includes('.next/standalone') && !fs.existsSync(standaloneUploads)) {
-        fs.mkdirSync(standaloneUploads, { recursive: true });
-        fs.writeFileSync(path.join(standaloneUploads, uniqueName), buffer);
-      }
+      const uploadRes = await uploadFileToStorage(buffer, thumbnailFile.name, thumbnailFile.type, 'insight');
+      thumbnail = uploadRes.fileUrl;
     }
 
     if (!thumbnail) {
