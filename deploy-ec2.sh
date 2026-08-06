@@ -31,7 +31,8 @@ echo "🚀 [4/6] 디렉토리 및 권한 준비..."
 mkdir -p data public/uploads
 chmod -R 777 data public/uploads
 
-echo "🚀 [5/6] 이전 빌드 정리 및 Standalone 프로덕션 빌드..."
+echo "🚀 [5/6] 이전 빌드 및 구버전 구동 파일 정리..."
+rm -f server.js
 npm install
 npm rebuild better-sqlite3
 rm -rf .next
@@ -53,10 +54,11 @@ if [ ! -f ".next/standalone/server.js" ]; then
 fi
 
 echo "🚀 [6/6] PM2 무중단 프로세스 초기화 및 구동..."
-pm2 delete velix 2>/dev/null || true
+pm2 delete all 2>/dev/null || true
 pm2 kill 2>/dev/null || true
+pm2 flush 2>/dev/null || true
 pm2 start ecosystem.config.js
-pm2 save
+pm2 save --force
 
 echo "🚀 [7/7] Nginx 설정 (AWS ALB 헬스체크 및 도메인 호환)..."
 sudo cat <<EOF | sudo tee /etc/nginx/sites-available/velix
