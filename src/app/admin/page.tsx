@@ -17,8 +17,38 @@ import {
   X,
   FileDown,
   Sparkles,
+  Edit,
+  Image as ImageIcon,
+  Video as VideoIcon,
+  Paperclip,
   ExternalLink,
 } from 'lucide-react';
+
+function getDisplayUrl(url: string) {
+  if (!url) return '';
+  if (url.startsWith('/api/files') || url.startsWith('/uploads/') || url.startsWith('http://') || url.startsWith('https://')) {
+    if (url.includes('s3.ap-northeast-2.amazonaws.com/')) {
+      const key = url.split('amazonaws.com/')[1] || '';
+      return `/api/files?key=${encodeURIComponent(key)}`;
+    }
+    return url;
+  }
+  return url;
+}
+
+function getDownloadUrl(url: string, filename?: string) {
+  if (!url) return '';
+  let key = url;
+  if (url.includes('s3.ap-northeast-2.amazonaws.com/')) {
+    key = url.split('amazonaws.com/')[1] || '';
+  } else if (url.startsWith('/uploads/')) {
+    key = url.replace(/^\//, '');
+  } else if (url.startsWith('/api/files')) {
+    const search = url.split('?key=')[1];
+    if (search) key = decodeURIComponent(search.split('&')[0]);
+  }
+  return `/api/files?key=${encodeURIComponent(key)}&download=true${filename ? `&filename=${encodeURIComponent(filename)}` : ''}`;
+}
 
 export default function AdminDashboardPage() {
   const [activeTab, setActiveTab] = useState<'creators' | 'business' | 'insights' | 'notices' | 'faqs'>('creators');
@@ -35,9 +65,15 @@ export default function AdminDashboardPage() {
   // Selected Detail Modal
   const [selectedItem, setSelectedItem] = useState<any | null>(null);
 
-  // Form states for CMS
+  // Edit Modal States
+  const [editInsightModal, setEditInsightModal] = useState<any | null>(null);
+  const [editNoticeModal, setEditNoticeModal] = useState<any | null>(null);
+  const [editFaqModal, setEditFaqModal] = useState<any | null>(null);
+
+  // Form states for CMS Creation
   const [newInsight, setNewInsight] = useState({ title: '', category: 'INSIGHT', excerpt: '', content: '', thumbnailUrl: '' });
   const [insightFile, setInsightFile] = useState<File | null>(null);
+  const [editInsightFile, setEditInsightFile] = useState<File | null>(null);
   const [newNotice, setNewNotice] = useState({ title: '', content: '' });
   const [newFaq, setNewFaq] = useState({ question: '', answer: '', category: '일반' });
 
@@ -59,27 +95,22 @@ export default function AdminDashboardPage() {
   }, [router]);
 
   const loadAllData = () => {
-    // Load Applications
     fetch('/api/admin/applications')
       .then((res) => res.json())
       .then((data) => setApplications(data.applications || []));
 
-    // Load Inquiries
     fetch('/api/admin/inquiries')
       .then((res) => res.json())
       .then((data) => setInquiries(data.inquiries || []));
 
-    // Load Insights
     fetch('/api/insights?limit=50')
       .then((res) => res.json())
       .then((data) => setInsights(data.insights || []));
 
-    // Load Notices
     fetch('/api/notices')
       .then((res) => res.json())
       .then((data) => setNotices(data.notices || []));
 
-    // Load FAQs
     fetch('/api/faqs')
       .then((res) => res.json())
       .then((data) => setFaqs(data.faqs || []));
@@ -90,6 +121,46 @@ export default function AdminDashboardPage() {
     router.push('/admin/login');
   };
 
+  // Upload inline media (Image/Video) into post content
+  const handleInsertMedia = async (
+    targetSetter: React.Dispatch<React.SetStateAction<any>>,
+    field: string = 'content'
+  ) => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*,video/*';
+    input.onchange = async (e: any) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      const body = new FormData();
+      body.append('file', file);
+
+      try {
+        const res = await fetch('/api/admin/media/upload', {
+          method: 'POST',
+          body,
+        });
+        const data = await res.json();
+        if (data.success && data.fileUrl) {
+          const tag = data.isVideo
+            ? `\n<video src="${data.fileUrl}" controls style="max-width:100%; border-radius:16px; margin:16px 0;"></video>\n`
+            : `\n<img src="${data.fileUrl}" alt="첨부 이미지" style="max-width:100%; border-radius:16px; margin:16px 0;" />\n`;
+
+          targetSetter((prev: any) => ({
+            ...prev,
+            [field]: (prev[field] || '') + tag,
+          }));
+        } else {
+          alert(data.error || '미디어 업로드에 실패했습니다.');
+        }
+      } catch (err: any) {
+        alert('업로드 중 오류가 발생했습니다: ' + err.message);
+      }
+    };
+    input.click();
+  };
+
   // Delete Handlers
   const handleDeleteApplication = async (id: number) => {
     if (!confirm('이 지원서를 삭제하시겠습니까?')) return;
@@ -98,27 +169,27 @@ export default function AdminDashboardPage() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id }),
     });
-    setApplications((prev) => prev.filter((a) => a.id !== id));
+    loadAllData();
   };
 
   const handleDeleteInquiry = async (id: number) => {
-    if (!confirm('이 비즈니스 문의를 삭제하시겠습니까?')) return;
+    if (!confirm('이 문의건을 삭제하시겠습니까?')) return;
     await fetch('/api/admin/inquiries', {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id }),
     });
-    setInquiries((prev) => prev.filter((i) => i.id !== id));
+    loadAllData();
   };
 
   const handleDeleteInsight = async (id: number) => {
-    if (!confirm('이 인사이트 글을 삭제하시겠습니까?')) return;
+    if (!confirm('이 인사이트 게시글을 삭제하시겠습니까?')) return;
     await fetch('/api/admin/insights', {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id }),
     });
-    setInsights((prev) => prev.filter((i) => i.id !== id));
+    loadAllData();
   };
 
   const handleDeleteNotice = async (id: number) => {
@@ -128,7 +199,7 @@ export default function AdminDashboardPage() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id }),
     });
-    setNotices((prev) => prev.filter((n) => n.id !== id));
+    loadAllData();
   };
 
   const handleDeleteFaq = async (id: number) => {
@@ -138,42 +209,64 @@ export default function AdminDashboardPage() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id }),
     });
-    setFaqs((prev) => prev.filter((f) => f.id !== id));
+    loadAllData();
   };
 
-  // Create CMS Handlers
+  // Create Handlers
   const handleCreateInsight = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const formData = new FormData();
-      formData.append('title', newInsight.title);
-      formData.append('category', newInsight.category);
-      formData.append('excerpt', newInsight.excerpt);
-      formData.append('content', newInsight.content);
-      formData.append('thumbnailUrl', newInsight.thumbnailUrl);
-      if (insightFile) {
-        formData.append('thumbnail', insightFile);
-      }
+      const body = new FormData();
+      body.append('title', newInsight.title);
+      body.append('category', newInsight.category);
+      body.append('excerpt', newInsight.excerpt);
+      body.append('content', newInsight.content);
+      body.append('thumbnailUrl', newInsight.thumbnailUrl);
+      if (insightFile) body.append('thumbnail', insightFile);
 
-      const res = await fetch('/api/admin/insights', {
-        method: 'POST',
-        body: formData,
-      });
-
+      const res = await fetch('/api/admin/insights', { method: 'POST', body });
       const data = await res.json();
-      if (res.ok) {
-        setNewInsight({ title: '', category: 'INSIGHT', excerpt: '', content: '', thumbnailUrl: '' });
-        setInsightFile(null);
-        setActionSuccess('인사이트가 성공적으로 등록되었습니다.');
-        setTimeout(() => setActionSuccess(''), 3000);
-        loadAllData();
-      } else {
-        alert(data.error || '인사이트 등록 중 오류가 발생했습니다.');
-      }
+      if (!res.ok) throw new Error(data.error || '등록 실패');
+
+      setActionSuccess('인사이트가 새로 등록되었습니다!');
+      setNewInsight({ title: '', category: 'INSIGHT', excerpt: '', content: '', thumbnailUrl: '' });
+      setInsightFile(null);
+      loadAllData();
+      setTimeout(() => setActionSuccess(''), 3000);
     } catch (err: any) {
-      console.error(err);
-      alert(err.message || '등록 중 오류가 발생했습니다.');
+      alert(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Edit Handlers
+  const handleUpdateInsight = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editInsightModal) return;
+    setLoading(true);
+    try {
+      const body = new FormData();
+      body.append('id', editInsightModal.id);
+      body.append('title', editInsightModal.title);
+      body.append('category', editInsightModal.category || 'INSIGHT');
+      body.append('excerpt', editInsightModal.excerpt || '');
+      body.append('content', editInsightModal.content);
+      body.append('existingThumbnail', editInsightModal.thumbnail || '');
+      if (editInsightFile) body.append('thumbnail', editInsightFile);
+
+      const res = await fetch('/api/admin/insights', { method: 'PUT', body });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || '수정 실패');
+
+      setActionSuccess('인사이트 게시글이 성공적으로 수정되었습니다!');
+      setEditInsightModal(null);
+      setEditInsightFile(null);
+      loadAllData();
+      setTimeout(() => setActionSuccess(''), 3000);
+    } catch (err: any) {
+      alert(err.message);
     } finally {
       setLoading(false);
     }
@@ -188,19 +281,39 @@ export default function AdminDashboardPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newNotice),
       });
-
       const data = await res.json();
-      if (res.ok) {
-        setNewNotice({ title: '', content: '' });
-        setActionSuccess('공지사항이 성공적으로 등록되었습니다.');
-        setTimeout(() => setActionSuccess(''), 3000);
-        loadAllData();
-      } else {
-        alert(data.error || '공지사항 등록 중 오류가 발생했습니다.');
-      }
+      if (!res.ok) throw new Error(data.error || '등록 실패');
+
+      setActionSuccess('공지사항이 등록되었습니다!');
+      setNewNotice({ title: '', content: '' });
+      loadAllData();
+      setTimeout(() => setActionSuccess(''), 3000);
     } catch (err: any) {
-      console.error(err);
-      alert(err.message || '등록 중 오류가 발생했습니다.');
+      alert(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpdateNotice = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editNoticeModal) return;
+    setLoading(true);
+    try {
+      const res = await fetch('/api/admin/notices', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editNoticeModal),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || '수정 실패');
+
+      setActionSuccess('공지사항이 성공적으로 수정되었습니다!');
+      setEditNoticeModal(null);
+      loadAllData();
+      setTimeout(() => setActionSuccess(''), 3000);
+    } catch (err: any) {
+      alert(err.message);
     } finally {
       setLoading(false);
     }
@@ -215,569 +328,909 @@ export default function AdminDashboardPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newFaq),
       });
-
       const data = await res.json();
-      if (res.ok) {
-        setNewFaq({ question: '', answer: '', category: '일반' });
-        setActionSuccess('FAQ 항목이 성공적으로 등록되었습니다.');
-        setTimeout(() => setActionSuccess(''), 3000);
-        loadAllData();
-      } else {
-        alert(data.error || 'FAQ 등록 중 오류가 발생했습니다.');
-      }
+      if (!res.ok) throw new Error(data.error || '등록 실패');
+
+      setActionSuccess('FAQ가 등록되었습니다!');
+      setNewFaq({ question: '', answer: '', category: '일반' });
+      loadAllData();
+      setTimeout(() => setActionSuccess(''), 3000);
     } catch (err: any) {
-      console.error(err);
-      alert(err.message || '등록 중 오류가 발생했습니다.');
+      alert(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpdateFaq = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editFaqModal) return;
+    setLoading(true);
+    try {
+      const res = await fetch('/api/admin/faqs', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editFaqModal),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || '수정 실패');
+
+      setActionSuccess('FAQ가 성공적으로 수정되었습니다!');
+      setEditFaqModal(null);
+      loadAllData();
+      setTimeout(() => setActionSuccess(''), 3000);
+    } catch (err: any) {
+      alert(err.message);
     } finally {
       setLoading(false);
     }
   };
 
   if (!authChecked) {
-    return <div className="min-h-screen flex items-center justify-center text-white">인증 확인 중...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center text-white">
+        <div className="flex items-center gap-3">
+          <Sparkles className="w-6 h-6 text-purple-400 animate-spin" />
+          <span className="text-sm font-semibold">관리자 인증 상태 확인 중...</span>
+        </div>
+      </div>
+    );
   }
 
+  // Parse files list for applications or inquiries
+  const parseFilesList = (item: any) => {
+    if (item.files_json) {
+      try {
+        const parsed = JSON.parse(item.files_json);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      } catch {}
+    }
+    if (item.file_url) {
+      return [{ url: item.file_url, name: item.file_name || '첨부파일' }];
+    }
+    return [];
+  };
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
+    <div className="min-h-screen bg-[#0A0B10] text-gray-100 p-4 sm:p-8">
       {/* Top Admin Header */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-6 border-b border-white/10">
+      <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-8 border-b border-white/10">
         <div>
-          <span className="text-xs uppercase font-bold tracking-widest text-purple-400">Management Panel</span>
-          <h1 className="text-3xl font-black text-white">VelixENT 관리자 대시보드</h1>
+          <span className="text-xs uppercase font-bold tracking-widest text-purple-400 bg-purple-500/10 px-3 py-1 rounded-full border border-purple-500/20">
+            VelixENT Admin CMS
+          </span>
+          <h1 className="text-3xl font-black text-white mt-2">관리자 종합 통합 대시보드</h1>
         </div>
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-rose-600/20 text-rose-300 hover:bg-rose-600/40 font-bold text-xs transition-colors"
-        >
-          <LogOut className="w-4 h-4" />
-          <span>관리자 로그아웃</span>
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => router.push('/')}
+            className="px-4 py-2 rounded-xl glass-panel hover:bg-white/10 text-xs font-semibold text-gray-300 flex items-center gap-1.5"
+          >
+            <ExternalLink className="w-3.5 h-3.5" />
+            <span>메인 웹사이트 이동</span>
+          </button>
+          <button
+            onClick={handleLogout}
+            className="px-4 py-2 rounded-xl bg-rose-600/20 border border-rose-500/30 hover:bg-rose-600/30 text-rose-300 text-xs font-bold flex items-center gap-1.5"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            <span>로그아웃</span>
+          </button>
+        </div>
       </div>
 
       {actionSuccess && (
-        <div className="p-4 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-sm flex items-center gap-2">
-          <CheckCircle className="w-5 h-5" />
+        <div className="max-w-7xl mx-auto mt-4 p-4 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-sm flex items-center gap-2">
+          <CheckCircle className="w-5 h-5 shrink-0" />
           <span>{actionSuccess}</span>
         </div>
       )}
 
       {/* Tabs */}
-      <div className="flex flex-wrap gap-2 p-1.5 rounded-2xl glass-panel border border-white/10">
+      <div className="max-w-7xl mx-auto mt-8 flex flex-wrap gap-2 pb-4 border-b border-white/10">
         <button
           onClick={() => setActiveTab('creators')}
-          className={`flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-xs transition-all ${
-            activeTab === 'creators'
-              ? 'bg-purple-600 text-white shadow-lg'
-              : 'text-gray-400 hover:text-white hover:bg-white/5'
+          className={`px-5 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 transition-colors ${
+            activeTab === 'creators' ? 'bg-purple-600 text-white shadow-lg' : 'glass-panel text-gray-400 hover:text-white'
           }`}
         >
           <Users className="w-4 h-4" />
           <span>크리에이터 지원서 ({applications.length})</span>
         </button>
-
         <button
           onClick={() => setActiveTab('business')}
-          className={`flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-xs transition-all ${
-            activeTab === 'business'
-              ? 'bg-cyan-600 text-white shadow-lg'
-              : 'text-gray-400 hover:text-white hover:bg-white/5'
+          className={`px-5 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 transition-colors ${
+            activeTab === 'business' ? 'bg-purple-600 text-white shadow-lg' : 'glass-panel text-gray-400 hover:text-white'
           }`}
         >
           <Briefcase className="w-4 h-4" />
           <span>비즈니스 문의 ({inquiries.length})</span>
         </button>
-
         <button
           onClick={() => setActiveTab('insights')}
-          className={`flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-xs transition-all ${
-            activeTab === 'insights'
-              ? 'bg-amber-600 text-white shadow-lg'
-              : 'text-gray-400 hover:text-white hover:bg-white/5'
+          className={`px-5 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 transition-colors ${
+            activeTab === 'insights' ? 'bg-purple-600 text-white shadow-lg' : 'glass-panel text-gray-400 hover:text-white'
           }`}
         >
           <FileText className="w-4 h-4" />
-          <span>인사이트 CMS ({insights.length})</span>
+          <span>인사이트 관리 ({insights.length})</span>
         </button>
-
         <button
           onClick={() => setActiveTab('notices')}
-          className={`flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-xs transition-all ${
-            activeTab === 'notices'
-              ? 'bg-violet-600 text-white shadow-lg'
-              : 'text-gray-400 hover:text-white hover:bg-white/5'
+          className={`px-5 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 transition-colors ${
+            activeTab === 'notices' ? 'bg-purple-600 text-white shadow-lg' : 'glass-panel text-gray-400 hover:text-white'
           }`}
         >
           <Bell className="w-4 h-4" />
-          <span>공지사항 CMS ({notices.length})</span>
+          <span>공지사항 관리 ({notices.length})</span>
         </button>
-
         <button
           onClick={() => setActiveTab('faqs')}
-          className={`flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-xs transition-all ${
-            activeTab === 'faqs'
-              ? 'bg-pink-600 text-white shadow-lg'
-              : 'text-gray-400 hover:text-white hover:bg-white/5'
+          className={`px-5 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 transition-colors ${
+            activeTab === 'faqs' ? 'bg-purple-600 text-white shadow-lg' : 'glass-panel text-gray-400 hover:text-white'
           }`}
         >
           <HelpCircle className="w-4 h-4" />
-          <span>FAQ CMS ({faqs.length})</span>
+          <span>FAQ 관리 ({faqs.length})</span>
         </button>
       </div>
 
-      {/* TAB 1: Creator Applications */}
-      {activeTab === 'creators' && (
-        <div className="rounded-3xl glass-panel border border-white/10 p-6 space-y-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-black text-white">접수된 크리에이터 지원자 목록</h2>
-            <span className="text-xs text-gray-400">총 {applications.length}건</span>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-gray-300">
-              <thead className="bg-white/5 text-gray-400 font-bold uppercase border-b border-white/10">
-                <tr>
-                  <th className="py-3 px-4">접수일</th>
-                  <th className="py-3 px-4">이름</th>
-                  <th className="py-3 px-4">성별</th>
-                  <th className="py-3 px-4">연락처</th>
-                  <th className="py-3 px-4">이메일</th>
-                  <th className="py-3 px-4">스튜디오여부</th>
-                  <th className="py-3 px-4">첨부파일</th>
-                  <th className="py-3 px-4">상세/관리</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/5">
-                {applications.map((app) => (
-                  <tr key={app.id} className="hover:bg-white/5 transition-colors">
-                    <td className="py-3 px-4">{new Date(app.created_at).toLocaleDateString()}</td>
-                    <td className="py-3 px-4 font-bold text-white">{app.name}</td>
-                    <td className="py-3 px-4">{app.gender}</td>
-                    <td className="py-3 px-4 font-mono">{app.phone}</td>
-                    <td className="py-3 px-4 font-mono">{app.email}</td>
-                    <td className="py-3 px-4">
-                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                        app.has_studio === 'Y' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-rose-500/20 text-rose-300'
-                      }`}>
-                        {app.has_studio === 'Y' ? '보유' : '미보유'}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4">
-                      {app.file_url ? (
-                        <a
-                          href={app.file_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-1 text-purple-400 hover:underline font-semibold"
-                        >
-                          <Download className="w-3.5 h-3.5" />
-                          <span>{app.file_name || '다운로드'}</span>
-                        </a>
-                      ) : (
-                        <span className="text-gray-600">없음</span>
-                      )}
-                    </td>
-                    <td className="py-3 px-4 flex items-center gap-2">
-                      <button
-                        onClick={() => setSelectedItem({ type: 'creator', data: app })}
-                        className="p-1.5 rounded bg-purple-600/30 text-purple-300 hover:bg-purple-600/50"
-                        title="상세보기"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteApplication(app.id)}
-                        className="p-1.5 rounded bg-rose-600/30 text-rose-300 hover:bg-rose-600/50"
-                        title="삭제"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-                {applications.length === 0 && (
-                  <tr>
-                    <td colSpan={8} className="py-8 text-center text-gray-500">
-                      접수된 지원서가 없습니다.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-
-      {/* TAB 2: Business Inquiries */}
-      {activeTab === 'business' && (
-        <div className="rounded-3xl glass-panel border border-white/10 p-6 space-y-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-black text-white">접수된 비즈니스 문의 목록</h2>
-            <span className="text-xs text-gray-400">총 {inquiries.length}건</span>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-gray-300">
-              <thead className="bg-white/5 text-gray-400 font-bold uppercase border-b border-white/10">
-                <tr>
-                  <th className="py-3 px-4">접수일</th>
-                  <th className="py-3 px-4">이름/담당자</th>
-                  <th className="py-3 px-4">이메일</th>
-                  <th className="py-3 px-4">연락처</th>
-                  <th className="py-3 px-4">SNS/회사주소</th>
-                  <th className="py-3 px-4">첨부파일</th>
-                  <th className="py-3 px-4">상세/관리</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/5">
-                {inquiries.map((inq) => (
-                  <tr key={inq.id} className="hover:bg-white/5 transition-colors">
-                    <td className="py-3 px-4">{new Date(inq.created_at).toLocaleDateString()}</td>
-                    <td className="py-3 px-4 font-bold text-white">{inq.name}</td>
-                    <td className="py-3 px-4 font-mono">{inq.email}</td>
-                    <td className="py-3 px-4 font-mono">{inq.phone}</td>
-                    <td className="py-3 px-4 truncate max-w-[150px]">{inq.sns || '-'}</td>
-                    <td className="py-3 px-4">
-                      {inq.file_url ? (
-                        <a
-                          href={inq.file_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-1 text-cyan-400 hover:underline font-semibold"
-                        >
-                          <Download className="w-3.5 h-3.5" />
-                          <span>{inq.file_name || '다운로드'}</span>
-                        </a>
-                      ) : (
-                        <span className="text-gray-600">없음</span>
-                      )}
-                    </td>
-                    <td className="py-3 px-4 flex items-center gap-2">
-                      <button
-                        onClick={() => setSelectedItem({ type: 'business', data: inq })}
-                        className="p-1.5 rounded bg-cyan-600/30 text-cyan-300 hover:bg-cyan-600/50"
-                        title="상세보기"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteInquiry(inq.id)}
-                        className="p-1.5 rounded bg-rose-600/30 text-rose-300 hover:bg-rose-600/50"
-                        title="삭제"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-                {inquiries.length === 0 && (
-                  <tr>
-                    <td colSpan={7} className="py-8 text-center text-gray-500">
-                      접수된 문의사항이 없습니다.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-
-      {/* TAB 3: Insights CMS */}
-      {activeTab === 'insights' && (
-        <div className="space-y-8">
-          {/* Form */}
-          <form onSubmit={handleCreateInsight} className="rounded-3xl glass-panel border border-white/10 p-6 sm:p-8 space-y-6">
-            <h2 className="text-xl font-black text-white flex items-center gap-2">
-              <Plus className="w-5 h-5 text-amber-400" />
-              새 인사이트 아티클 등록
+      {/* Main Content Areas */}
+      <div className="max-w-7xl mx-auto mt-8">
+        {/* Tab 1: Creators Applications */}
+        {activeTab === 'creators' && (
+          <div className="space-y-6">
+            <h2 className="text-xl font-bold text-white flex items-center gap-2">
+              <Users className="w-5 h-5 text-purple-400" />
+              <span>접수된 크리에이터 / BJ 지원서 목록</span>
             </h2>
+            <div className="glass-panel rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm">
+                  <thead className="bg-white/5 text-gray-400 text-xs font-semibold uppercase">
+                    <tr>
+                      <th className="p-4">접수일시</th>
+                      <th className="p-4">성명/활동명</th>
+                      <th className="p-4">성별</th>
+                      <th className="p-4">연락처</th>
+                      <th className="p-4">이메일</th>
+                      <th className="p-4">스튜디오</th>
+                      <th className="p-4">첨부파일(미디어)</th>
+                      <th className="p-4 text-center">관리</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/5 text-gray-300">
+                    {applications.length === 0 ? (
+                      <tr>
+                        <td colSpan={8} className="p-8 text-center text-gray-500">
+                          접수된 크리에이터 지원서가 없습니다.
+                        </td>
+                      </tr>
+                    ) : (
+                      applications.map((app) => {
+                        const fileList = parseFilesList(app);
+                        return (
+                          <tr key={app.id} className="hover:bg-white/5 transition-colors">
+                            <td className="p-4 text-xs text-gray-400">{new Date(app.created_at).toLocaleString('ko-KR')}</td>
+                            <td className="p-4 font-bold text-white">{app.name}</td>
+                            <td className="p-4">{app.gender}</td>
+                            <td className="p-4 text-purple-300">{app.phone}</td>
+                            <td className="p-4">{app.email}</td>
+                            <td className="p-4">
+                              <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${app.has_studio === 'Y' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-amber-500/20 text-amber-300'}`}>
+                                {app.has_studio === 'Y' ? '보유' : '미보유'}
+                              </span>
+                            </td>
+                            <td className="p-4">
+                              {fileList.length > 0 ? (
+                                <div className="flex flex-col gap-1.5">
+                                  {fileList.map((f: any, idx: number) => (
+                                    <a
+                                      key={idx}
+                                      href={getDownloadUrl(f.url, f.name)}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="inline-flex items-center gap-1.5 text-xs text-purple-400 hover:text-purple-300 underline font-semibold"
+                                    >
+                                      <FileDown className="w-3.5 h-3.5" />
+                                      <span className="max-w-[140px] truncate">{f.name || `파일 ${idx + 1}`}</span>
+                                    </a>
+                                  ))}
+                                </div>
+                              ) : (
+                                <span className="text-gray-500 text-xs">-</span>
+                              )}
+                            </td>
+                            <td className="p-4 text-center">
+                              <div className="flex items-center justify-center gap-2">
+                                <button
+                                  onClick={() => setSelectedItem({ type: 'creator', data: app })}
+                                  className="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-gray-300 hover:text-white transition-colors"
+                                  title="상세보기"
+                                >
+                                  <Eye className="w-4 h-4" />
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteApplication(app.id)}
+                                  className="p-2 rounded-lg bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 transition-colors"
+                                  title="삭제"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <input
-                type="text"
-                required
-                placeholder="제목"
-                value={newInsight.title}
-                onChange={(e) => setNewInsight({ ...newInsight, title: e.target.value })}
-                className="px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm"
-              />
-              <input
-                type="text"
-                placeholder="카테고리 (예: 트렌드, 브랜딩)"
-                value={newInsight.category}
-                onChange={(e) => setNewInsight({ ...newInsight, category: e.target.value })}
-                className="px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm"
-              />
+        {/* Tab 2: Business Inquiries */}
+        {activeTab === 'business' && (
+          <div className="space-y-6">
+            <h2 className="text-xl font-bold text-white flex items-center gap-2">
+              <Briefcase className="w-5 h-5 text-purple-400" />
+              <span>접수된 비즈니스 제휴 / 문의 목록</span>
+            </h2>
+            <div className="glass-panel rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm">
+                  <thead className="bg-white/5 text-gray-400 text-xs font-semibold uppercase">
+                    <tr>
+                      <th className="p-4">접수일시</th>
+                      <th className="p-4">문의자/회사명</th>
+                      <th className="p-4">연락처</th>
+                      <th className="p-4">이메일</th>
+                      <th className="p-4">첨부 제안서</th>
+                      <th className="p-4 text-center">관리</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/5 text-gray-300">
+                    {inquiries.length === 0 ? (
+                      <tr>
+                        <td colSpan={6} className="p-8 text-center text-gray-500">
+                          접수된 비즈니스 문의가 없습니다.
+                        </td>
+                      </tr>
+                    ) : (
+                      inquiries.map((inq) => {
+                        const fileList = parseFilesList(inq);
+                        return (
+                          <tr key={inq.id} className="hover:bg-white/5 transition-colors">
+                            <td className="p-4 text-xs text-gray-400">{new Date(inq.created_at).toLocaleString('ko-KR')}</td>
+                            <td className="p-4 font-bold text-white">{inq.name}</td>
+                            <td className="p-4 text-purple-300">{inq.phone}</td>
+                            <td className="p-4">{inq.email}</td>
+                            <td className="p-4">
+                              {fileList.length > 0 ? (
+                                <div className="flex flex-col gap-1.5">
+                                  {fileList.map((f: any, idx: number) => (
+                                    <a
+                                      key={idx}
+                                      href={getDownloadUrl(f.url, f.name)}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="inline-flex items-center gap-1.5 text-xs text-purple-400 hover:text-purple-300 underline font-semibold"
+                                    >
+                                      <FileDown className="w-3.5 h-3.5" />
+                                      <span className="max-w-[140px] truncate">{f.name || `제안서 ${idx + 1}`}</span>
+                                    </a>
+                                  ))}
+                                </div>
+                              ) : (
+                                <span className="text-gray-500 text-xs">-</span>
+                              )}
+                            </td>
+                            <td className="p-4 text-center">
+                              <div className="flex items-center justify-center gap-2">
+                                <button
+                                  onClick={() => setSelectedItem({ type: 'business', data: inq })}
+                                  className="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-gray-300 hover:text-white transition-colors"
+                                  title="상세보기"
+                                >
+                                  <Eye className="w-4 h-4" />
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteInquiry(inq.id)}
+                                  className="p-2 rounded-lg bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 transition-colors"
+                                  title="삭제"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Tab 3: Insights CMS */}
+        {activeTab === 'insights' && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Create Form */}
+            <div className="glass-panel p-6 rounded-2xl border border-white/10 space-y-6 h-fit">
+              <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                <Plus className="w-5 h-5 text-purple-400" />
+                <span>새 인사이트 게시글 작성</span>
+              </h2>
+              <form onSubmit={handleCreateInsight} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-bold text-gray-400 uppercase mb-1">제목</label>
+                  <input
+                    type="text"
+                    required
+                    value={newInsight.title}
+                    onChange={(e) => setNewInsight({ ...newInsight, title: e.target.value })}
+                    placeholder="인사이트 게시글 제목"
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-purple-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-400 uppercase mb-1">카테고리</label>
+                  <input
+                    type="text"
+                    value={newInsight.category}
+                    onChange={(e) => setNewInsight({ ...newInsight, category: e.target.value })}
+                    placeholder="예: 트렌드, 브랜딩, MCN"
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-purple-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-400 uppercase mb-1">요약 설명 (Excerpt)</label>
+                  <input
+                    type="text"
+                    value={newInsight.excerpt}
+                    onChange={(e) => setNewInsight({ ...newInsight, excerpt: e.target.value })}
+                    placeholder="목록에 노출될 간단한 대표 한 줄 요약"
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-purple-500"
+                  />
+                </div>
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-bold text-gray-400 uppercase">본문 내용</label>
+                    <button
+                      type="button"
+                      onClick={() => handleInsertMedia(setNewInsight, 'content')}
+                      className="px-2.5 py-1 rounded-lg bg-purple-600/30 hover:bg-purple-600/50 text-purple-300 text-xs font-bold flex items-center gap-1 transition-colors"
+                    >
+                      <ImageIcon className="w-3.5 h-3.5" />
+                      <span>+ 미디어(사진/영상) 본문 삽입</span>
+                    </button>
+                  </div>
+                  <textarea
+                    rows={8}
+                    required
+                    value={newInsight.content}
+                    onChange={(e) => setNewInsight({ ...newInsight, content: e.target.value })}
+                    placeholder="본문 내용을 입력하세요. 상단 버튼으로 사진 및 동영상을 본문에 다중 삽입할 수 있습니다."
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-purple-500 font-mono"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-400 uppercase mb-1">대표 썸네일 이미지 파일</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setInsightFile(e.target.files?.[0] || null)}
+                    className="w-full text-xs text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-purple-600 file:text-white hover:file:bg-purple-500"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-3.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-sm transition-all shadow-lg"
+                >
+                  {loading ? '등록 중...' : '인사이트 등록하기'}
+                </button>
+              </form>
             </div>
 
-            <textarea
-              placeholder="요약설명 (Excerpt)"
-              rows={2}
-              value={newInsight.excerpt}
-              onChange={(e) => setNewInsight({ ...newInsight, excerpt: e.target.value })}
-              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm"
-            />
+            {/* List & Edit Trigger */}
+            <div className="lg:col-span-2 space-y-4">
+              <h2 className="text-lg font-bold text-white">등록된 인사이트 목록 ({insights.length})</h2>
+              <div className="space-y-3">
+                {insights.map((item) => (
+                  <div key={item.id} className="p-4 rounded-2xl glass-panel border border-white/10 flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-4 truncate">
+                      {item.thumbnail && (
+                        <img src={getDisplayUrl(item.thumbnail)} alt={item.title} className="w-16 h-16 rounded-xl object-cover border border-white/10 shrink-0" />
+                      )}
+                      <div className="truncate">
+                        <span className="px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 text-[10px] font-bold">{item.category}</span>
+                        <h3 className="font-bold text-white text-sm truncate mt-1">{item.title}</h3>
+                        <p className="text-xs text-gray-400 truncate">{item.excerpt}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button
+                        onClick={() => setEditInsightModal({ ...item })}
+                        className="px-3 py-2 rounded-xl bg-purple-600/30 hover:bg-purple-600/50 text-purple-300 font-bold text-xs flex items-center gap-1"
+                      >
+                        <Edit className="w-3.5 h-3.5" />
+                        <span>수정</span>
+                      </button>
+                      <button
+                        onClick={() => handleDeleteInsight(item.id)}
+                        className="p-2 rounded-xl bg-rose-500/20 hover:bg-rose-500/40 text-rose-300"
+                        title="삭제"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
 
-            <textarea
-              required
-              placeholder="상세 본문 내용"
-              rows={5}
-              value={newInsight.content}
-              onChange={(e) => setNewInsight({ ...newInsight, content: e.target.value })}
-              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm"
-            />
+        {/* Tab 4: Notices CMS */}
+        {activeTab === 'notices' && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="glass-panel p-6 rounded-2xl border border-white/10 space-y-6 h-fit">
+              <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                <Plus className="w-5 h-5 text-purple-400" />
+                <span>새 공지사항 작성</span>
+              </h2>
+              <form onSubmit={handleCreateNotice} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-bold text-gray-400 uppercase mb-1">공지 제목</label>
+                  <input
+                    type="text"
+                    required
+                    value={newNotice.title}
+                    onChange={(e) => setNewNotice({ ...newNotice, title: e.target.value })}
+                    placeholder="공지사항 제목"
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-purple-500"
+                  />
+                </div>
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-bold text-gray-400 uppercase">공지 내용</label>
+                    <button
+                      type="button"
+                      onClick={() => handleInsertMedia(setNewNotice, 'content')}
+                      className="px-2.5 py-1 rounded-lg bg-purple-600/30 hover:bg-purple-600/50 text-purple-300 text-xs font-bold flex items-center gap-1 transition-colors"
+                    >
+                      <ImageIcon className="w-3.5 h-3.5" />
+                      <span>+ 미디어 삽입</span>
+                    </button>
+                  </div>
+                  <textarea
+                    rows={8}
+                    required
+                    value={newNotice.content}
+                    onChange={(e) => setNewNotice({ ...newNotice, content: e.target.value })}
+                    placeholder="공지 내용을 작성해 주세요."
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-purple-500 font-mono"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-3.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-sm transition-all shadow-lg"
+                >
+                  {loading ? '등록 중...' : '공지사항 등록하기'}
+                </button>
+              </form>
+            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="lg:col-span-2 space-y-4">
+              <h2 className="text-lg font-bold text-white">등록된 공지사항 목록 ({notices.length})</h2>
+              <div className="space-y-3">
+                {notices.map((notice) => (
+                  <div key={notice.id} className="p-4 rounded-2xl glass-panel border border-white/10 flex items-center justify-between gap-4">
+                    <div>
+                      <h3 className="font-bold text-white text-sm">{notice.title}</h3>
+                      <p className="text-xs text-gray-400 mt-1">{new Date(notice.created_at).toLocaleDateString('ko-KR')}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setEditNoticeModal({ ...notice })}
+                        className="px-3 py-2 rounded-xl bg-purple-600/30 hover:bg-purple-600/50 text-purple-300 font-bold text-xs flex items-center gap-1"
+                      >
+                        <Edit className="w-3.5 h-3.5" />
+                        <span>수정</span>
+                      </button>
+                      <button
+                        onClick={() => handleDeleteNotice(notice.id)}
+                        className="p-2 rounded-xl bg-rose-500/20 hover:bg-rose-500/40 text-rose-300"
+                        title="삭제"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Tab 5: FAQs CMS */}
+        {activeTab === 'faqs' && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="glass-panel p-6 rounded-2xl border border-white/10 space-y-6 h-fit">
+              <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                <Plus className="w-5 h-5 text-purple-400" />
+                <span>새 FAQ 항목 작성</span>
+              </h2>
+              <form onSubmit={handleCreateFaq} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-bold text-gray-400 uppercase mb-1">카테고리</label>
+                  <input
+                    type="text"
+                    value={newFaq.category}
+                    onChange={(e) => setNewFaq({ ...newFaq, category: e.target.value })}
+                    placeholder="예: 지원관련, 계약관련, 정산"
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-purple-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-400 uppercase mb-1">질문 (Question)</label>
+                  <input
+                    type="text"
+                    required
+                    value={newFaq.question}
+                    onChange={(e) => setNewFaq({ ...newFaq, question: e.target.value })}
+                    placeholder="자주 묻는 질문 항목"
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-purple-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-400 uppercase mb-1">답변 (Answer)</label>
+                  <textarea
+                    rows={6}
+                    required
+                    value={newFaq.answer}
+                    onChange={(e) => setNewFaq({ ...newFaq, answer: e.target.value })}
+                    placeholder="상세 답변 내용을 작성하세요."
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-purple-500 font-mono"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-3.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-sm transition-all shadow-lg"
+                >
+                  {loading ? '등록 중...' : 'FAQ 등록하기'}
+                </button>
+              </form>
+            </div>
+
+            <div className="lg:col-span-2 space-y-4">
+              <h2 className="text-lg font-bold text-white">등록된 FAQ 목록 ({faqs.length})</h2>
+              <div className="space-y-3">
+                {faqs.map((faq) => (
+                  <div key={faq.id} className="p-4 rounded-2xl glass-panel border border-white/10 flex items-center justify-between gap-4">
+                    <div>
+                      <span className="px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 text-[10px] font-bold">{faq.category}</span>
+                      <h3 className="font-bold text-white text-sm mt-1">Q. {faq.question}</h3>
+                      <p className="text-xs text-gray-400 mt-1 line-clamp-2">{faq.answer}</p>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button
+                        onClick={() => setEditFaqModal({ ...faq })}
+                        className="px-3 py-2 rounded-xl bg-purple-600/30 hover:bg-purple-600/50 text-purple-300 font-bold text-xs flex items-center gap-1"
+                      >
+                        <Edit className="w-3.5 h-3.5" />
+                        <span>수정</span>
+                      </button>
+                      <button
+                        onClick={() => handleDeleteFaq(faq.id)}
+                        className="p-2 rounded-xl bg-rose-500/20 hover:bg-rose-500/40 text-rose-300"
+                        title="삭제"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Detail Viewer Modal */}
+      {selectedItem && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="glass-panel p-8 rounded-3xl border border-white/15 max-w-2xl w-full max-h-[90vh] overflow-y-auto space-y-6 animate-in fade-in zoom-in duration-200">
+            <div className="flex items-center justify-between pb-4 border-b border-white/10">
+              <h3 className="text-xl font-bold text-white">
+                {selectedItem.type === 'creator' ? '크리에이터 지원서 상세보기' : '비즈니스 제휴 문의 상세보기'}
+              </h3>
+              <button
+                onClick={() => setSelectedItem(null)}
+                className="p-2 rounded-xl bg-white/10 text-gray-300 hover:text-white"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-4 text-sm">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <span className="text-xs text-gray-400 block">성명/활동명</span>
+                  <span className="font-bold text-white text-base">{selectedItem.data.name}</span>
+                </div>
+                <div>
+                  <span className="text-xs text-gray-400 block">성별</span>
+                  <span className="font-bold text-white">{selectedItem.data.gender || '-'}</span>
+                </div>
+                <div>
+                  <span className="text-xs text-gray-400 block">연락처</span>
+                  <span className="font-bold text-purple-300">{selectedItem.data.phone}</span>
+                </div>
+                <div>
+                  <span className="text-xs text-gray-400 block">이메일</span>
+                  <span className="font-bold text-white">{selectedItem.data.email}</span>
+                </div>
+              </div>
+
               <div>
-                <label className="block text-xs font-bold text-gray-400 mb-1">썸네일 이미지 파일 업로드</label>
+                <span className="text-xs text-gray-400 block">자기소개 및 주요 경력</span>
+                <p className="p-4 rounded-xl bg-white/5 border border-white/10 text-gray-200 mt-1 whitespace-pre-wrap">
+                  {selectedItem.data.bio || '작성된 자기소개가 없습니다.'}
+                </p>
+              </div>
+
+              {/* Attachments Section */}
+              <div>
+                <span className="text-xs text-gray-400 block mb-2">첨부 미디어 및 파일 목록</span>
+                {parseFilesList(selectedItem.data).length > 0 ? (
+                  <div className="space-y-3">
+                    {parseFilesList(selectedItem.data).map((f: any, idx: number) => (
+                      <div key={idx} className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <span className="font-bold text-purple-300 text-sm">{f.name || `파일 ${idx + 1}`}</span>
+                          <a
+                            href={getDownloadUrl(f.url, f.name)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-3 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs flex items-center gap-1.5"
+                          >
+                            <Download className="w-3.5 h-3.5" />
+                            <span>다운로드</span>
+                          </a>
+                        </div>
+                        {/* Media Preview inside Modal */}
+                        {f.url && (f.url.endsWith('.mp4') || f.url.endsWith('.webm')) ? (
+                          <video src={getDisplayUrl(f.url)} controls className="w-full max-h-60 rounded-xl border border-white/10" />
+                        ) : f.url && (f.url.endsWith('.jpg') || f.url.endsWith('.jpeg') || f.url.endsWith('.png') || f.url.endsWith('.webp') || f.url.endsWith('.gif') || f.url.includes('/api/files')) ? (
+                          <img src={getDisplayUrl(f.url)} alt={f.name} className="w-full max-h-60 object-contain rounded-xl border border-white/10 bg-black/40" />
+                        ) : null}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <span className="text-gray-500 text-xs">첨부된 파일이 없습니다.</span>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Insight Edit Modal */}
+      {editInsightModal && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="glass-panel p-8 rounded-3xl border border-white/15 max-w-2xl w-full max-h-[90vh] overflow-y-auto space-y-6 animate-in fade-in zoom-in duration-200">
+            <div className="flex items-center justify-between pb-4 border-b border-white/10">
+              <h3 className="text-xl font-bold text-white">인사이트 게시글 수정</h3>
+              <button onClick={() => setEditInsightModal(null)} className="p-2 rounded-xl bg-white/10 text-gray-300 hover:text-white">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <form onSubmit={handleUpdateInsight} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-gray-400 uppercase mb-1">제목</label>
+                <input
+                  type="text"
+                  required
+                  value={editInsightModal.title}
+                  onChange={(e) => setEditInsightModal({ ...editInsightModal, title: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-purple-500"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-gray-400 uppercase mb-1">카테고리</label>
+                <input
+                  type="text"
+                  value={editInsightModal.category}
+                  onChange={(e) => setEditInsightModal({ ...editInsightModal, category: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-purple-500"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-gray-400 uppercase mb-1">요약 설명</label>
+                <input
+                  type="text"
+                  value={editInsightModal.excerpt || ''}
+                  onChange={(e) => setEditInsightModal({ ...editInsightModal, excerpt: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-purple-500"
+                />
+              </div>
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-xs font-bold text-gray-400 uppercase">본문 내용 (사진/영상 다중 삽입 가능)</label>
+                  <button
+                    type="button"
+                    onClick={() => handleInsertMedia(setEditInsightModal, 'content')}
+                    className="px-2.5 py-1 rounded-lg bg-purple-600/30 hover:bg-purple-600/50 text-purple-300 text-xs font-bold flex items-center gap-1"
+                  >
+                    <ImageIcon className="w-3.5 h-3.5" />
+                    <span>+ 미디어 삽입</span>
+                  </button>
+                </div>
+                <textarea
+                  rows={8}
+                  required
+                  value={editInsightModal.content}
+                  onChange={(e) => setEditInsightModal({ ...editInsightModal, content: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-purple-500 font-mono"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-gray-400 uppercase mb-1">썸네일 변경 (선택)</label>
                 <input
                   type="file"
                   accept="image/*"
-                  onChange={(e) => setInsightFile(e.target.files ? e.target.files[0] : null)}
-                  className="w-full text-xs text-gray-300"
+                  onChange={(e) => setEditInsightFile(e.target.files?.[0] || null)}
+                  className="w-full text-xs text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-purple-600 file:text-white"
+                />
+              </div>
+              <div className="flex items-center justify-end gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setEditInsightModal(null)}
+                  className="px-5 py-2.5 rounded-xl bg-white/10 text-gray-300 text-sm font-bold"
+                >
+                  취소
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-sm shadow-lg"
+                >
+                  {loading ? '수정 저장 중...' : '인사이트 수정 저장'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Notice Edit Modal */}
+      {editNoticeModal && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="glass-panel p-8 rounded-3xl border border-white/15 max-w-2xl w-full max-h-[90vh] overflow-y-auto space-y-6 animate-in fade-in zoom-in duration-200">
+            <div className="flex items-center justify-between pb-4 border-b border-white/10">
+              <h3 className="text-xl font-bold text-white">공지사항 수정</h3>
+              <button onClick={() => setEditNoticeModal(null)} className="p-2 rounded-xl bg-white/10 text-gray-300 hover:text-white">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <form onSubmit={handleUpdateNotice} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-gray-400 uppercase mb-1">제목</label>
+                <input
+                  type="text"
+                  required
+                  value={editNoticeModal.title}
+                  onChange={(e) => setEditNoticeModal({ ...editNoticeModal, title: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-purple-500"
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-gray-400 mb-1">또는 이미지 URL 직접 입력</label>
-                <input
-                  type="text"
-                  placeholder="https://..."
-                  value={newInsight.thumbnailUrl}
-                  onChange={(e) => setNewInsight({ ...newInsight, thumbnailUrl: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm"
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-xs font-bold text-gray-400 uppercase">내용</label>
+                  <button
+                    type="button"
+                    onClick={() => handleInsertMedia(setEditNoticeModal, 'content')}
+                    className="px-2.5 py-1 rounded-lg bg-purple-600/30 hover:bg-purple-600/50 text-purple-300 text-xs font-bold flex items-center gap-1"
+                  >
+                    <ImageIcon className="w-3.5 h-3.5" />
+                    <span>+ 미디어 삽입</span>
+                  </button>
+                </div>
+                <textarea
+                  rows={8}
+                  required
+                  value={editNoticeModal.content}
+                  onChange={(e) => setEditNoticeModal({ ...editNoticeModal, content: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-purple-500 font-mono"
                 />
               </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="px-8 py-3.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-sm shadow-xl transition-all"
-            >
-              인사이트 게시글 등록하기
-            </button>
-          </form>
-
-          {/* List */}
-          <div className="rounded-3xl glass-panel border border-white/10 p-6 space-y-4">
-            <h3 className="text-lg font-bold text-white">등록된 인사이트 목록</h3>
-            <div className="space-y-3">
-              {insights.map((item) => (
-                <div key={item.id} className="p-4 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between gap-4">
-                  <div className="space-y-1">
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300">
-                      {item.category}
-                    </span>
-                    <h4 className="font-bold text-white text-sm">{item.title}</h4>
-                    <p className="text-xs text-gray-400 line-clamp-1">{item.content}</p>
-                  </div>
-                  <button
-                    onClick={() => handleDeleteInsight(item.id)}
-                    className="p-2 rounded bg-rose-600/30 text-rose-300 hover:bg-rose-600/50 shrink-0"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* TAB 4: Notices CMS */}
-      {activeTab === 'notices' && (
-        <div className="space-y-8">
-          <form onSubmit={handleCreateNotice} className="rounded-3xl glass-panel border border-white/10 p-6 sm:p-8 space-y-6">
-            <h2 className="text-xl font-black text-white flex items-center gap-2">
-              <Plus className="w-5 h-5 text-violet-400" />
-              새 공지사항 등록
-            </h2>
-
-            <input
-              type="text"
-              required
-              placeholder="공지사항 제목"
-              value={newNotice.title}
-              onChange={(e) => setNewNotice({ ...newNotice, title: e.target.value })}
-              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm"
-            />
-
-            <textarea
-              required
-              placeholder="공지사항 상세 내용"
-              rows={5}
-              value={newNotice.content}
-              onChange={(e) => setNewNotice({ ...newNotice, content: e.target.value })}
-              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm"
-            />
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="px-8 py-3.5 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-bold text-sm shadow-xl transition-all"
-            >
-              공지사항 등록하기
-            </button>
-          </form>
-
-          <div className="rounded-3xl glass-panel border border-white/10 p-6 space-y-4">
-            <h3 className="text-lg font-bold text-white">등록된 공지사항 목록</h3>
-            <div className="space-y-3">
-              {notices.map((n) => (
-                <div key={n.id} className="p-4 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between gap-4">
-                  <div>
-                    <h4 className="font-bold text-white text-sm">{n.title}</h4>
-                    <p className="text-xs text-gray-400 line-clamp-1">{n.content}</p>
-                  </div>
-                  <button
-                    onClick={() => handleDeleteNotice(n.id)}
-                    className="p-2 rounded bg-rose-600/30 text-rose-300 hover:bg-rose-600/50 shrink-0"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* TAB 5: FAQs CMS */}
-      {activeTab === 'faqs' && (
-        <div className="space-y-8">
-          <form onSubmit={handleCreateFaq} className="rounded-3xl glass-panel border border-white/10 p-6 sm:p-8 space-y-6">
-            <h2 className="text-xl font-black text-white flex items-center gap-2">
-              <Plus className="w-5 h-5 text-pink-400" />
-              새 자주묻는질문 (FAQ) 등록
-            </h2>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <input
-                type="text"
-                required
-                placeholder="질문 (Question)"
-                value={newFaq.question}
-                onChange={(e) => setNewFaq({ ...newFaq, question: e.target.value })}
-                className="px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm"
-              />
-              <input
-                type="text"
-                placeholder="카테고리 (예: 지원관련, 장비지원)"
-                value={newFaq.category}
-                onChange={(e) => setNewFaq({ ...newFaq, category: e.target.value })}
-                className="px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm"
-              />
-            </div>
-
-            <textarea
-              required
-              placeholder="답변 상세 내용 (Answer)"
-              rows={4}
-              value={newFaq.answer}
-              onChange={(e) => setNewFaq({ ...newFaq, answer: e.target.value })}
-              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm"
-            />
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="px-8 py-3.5 rounded-xl bg-pink-600 hover:bg-pink-500 text-white font-bold text-sm shadow-xl transition-all"
-            >
-              FAQ 항목 등록하기
-            </button>
-          </form>
-
-          <div className="rounded-3xl glass-panel border border-white/10 p-6 space-y-4">
-            <h3 className="text-lg font-bold text-white">등록된 FAQ 목록</h3>
-            <div className="space-y-3">
-              {faqs.map((f) => (
-                <div key={f.id} className="p-4 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between gap-4">
-                  <div>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-pink-500/20 text-pink-300">
-                      {f.category}
-                    </span>
-                    <h4 className="font-bold text-white text-sm">Q. {f.question}</h4>
-                    <p className="text-xs text-gray-400 line-clamp-1">A. {f.answer}</p>
-                  </div>
-                  <button
-                    onClick={() => handleDeleteFaq(f.id)}
-                    className="p-2 rounded bg-rose-600/30 text-rose-300 hover:bg-rose-600/50 shrink-0"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Selected Application/Inquiry Modal */}
-      {selectedItem && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-          <div className="relative w-full max-w-2xl max-h-[85vh] overflow-y-auto rounded-3xl glass-panel border border-white/20 p-8 shadow-2xl bg-[#0f111c] space-y-6">
-            <button
-              onClick={() => setSelectedItem(null)}
-              className="absolute top-6 right-6 p-2 rounded-full glass-panel text-gray-400 hover:text-white"
-            >
-              <X className="w-6 h-6" />
-            </button>
-
-            <h3 className="text-2xl font-black text-white border-b border-white/10 pb-4">
-              {selectedItem.type === 'creator' ? '크리에이터 지원서 상세보기' : '비즈니스 문의 상세보기'}
-            </h3>
-
-            <div className="grid grid-cols-2 gap-4 text-xs">
-              <div><strong className="text-gray-400">성명:</strong> <span className="text-white font-bold">{selectedItem.data.name}</span></div>
-              <div><strong className="text-gray-400">연락처:</strong> <span className="text-white font-mono">{selectedItem.data.phone}</span></div>
-              <div><strong className="text-gray-400">이메일:</strong> <span className="text-white font-mono">{selectedItem.data.email}</span></div>
-              <div><strong className="text-gray-400">생년월일:</strong> <span className="text-white">{selectedItem.data.birthdate || '-'}</span></div>
-              <div><strong className="text-gray-400">거주지역:</strong> <span className="text-white">{selectedItem.data.residence || '-'}</span></div>
-              <div><strong className="text-gray-400">SNS 계정:</strong> <span className="text-white">{selectedItem.data.sns || '-'}</span></div>
-              {selectedItem.type === 'creator' && (
-                <div><strong className="text-gray-400">스튜디오 보유:</strong> <span className="text-purple-300 font-bold">{selectedItem.data.has_studio === 'Y' ? '예' : '아니오'}</span></div>
-              )}
-            </div>
-
-            <div className="space-y-2 border-t border-white/10 pt-4">
-              <strong className="text-xs text-gray-400">자기소개 및 내용:</strong>
-              <div className="p-4 rounded-xl bg-white/5 text-sm text-gray-200 whitespace-pre-line leading-relaxed">
-                {selectedItem.data.bio || '내용이 없습니다.'}
+              <div className="flex items-center justify-end gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setEditNoticeModal(null)}
+                  className="px-5 py-2.5 rounded-xl bg-white/10 text-gray-300 text-sm font-bold"
+                >
+                  취소
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-sm shadow-lg"
+                >
+                  {loading ? '수정 저장 중...' : '공지사항 수정 저장'}
+                </button>
               </div>
-            </div>
+            </form>
+          </div>
+        </div>
+      )}
 
-            {selectedItem.data.file_url && (
-              <div className="space-y-2 border-t border-white/10 pt-4">
-                <strong className="text-xs text-gray-400">첨부 파일:</strong>
-                <div className="flex items-center justify-between p-3 rounded-xl bg-purple-600/10 border border-purple-500/30">
-                  <span className="text-xs text-purple-300 font-semibold">{selectedItem.data.file_name || '첨부파일'}</span>
-                  <a
-                    href={selectedItem.data.file_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-purple-600 text-white font-bold text-xs hover:bg-purple-500 transition-colors"
-                  >
-                    <Download className="w-3.5 h-3.5" />
-                    <span>열기/다운로드</span>
-                  </a>
-                </div>
-                {/* Media Preview if Image */}
-                {/\.(jpg|jpeg|png|gif|webp)$/i.test(selectedItem.data.file_url) && (
-                  <div className="mt-2 rounded-xl overflow-hidden border border-white/10 max-h-60">
-                    <img src={selectedItem.data.file_url} alt="File Preview" className="w-full h-full object-contain bg-black" />
-                  </div>
-                )}
-              </div>
-            )}
-
-            <div className="pt-4 flex justify-end">
-              <button
-                onClick={() => setSelectedItem(null)}
-                className="px-6 py-2.5 rounded-xl bg-white/10 text-white font-bold text-xs hover:bg-white/20"
-              >
-                닫기
+      {/* FAQ Edit Modal */}
+      {editFaqModal && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="glass-panel p-8 rounded-3xl border border-white/15 max-w-2xl w-full max-h-[90vh] overflow-y-auto space-y-6 animate-in fade-in zoom-in duration-200">
+            <div className="flex items-center justify-between pb-4 border-b border-white/10">
+              <h3 className="text-xl font-bold text-white">FAQ 수정</h3>
+              <button onClick={() => setEditFaqModal(null)} className="p-2 rounded-xl bg-white/10 text-gray-300 hover:text-white">
+                <X className="w-5 h-5" />
               </button>
             </div>
+            <form onSubmit={handleUpdateFaq} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-gray-400 uppercase mb-1">카테고리</label>
+                <input
+                  type="text"
+                  value={editFaqModal.category}
+                  onChange={(e) => setEditFaqModal({ ...editFaqModal, category: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-purple-500"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-gray-400 uppercase mb-1">질문</label>
+                <input
+                  type="text"
+                  required
+                  value={editFaqModal.question}
+                  onChange={(e) => setEditFaqModal({ ...editFaqModal, question: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-purple-500"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-gray-400 uppercase mb-1">답변</label>
+                <textarea
+                  rows={6}
+                  required
+                  value={editFaqModal.answer}
+                  onChange={(e) => setEditFaqModal({ ...editFaqModal, answer: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-purple-500 font-mono"
+                />
+              </div>
+              <div className="flex items-center justify-end gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setEditFaqModal(null)}
+                  className="px-5 py-2.5 rounded-xl bg-white/10 text-gray-300 text-sm font-bold"
+                >
+                  취소
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-sm shadow-lg"
+                >
+                  {loading ? '수정 저장 중...' : 'FAQ 수정 저장'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

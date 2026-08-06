@@ -17,26 +17,47 @@ export async function POST(req: NextRequest) {
     const sns = formData.get('sns') as string;
     const hasStudio = formData.get('hasStudio') as string;
     const bio = formData.get('bio') as string;
-    const file = formData.get('file') as File | null;
+    
+    // Support multiple files (images, videos, documents)
+    const rawFiles = formData.getAll('files') as File[];
+    const singleFile = formData.get('file') as File | null;
+    
+    const allFiles: File[] = [];
+    if (rawFiles && rawFiles.length > 0) {
+      allFiles.push(...rawFiles.filter(f => f && f.size > 0));
+    }
+    if (singleFile && singleFile.size > 0 && !allFiles.some(f => f.name === singleFile.name)) {
+      allFiles.push(singleFile);
+    }
 
     if (!name || !phone || !email) {
       return NextResponse.json({ error: '필수 항목(이름, 연락처, 이메일)을 작성해주세요.' }, { status: 400 });
     }
 
-    let fileUrl = '';
-    let fileName = '';
+    const filesList: Array<{ url: string; name: string; type: string }> = [];
 
-    if (file && file.size > 0) {
-      const bytes = await file.arrayBuffer();
-      const buffer = Buffer.from(bytes);
-      const uploadRes = await uploadFileToStorage(buffer, file.name, file.type, 'creator');
-      fileUrl = uploadRes.fileUrl;
-      fileName = uploadRes.fileName;
+    for (const file of allFiles) {
+      try {
+        const bytes = await file.arrayBuffer();
+        const buffer = Buffer.from(bytes);
+        const prefix = file.type.startsWith('video/') ? 'creator_video' : 'creator_file';
+        const uploadRes = await uploadFileToStorage(buffer, file.name, file.type, prefix);
+        filesList.push({
+          url: uploadRes.fileUrl,
+          name: uploadRes.fileName,
+          type: file.type,
+        });
+      } catch (err: any) {
+        console.error(`Error uploading application file ${file.name}:`, err);
+      }
     }
 
+    const firstFile = filesList[0] || { url: '', name: '' };
+    const filesJson = JSON.stringify(filesList);
+
     const stmt = db.prepare(`
-      INSERT INTO creator_applications (name, gender, phone, email, birthdate, residence, sns, has_studio, bio, file_url, file_name)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO creator_applications (name, gender, phone, email, birthdate, residence, sns, has_studio, bio, file_url, file_name, files_json)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
     const result = stmt.run(
@@ -49,8 +70,9 @@ export async function POST(req: NextRequest) {
       sns || '',
       hasStudio || 'N',
       bio || '',
-      fileUrl,
-      fileName
+      firstFile.url,
+      firstFile.name,
+      filesJson
     );
 
     return NextResponse.json({ success: true, id: result.lastInsertRowid });

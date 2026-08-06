@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { uploadFileToStorage } from '@/lib/s3';
 
+export const dynamic = 'force-dynamic';
+
 function isAuthenticated(req: NextRequest) {
   const authCookie = req.cookies.get('velix_admin_auth');
   return authCookie && authCookie.value === 'authenticated_token_velix_2026';
@@ -46,6 +48,48 @@ export async function POST(req: NextRequest) {
     const result = stmt.run(title, category, excerpt, content, thumbnail);
 
     return NextResponse.json({ success: true, id: result.lastInsertRowid });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
+export async function PUT(req: NextRequest) {
+  if (!isAuthenticated(req)) {
+    return NextResponse.json({ error: '관리자 권한이 없습니다.' }, { status: 401 });
+  }
+
+  try {
+    const formData = await req.formData();
+    const id = formData.get('id') as string;
+    const title = formData.get('title') as string;
+    const category = formData.get('category') as string || 'INSIGHT';
+    const excerpt = formData.get('excerpt') as string || '';
+    const content = formData.get('content') as string;
+    const thumbnailFile = formData.get('thumbnail') as File | null;
+    const existingThumbnail = formData.get('existingThumbnail') as string || '';
+
+    if (!id || !title || !content) {
+      return NextResponse.json({ error: '수정 정보가 유효하지 않습니다.' }, { status: 400 });
+    }
+
+    let thumbnail = existingThumbnail;
+
+    if (thumbnailFile && thumbnailFile.size > 0) {
+      const bytes = await thumbnailFile.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+      const uploadRes = await uploadFileToStorage(buffer, thumbnailFile.name, thumbnailFile.type, 'insight');
+      thumbnail = uploadRes.fileUrl;
+    }
+
+    const stmt = db.prepare(`
+      UPDATE insights
+      SET title = ?, category = ?, excerpt = ?, content = ?, thumbnail = ?
+      WHERE id = ?
+    `);
+
+    stmt.run(title, category, excerpt, content, thumbnail, id);
+
+    return NextResponse.json({ success: true });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

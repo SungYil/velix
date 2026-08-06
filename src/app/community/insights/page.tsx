@@ -15,6 +15,18 @@ interface Insight {
   created_at: string;
 }
 
+function getDisplayUrl(url: string) {
+  if (!url) return '';
+  if (url.startsWith('/api/files') || url.startsWith('/uploads/') || url.startsWith('http://') || url.startsWith('https://')) {
+    if (url.includes('s3.ap-northeast-2.amazonaws.com/')) {
+      const key = url.split('amazonaws.com/')[1] || '';
+      return `/api/files?key=${encodeURIComponent(key)}`;
+    }
+    return url;
+  }
+  return url;
+}
+
 export default function InsightsPage() {
   const [insights, setInsights] = useState<Insight[]>([]);
   const [page, setPage] = useState(1);
@@ -83,7 +95,7 @@ export default function InsightsPage() {
               {/* Thumbnail Image */}
               <div className="relative aspect-[16/9] w-full overflow-hidden bg-black/40">
                 <img
-                  src={item.thumbnail || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=800&q=80'}
+                  src={getDisplayUrl(item.thumbnail) || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=800&q=80'}
                   alt={item.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 filter brightness-90 group-hover:brightness-100"
                 />
@@ -98,19 +110,19 @@ export default function InsightsPage() {
               <div className="p-8 space-y-4 flex-1 flex flex-col justify-between">
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 text-xs text-gray-500">
-                    <Calendar className="w-3.5 h-3.5 text-amber-400" />
-                    <span>{new Date(item.created_at).toLocaleDateString()}</span>
+                    <Calendar className="w-3.5 h-3.5" />
+                    <span>{new Date(item.created_at).toLocaleDateString('ko-KR')}</span>
                   </div>
-                  <h3 className="text-xl sm:text-2xl font-black text-white group-hover:text-amber-300 transition-colors leading-snug">
+                  <h3 className="text-xl font-bold text-white group-hover:text-amber-300 transition-colors line-clamp-2">
                     {item.title}
                   </h3>
-                  <p className="text-xs sm:text-sm text-gray-400 leading-relaxed line-clamp-3">
+                  <p className="text-sm text-gray-400 line-clamp-3 leading-relaxed">
                     {item.excerpt || item.content}
                   </p>
                 </div>
 
                 <div className="pt-4 border-t border-white/10 flex items-center justify-between text-xs font-bold text-amber-400 group-hover:translate-x-1 transition-transform">
-                  <span>아티클 자세히 읽기</span>
+                  <span>인사이트 전문 읽기</span>
                   <ArrowRight className="w-4 h-4" />
                 </div>
               </div>
@@ -119,20 +131,20 @@ export default function InsightsPage() {
         ))}
       </div>
 
-      {/* Read More / Lead More Pagination Button */}
+      {/* Load More Button */}
       {hasMore && (
         <div className="text-center pt-8">
           <button
             onClick={handleLoadMore}
             disabled={loading}
-            className="px-10 py-4 rounded-2xl glass-panel hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold text-sm transition-all shadow-xl hover:scale-105 disabled:opacity-50"
+            className="px-8 py-3.5 rounded-2xl glass-panel glass-panel-hover text-white font-bold text-sm border border-amber-500/30 shadow-lg hover:border-amber-400 transition-all disabled:opacity-50"
           >
-            {loading ? '인사이트 불러오는 중...' : 'Read More (더보기)'}
+            {loading ? '로딩 중...' : '인사이트 더보기'}
           </button>
         </div>
       )}
 
-      {/* Detail Modal View */}
+      {/* Modal Detail Viewer */}
       <AnimatePresence>
         {selectedPost && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
@@ -165,16 +177,17 @@ export default function InsightsPage() {
               {selectedPost.thumbnail && (
                 <div className="relative aspect-[16/9] w-full rounded-2xl overflow-hidden border border-white/10">
                   <img
-                    src={selectedPost.thumbnail}
+                    src={getDisplayUrl(selectedPost.thumbnail)}
                     alt={selectedPost.title}
                     className="w-full h-full object-cover"
                   />
                 </div>
               )}
 
-              <div className="text-gray-200 text-sm sm:text-base leading-relaxed whitespace-pre-line border-t border-white/10 pt-6 font-light">
-                {selectedPost.content}
-              </div>
+              <div
+                className="text-gray-200 text-sm sm:text-base leading-relaxed border-t border-white/10 pt-6 font-light space-y-4"
+                dangerouslySetInnerHTML={{ __html: selectedPost.content }}
+              />
 
               <div className="pt-4 flex justify-end">
                 <button

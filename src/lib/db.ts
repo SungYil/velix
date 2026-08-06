@@ -102,13 +102,13 @@ try {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL, gender TEXT, phone TEXT NOT NULL, email TEXT NOT NULL,
       birthdate TEXT, residence TEXT, sns TEXT, has_studio TEXT, bio TEXT,
-      file_url TEXT, file_name TEXT, created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      file_url TEXT, file_name TEXT, files_json TEXT, created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
     CREATE TABLE IF NOT EXISTS business_inquiries (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL, email TEXT NOT NULL, phone TEXT NOT NULL,
       birthdate TEXT, residence TEXT, sns TEXT, bio TEXT,
-      file_url TEXT, file_name TEXT, created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      file_url TEXT, file_name TEXT, files_json TEXT, created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
     CREATE TABLE IF NOT EXISTS insights (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -139,23 +139,51 @@ const db = {
         console.warn('SQLite prepare error, switching to JSON fallback:', err);
       }
     }
-    // Fallback Mock Statement for JSON store
+    // Fallback Statement Runner for JSON store
     return {
       run(...args: any[]) {
         const store = readJsonStore();
         const now = new Date().toISOString();
         let lastId = Date.now();
 
-        if (sql.includes('creator_applications')) {
+        if (sql.includes('UPDATE')) {
+          if (sql.includes('insights')) {
+            const [title, category, excerpt, content, thumbnail, targetId] = args;
+            const item = store.insights.find((i: any) => String(i.id) === String(targetId));
+            if (item) {
+              item.title = title;
+              item.category = category;
+              item.excerpt = excerpt;
+              item.content = content;
+              if (thumbnail !== undefined && thumbnail !== null) item.thumbnail = thumbnail;
+            }
+          } else if (sql.includes('notices')) {
+            const [title, content, targetId] = args;
+            const item = store.notices.find((n: any) => String(n.id) === String(targetId));
+            if (item) {
+              item.title = title;
+              item.content = content;
+            }
+          } else if (sql.includes('faqs')) {
+            const [question, answer, category, orderIndex, targetId] = args;
+            const item = store.faqs.find((f: any) => String(f.id) === String(targetId));
+            if (item) {
+              item.question = question;
+              item.answer = answer;
+              item.category = category;
+              item.order_index = orderIndex;
+            }
+          }
+        } else if (sql.includes('creator_applications')) {
           store.creator_applications.push({
             id: lastId, name: args[0], gender: args[1], phone: args[2], email: args[3],
             birthdate: args[4], residence: args[5], sns: args[6], has_studio: args[7],
-            bio: args[8], file_url: args[9], file_name: args[10], created_at: now
+            bio: args[8], file_url: args[9], file_name: args[10], files_json: args[11] || null, created_at: now
           });
         } else if (sql.includes('business_inquiries')) {
           store.business_inquiries.push({
             id: lastId, name: args[0], email: args[1], phone: args[2], birthdate: args[3],
-            residence: args[4], sns: args[5], bio: args[6], file_url: args[7], file_name: args[8], created_at: now
+            residence: args[4], sns: args[5], bio: args[6], file_url: args[7], file_name: args[8], files_json: args[9] || null, created_at: now
           });
         } else if (sql.includes('insights')) {
           store.insights.unshift({
@@ -171,9 +199,9 @@ const db = {
           });
         } else if (sql.includes('DELETE FROM')) {
           const targetId = args[0];
-          if (sql.includes('insights')) store.insights = store.insights.filter((i: any) => i.id !== targetId);
-          if (sql.includes('notices')) store.notices = store.notices.filter((n: any) => n.id !== targetId);
-          if (sql.includes('faqs')) store.faqs = store.faqs.filter((f: any) => f.id !== targetId);
+          if (sql.includes('insights')) store.insights = store.insights.filter((i: any) => String(i.id) !== String(targetId));
+          if (sql.includes('notices')) store.notices = store.notices.filter((n: any) => String(n.id) !== String(targetId));
+          if (sql.includes('faqs')) store.faqs = store.faqs.filter((f: any) => String(f.id) !== String(targetId));
         }
 
         writeJsonStore(store);

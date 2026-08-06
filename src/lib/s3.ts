@@ -49,7 +49,8 @@ export async function uploadFileToStorage(
 
       await s3Client.send(command);
 
-      const fileUrl = `https://${bucketName}.s3.${region}.amazonaws.com/${s3Key}`;
+      // Return proxy API URL to avoid S3 bucket public access blocks or AccessDenied errors
+      const fileUrl = `/api/files?key=${encodeURIComponent(s3Key)}`;
       return { fileUrl, fileName: originalFilename };
     } catch (err: any) {
       console.error('AWS S3 Upload Error, falling back to local storage:', err);
@@ -65,15 +66,6 @@ export async function uploadFileToStorage(
 
   const filePath = path.join(uploadsDir, uniqueName);
   fs.writeFileSync(filePath, fileBuffer);
-
-  // Copy to standalone public folder if running in standalone mode
-  if (process.cwd().includes('.next/standalone')) {
-    const standaloneUploads = path.join(process.cwd(), 'public', 'uploads');
-    if (!fs.existsSync(standaloneUploads)) {
-      fs.mkdirSync(standaloneUploads, { recursive: true });
-    }
-    fs.writeFileSync(path.join(standaloneUploads, uniqueName), fileBuffer);
-  }
 
   return { fileUrl: `/uploads/${uniqueName}`, fileName: originalFilename };
 }

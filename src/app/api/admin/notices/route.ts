@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 
+export const dynamic = 'force-dynamic';
+
 function isAuthenticated(req: NextRequest) {
   const authCookie = req.cookies.get('velix_admin_auth');
   return authCookie && authCookie.value === 'authenticated_token_velix_2026';
@@ -26,6 +28,32 @@ export async function POST(req: NextRequest) {
     const result = stmt.run(title, content);
 
     return NextResponse.json({ success: true, id: result.lastInsertRowid });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
+export async function PUT(req: NextRequest) {
+  if (!isAuthenticated(req)) {
+    return NextResponse.json({ error: '권한이 없습니다.' }, { status: 401 });
+  }
+
+  try {
+    const { id, title, content } = await req.json();
+
+    if (!id || !title || !content) {
+      return NextResponse.json({ error: '수정할 필수 항목이 부족합니다.' }, { status: 400 });
+    }
+
+    const stmt = db.prepare(`
+      UPDATE notices
+      SET title = ?, content = ?
+      WHERE id = ?
+    `);
+
+    stmt.run(title, content, id);
+
+    return NextResponse.json({ success: true });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

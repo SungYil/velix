@@ -80,7 +80,7 @@ export default function NoticesPage() {
                       {/* Short Content Snippet Preview */}
                       {!isOpen && (
                         <p className="text-xs text-gray-400 line-clamp-1">
-                          {n.content}
+                          {n.content.replace(/<[^>]*>?/gm, '')}
                         </p>
                       )}
                     </div>
@@ -95,9 +95,10 @@ export default function NoticesPage() {
 
                 {/* Expanded Full Notice */}
                 {isOpen && (
-                  <div className="px-6 pb-6 pt-2 text-sm sm:text-base text-gray-300 leading-relaxed border-t border-white/5 whitespace-pre-line font-light">
-                    {n.content}
-                  </div>
+                  <div
+                    className="px-6 pb-6 pt-2 text-sm sm:text-base text-gray-300 leading-relaxed border-t border-white/5 font-light space-y-4"
+                    dangerouslySetInnerHTML={{ __html: n.content }}
+                  />
                 )}
               </div>
             </ScrollReveal>

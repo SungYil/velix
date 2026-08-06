@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import ScrollReveal from '@/components/ScrollReveal';
-import { Upload, CheckCircle2, AlertCircle, Sparkles, Send, FileVideo, Image as ImageIcon } from 'lucide-react';
+import { Upload, CheckCircle2, AlertCircle, Send, FileVideo, Image as ImageIcon, X, Paperclip } from 'lucide-react';
 
 export default function CreatorApplyPage() {
   const [formData, setFormData] = useState({
@@ -17,8 +17,7 @@ export default function CreatorApplyPage() {
     bio: '',
   });
 
-  const [file, setFile] = useState<File | null>(null);
-  const [filePreview, setFilePreview] = useState<string | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -28,19 +27,15 @@ export default function CreatorApplyPage() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const selectedFile = e.target.files[0];
-      setFile(selectedFile);
-
-      if (selectedFile.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = (event) => setFilePreview(event.target?.result as string);
-        reader.readAsDataURL(selectedFile);
-      } else {
-        setFilePreview(null);
-      }
+  const handleFileAdd = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const selectedFiles = Array.from(e.target.files);
+      setFiles((prev) => [...prev, ...selectedFiles]);
     }
+  };
+
+  const removeFile = (index: number) => {
+    setFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -54,9 +49,9 @@ export default function CreatorApplyPage() {
         body.append(key, value);
       });
 
-      if (file) {
-        body.append('file', file);
-      }
+      files.forEach((f) => {
+        body.append('files', f);
+      });
 
       const res = await fetch('/api/creator/apply', {
         method: 'POST',
@@ -130,8 +125,7 @@ export default function CreatorApplyPage() {
                   hasStudio: 'Y',
                   bio: '',
                 });
-                setFile(null);
-                setFilePreview(null);
+                setFiles([]);
               }}
               className="px-6 py-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-sm transition-all"
             >
@@ -293,44 +287,64 @@ export default function CreatorApplyPage() {
               />
             </div>
 
-            {/* File / Media Upload (Photo/Video) */}
-            <div className="space-y-2">
+            {/* Multiple File / Media Upload (Photos/Videos) */}
+            <div className="space-y-3">
               <label className="block text-xs font-bold text-gray-300 uppercase tracking-wider">
-                프로필 사진 또는 동영상 첨부 (선택)
+                프로필 사진 / 동영상 / 포트폴리오 첨부 (다중 첨부 가능)
               </label>
+              
               <div className="relative border-2 border-dashed border-white/20 hover:border-purple-500/50 rounded-2xl p-6 text-center cursor-pointer transition-colors bg-white/5">
                 <input
                   type="file"
-                  accept="image/*,video/*"
-                  onChange={handleFileChange}
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  multiple
+                  accept="image/*,video/*,application/pdf"
+                  onChange={handleFileAdd}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                 />
                 <div className="space-y-3 flex flex-col items-center justify-center">
                   <div className="p-3 rounded-full bg-purple-600/20 text-purple-400">
                     <Upload className="w-6 h-6" />
                   </div>
-                  {file ? (
-                    <div className="space-y-2">
-                      <p className="text-sm font-bold text-purple-300">{file.name}</p>
-                      <p className="text-xs text-gray-400">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
-                      {filePreview && (
-                        <div className="mt-3 w-24 h-24 rounded-xl overflow-hidden mx-auto border border-purple-500/40">
-                          <img src={filePreview} alt="Preview" className="w-full h-full object-cover" />
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <>
-                      <p className="text-sm font-semibold text-gray-300">
-                        클릭하여 사진이나 영상 파일을 업로드하세요
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        지원 형식: JPG, PNG, GIF, MP4, MOV (최대 50MB)
-                      </p>
-                    </>
-                  )}
+                  <div>
+                    <p className="text-sm font-semibold text-gray-200">
+                      클릭하거나 파일을 가져다 놓아 다중 첨부하세요 (사진, 영상, 문서)
+                    </p>
+                    <p className="text-xs text-gray-400 mt-1">
+                      지원 형식: JPG, PNG, GIF, MP4, MOV, PDF (여러 개 파일 동시 제출 가능)
+                    </p>
+                  </div>
                 </div>
               </div>
+
+              {/* Selected File Chips List */}
+              {files.length > 0 && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                  {files.map((f, idx) => (
+                    <div key={idx} className="flex items-center justify-between p-3 rounded-xl glass-panel border border-white/10 bg-white/5">
+                      <div className="flex items-center gap-2.5 truncate">
+                        {f.type.startsWith('video/') ? (
+                          <FileVideo className="w-5 h-5 text-pink-400 shrink-0" />
+                        ) : f.type.startsWith('image/') ? (
+                          <ImageIcon className="w-5 h-5 text-purple-400 shrink-0" />
+                        ) : (
+                          <Paperclip className="w-5 h-5 text-amber-400 shrink-0" />
+                        )}
+                        <div className="truncate">
+                          <p className="text-xs font-bold text-white truncate">{f.name}</p>
+                          <p className="text-[10px] text-gray-400">{(f.size / 1024 / 1024).toFixed(2)} MB</p>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => removeFile(idx)}
+                        className="p-1 rounded-lg hover:bg-rose-500/20 text-gray-400 hover:text-rose-300 transition-colors"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Submit Button */}
@@ -345,7 +359,7 @@ export default function CreatorApplyPage() {
                 ) : (
                   <>
                     <Send className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                    <span>지원서 제출하기</span>
+                    <span>지원서 제출하기 ({files.length}개 첨부됨)</span>
                   </>
                 )}
               </button>
