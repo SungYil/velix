@@ -27,15 +27,15 @@ if [ ! -f /swapfile ]; then
     echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
 fi
 
-echo "🚀 [4/6] 디렉토리 및 권한 준비..."
+echo "🚀 [4/6] 디렉토리 및 이전 캐시 완전 소거..."
+rm -f server.js
+rm -rf .next node_modules/.cache
 mkdir -p data public/uploads
 chmod -R 777 data public/uploads
 
-echo "🚀 [5/6] 이전 빌드 및 구버전 구동 파일 정리..."
-rm -f server.js
+echo "🚀 [5/6] 패키지 설치 및 Webpack 프로덕션 재빌드..."
 npm install
 npm rebuild better-sqlite3
-rm -rf .next
 
 export NODE_OPTIONS="--max-old-space-size=2048"
 export NEXT_TELEMETRY_DISABLED=1
@@ -51,6 +51,8 @@ if [ ! -d ".next" ]; then
     exit 1
 fi
 
+chmod -R 777 .next data public 2>/dev/null || true
+
 echo "🚀 [6/6] PM2 무중단 프로세스 초기화 및 구동..."
 pm2 delete all 2>/dev/null || true
 pm2 kill 2>/dev/null || true
@@ -60,7 +62,7 @@ pm2 save --force
 
 sudo chmod -R 777 /var/lib/nginx /var/log/nginx 2>/dev/null || true
 
-echo "🚀 [7/7] Nginx 설정 (AWS ALB 헬스체크 및 도메인 호환)..."
+echo "🚀 [7/7] Nginx 설정 (정적 자산 직결 및 도메인 완벽 호환)..."
 sudo cat <<EOF | sudo tee /etc/nginx/sites-available/velix
 server {
     listen 80 default_server;
@@ -68,6 +70,20 @@ server {
     server_name _ ${DOMAIN} ${WWW_DOMAIN} velix.moibluu.com *.moibluu.com;
 
     client_max_body_size 50M;
+
+    # Nginx가 Next.js 정적 빌드 자산 직접 초고속 응답 (500 에러 원천 차단)
+    location /_next/static/ {
+        alias ${CDIR}/.next/static/;
+        expires 365d;
+        access_log off;
+        add_header Cache-Control "public, max-age=31536000, immutable";
+    }
+
+    location /uploads/ {
+        alias ${CDIR}/public/uploads/;
+        expires 30d;
+        access_log off;
+    }
 
     location / {
         proxy_pass http://127.0.0.1:3000;
@@ -79,8 +95,6 @@ server {
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto \$http_x_forwarded_proto;
-
-        add_header Cache-Control "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0";
 
         proxy_connect_timeout 300s;
         proxy_send_timeout 300s;
