@@ -19,10 +19,13 @@ export function getDb(): Database.Database {
       const dataDir = path.join(rootDir, 'data');
       if (!fs.existsSync(dataDir)) {
         fs.mkdirSync(dataDir, { recursive: true });
+        try { fs.chmodSync(dataDir, 0o777); } catch {}
       }
 
       const dbPath = path.join(dataDir, 'velix.db');
       _db = new Database(dbPath);
+      try { fs.chmodSync(dbPath, 0o777); } catch {}
+
       _db.pragma('journal_mode = WAL');
 
       // Initialize Tables

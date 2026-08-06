@@ -48,6 +48,15 @@ cp -r public .next/standalone/ || true
 mkdir -p .next/standalone/.next
 cp -r .next/static .next/standalone/.next/
 
+echo "Rebuilding better-sqlite3 native binary for Linux..."
+npm rebuild better-sqlite3
+if [ -d ".next/standalone/node_modules/better-sqlite3" ]; then
+    (cd .next/standalone/node_modules/better-sqlite3 && npm run build-release 2>/dev/null || npx node-gyp rebuild 2>/dev/null || true)
+fi
+
+mkdir -p data public/uploads .next/standalone/data .next/standalone/public/uploads
+chmod -R 777 data public/uploads .next/standalone/data 2>/dev/null || true
+
 if [ ! -f ".next/standalone/server.js" ]; then
     echo "❌ error: .next/standalone/server.js 파일이 생성되지 않았습니다!"
     exit 1
