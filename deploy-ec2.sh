@@ -1,7 +1,6 @@
 #!/bin/bash
-# =================================================================
-# VelixENT AWS EC2 Auto Deployment Script for AWS ALB & moibluu.com
-# =================================================================
+# Exit immediately if a command exits with a non-zero status
+set -e
 
 # 항상 스크립트가 위치한 디렉토리로 이동
 CDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
@@ -14,12 +13,12 @@ echo "🚀 [1/6] 시스템 패키지 업데이트 및 필요 도구 설치..."
 sudo apt-get update -y
 sudo apt-get install -y curl git build-essential nginx sqlite3 libsqlite3-dev
 
-echo "🚀 [2/6] Node.js 20 LTS 및 PM2 프로세스 매니저 설치..."
+echo "🚀 [2/6] Node.js 20 LTS 및 PM2 설치..."
 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 sudo apt-get install -y nodejs
 sudo npm install -g pm2
 
-echo "🚀 [3/6] Swap 메모리 2GB 설정 (메모리 부족 방지)..."
+echo "🚀 [3/6] Swap 메모리 2GB 설정..."
 if [ ! -f /swapfile ]; then
     sudo fallocate -l 2G /swapfile
     sudo chmod 600 /swapfile
@@ -28,23 +27,29 @@ if [ ! -f /swapfile ]; then
     echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
 fi
 
-echo "🚀 [4/6] 데이터 및 업로드 디렉토리 권한 생성..."
+echo "🚀 [4/6] 디렉토리 및 권한 준비..."
 mkdir -p data public/uploads
 chmod -R 777 data public/uploads
 
-echo "🚀 [5/6] 이전 빌드 클리어 및 프로덕션 재빌드..."
+echo "🚀 [5/6] 이전 빌드 정리 및 Standalone 프로덕션 빌드..."
 npm install
 npm rebuild better-sqlite3
 rm -rf .next
+
+echo "Executing npm run build..."
 npm run build
 
-# 빌드 결과 검증
-if [ ! -d ".next" ]; then
-    echo "❌ error: .next 빌드 폴더가 생성되지 않았습니다! npm run build 에러를 확인하세요."
+echo "Copying static assets to standalone folder..."
+cp -r public .next/standalone/ || true
+mkdir -p .next/standalone/.next
+cp -r .next/static .next/standalone/.next/
+
+if [ ! -f ".next/standalone/server.js" ]; then
+    echo "❌ error: .next/standalone/server.js 파일이 생성되지 않았습니다!"
     exit 1
 fi
 
-echo "🚀 [6/6] PM2 기존 프로세스 초기화 및 ecosystem 구동..."
+echo "🚀 [6/6] PM2 무중단 프로세스 초기화 및 구동..."
 pm2 delete velix 2>/dev/null || true
 pm2 kill 2>/dev/null || true
 pm2 start ecosystem.config.js
@@ -78,6 +83,5 @@ sudo rm -f /etc/nginx/sites-enabled/default
 sudo nginx -t
 sudo systemctl restart nginx
 
-echo "🎉 Nginx 및 Next.js 배포 완료!"
-echo "PM2 상태:"
+echo "🎉 Nginx 및 Next.js Standalone 배포 완벽 성공!"
 pm2 status
