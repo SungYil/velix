@@ -33,6 +33,12 @@ npm install
 npm rebuild better-sqlite3
 npm run build
 
+# 빌드 결과 확인
+if [ ! -d ".next" ]; then
+    echo "❌ error: .next 빌드 폴더가 생성되지 않았습니다!"
+    exit 1
+fi
+
 echo "🚀 [6/6] PM2 기존 프로세스 초기화 및 ecosystem 구동..."
 pm2 kill 2>/dev/null || true
 pm2 start ecosystem.config.js
