@@ -3,6 +3,14 @@ import db from '@/lib/db';
 import path from 'path';
 import fs from 'fs';
 
+function getProjectRoot() {
+  const cwd = process.cwd();
+  if (cwd.includes('.next/standalone')) {
+    return path.resolve(cwd.split('.next/standalone')[0]);
+  }
+  return cwd;
+}
+
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
@@ -27,7 +35,8 @@ export async function POST(req: NextRequest) {
       const bytes = await file.arrayBuffer();
       const buffer = Buffer.from(bytes);
 
-      const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
+      const rootDir = getProjectRoot();
+      const uploadsDir = path.join(rootDir, 'public', 'uploads');
       if (!fs.existsSync(uploadsDir)) {
         fs.mkdirSync(uploadsDir, { recursive: true });
       }
@@ -39,6 +48,12 @@ export async function POST(req: NextRequest) {
       fs.writeFileSync(filePath, buffer);
       fileUrl = `/uploads/${uniqueName}`;
       fileName = file.name;
+
+      const standaloneUploads = path.join(process.cwd(), 'public', 'uploads');
+      if (process.cwd().includes('.next/standalone') && !fs.existsSync(standaloneUploads)) {
+        fs.mkdirSync(standaloneUploads, { recursive: true });
+        fs.writeFileSync(path.join(standaloneUploads, uniqueName), buffer);
+      }
     }
 
     const stmt = db.prepare(`
@@ -61,6 +76,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true, id: result.lastInsertRowid });
   } catch (error: any) {
     console.error('Business inquiry error:', error);
-    return NextResponse.json({ error: '제출 중 오류가 발생했습니다. 다시 시도해주세요.' }, { status: 500 });
+    return NextResponse.json({ error: error.message || '제출 중 오류가 발생했습니다.' }, { status: 500 });
   }
 }

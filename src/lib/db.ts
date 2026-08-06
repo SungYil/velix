@@ -4,9 +4,18 @@ import fs from 'fs';
 
 let _db: Database.Database | null = null;
 
+function getProjectRoot() {
+  const cwd = process.cwd();
+  if (cwd.includes('.next/standalone')) {
+    return path.resolve(cwd.split('.next/standalone')[0]);
+  }
+  return cwd;
+}
+
 function getDbInstance(): Database.Database {
   if (!_db) {
-    const dataDir = path.join(process.cwd(), 'data');
+    const rootDir = getProjectRoot();
+    const dataDir = path.join(rootDir, 'data');
     if (!fs.existsSync(dataDir)) {
       fs.mkdirSync(dataDir, { recursive: true });
     }

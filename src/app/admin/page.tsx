@@ -161,15 +161,19 @@ export default function AdminDashboardPage() {
         body: formData,
       });
 
+      const data = await res.json();
       if (res.ok) {
         setNewInsight({ title: '', category: 'INSIGHT', excerpt: '', content: '', thumbnailUrl: '' });
         setInsightFile(null);
         setActionSuccess('인사이트가 성공적으로 등록되었습니다.');
         setTimeout(() => setActionSuccess(''), 3000);
         loadAllData();
+      } else {
+        alert(data.error || '인사이트 등록 중 오류가 발생했습니다.');
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
+      alert(err.message || '등록 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);
     }
@@ -185,14 +189,18 @@ export default function AdminDashboardPage() {
         body: JSON.stringify(newNotice),
       });
 
+      const data = await res.json();
       if (res.ok) {
         setNewNotice({ title: '', content: '' });
         setActionSuccess('공지사항이 성공적으로 등록되었습니다.');
         setTimeout(() => setActionSuccess(''), 3000);
         loadAllData();
+      } else {
+        alert(data.error || '공지사항 등록 중 오류가 발생했습니다.');
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
+      alert(err.message || '등록 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);
     }
@@ -208,14 +216,18 @@ export default function AdminDashboardPage() {
         body: JSON.stringify(newFaq),
       });
 
+      const data = await res.json();
       if (res.ok) {
         setNewFaq({ question: '', answer: '', category: '일반' });
         setActionSuccess('FAQ 항목이 성공적으로 등록되었습니다.');
         setTimeout(() => setActionSuccess(''), 3000);
         loadAllData();
+      } else {
+        alert(data.error || 'FAQ 등록 중 오류가 발생했습니다.');
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
+      alert(err.message || '등록 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);
     }

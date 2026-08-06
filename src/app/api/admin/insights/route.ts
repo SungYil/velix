@@ -3,6 +3,14 @@ import db from '@/lib/db';
 import path from 'path';
 import fs from 'fs';
 
+function getProjectRoot() {
+  const cwd = process.cwd();
+  if (cwd.includes('.next/standalone')) {
+    return path.resolve(cwd.split('.next/standalone')[0]);
+  }
+  return cwd;
+}
+
 function isAuthenticated(req: NextRequest) {
   const authCookie = req.cookies.get('velix_admin_auth');
   return authCookie && authCookie.value === 'authenticated_token_velix_2026';
@@ -10,7 +18,7 @@ function isAuthenticated(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   if (!isAuthenticated(req)) {
-    return NextResponse.json({ error: '권한이 없습니다.' }, { status: 401 });
+    return NextResponse.json({ error: '관리자 로그인 권한이 필요합니다. 다시 로그인해주세요.' }, { status: 401 });
   }
 
   try {
@@ -32,7 +40,8 @@ export async function POST(req: NextRequest) {
       const bytes = await thumbnailFile.arrayBuffer();
       const buffer = Buffer.from(bytes);
 
-      const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
+      const rootDir = getProjectRoot();
+      const uploadsDir = path.join(rootDir, 'public', 'uploads');
       if (!fs.existsSync(uploadsDir)) {
         fs.mkdirSync(uploadsDir, { recursive: true });
       }
@@ -43,6 +52,12 @@ export async function POST(req: NextRequest) {
 
       fs.writeFileSync(filePath, buffer);
       thumbnail = `/uploads/${uniqueName}`;
+
+      const standaloneUploads = path.join(process.cwd(), 'public', 'uploads');
+      if (process.cwd().includes('.next/standalone') && !fs.existsSync(standaloneUploads)) {
+        fs.mkdirSync(standaloneUploads, { recursive: true });
+        fs.writeFileSync(path.join(standaloneUploads, uniqueName), buffer);
+      }
     }
 
     if (!thumbnail) {
@@ -64,7 +79,7 @@ export async function POST(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   if (!isAuthenticated(req)) {
-    return NextResponse.json({ error: '권한이 없습니다.' }, { status: 401 });
+    return NextResponse.json({ error: '관리자 권한이 없습니다.' }, { status: 401 });
   }
 
   try {
