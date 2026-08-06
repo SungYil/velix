@@ -2,8 +2,8 @@
 # Exit immediately if a command exits with a non-zero status
 set -e
 
-# 항상 스크립트가 위치한 디렉토리로 이동
-CDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+# POSIX 호환 디렉토리 이동 ($0 호환)
+CDIR="$( cd "$( dirname "$0" )" >/dev/null 2>&1 && pwd )"
 cd "$CDIR"
 
 DOMAIN="moibluu.com"
@@ -33,18 +33,12 @@ rm -rf .next node_modules/.cache
 mkdir -p data public/uploads
 chmod -R 777 data public/uploads
 
-echo "🚀 [5/6] 패키지 설치 및 Webpack 프로덕션 재빌드..."
+echo "🚀 [5/6] 패키지 설치 및 단일 스레드 클린 빌드..."
 npm install
-npm rebuild better-sqlite3
+npm rebuild better-sqlite3 2>/dev/null || true
 
-export NODE_OPTIONS="--max-old-space-size=2048"
-export NEXT_TELEMETRY_DISABLED=1
-export NEXT_PRIVATE_WORKERS=1
-export NEXT_MAX_WORKERS=1
-export UV_THREADPOOL_SIZE=1
-
-echo "Executing npm run build..."
-npm run build
+echo "Executing npm run build in single worker mode..."
+NODE_OPTIONS="--max-old-space-size=2048" NEXT_TELEMETRY_DISABLED=1 NEXT_PRIVATE_WORKERS=1 NEXT_MAX_WORKERS=1 UV_THREADPOOL_SIZE=1 npm run build
 
 if [ ! -d ".next" ]; then
     echo "❌ error: .next 빌드 폴더가 생성되지 않았습니다!"
@@ -71,7 +65,6 @@ server {
 
     client_max_body_size 50M;
 
-    # Nginx가 Next.js 정적 빌드 자산 직접 초고속 응답 (500 에러 원천 차단)
     location /_next/static/ {
         alias ${CDIR}/.next/static/;
         expires 365d;
