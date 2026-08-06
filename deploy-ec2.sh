@@ -69,12 +69,14 @@ pm2 flush 2>/dev/null || true
 pm2 start ecosystem.config.js
 pm2 save --force
 
+sudo chmod -R 777 /var/lib/nginx /var/log/nginx 2>/dev/null || true
+
 echo "🚀 [7/7] Nginx 설정 (AWS ALB 헬스체크 및 도메인 호환)..."
 sudo cat <<EOF | sudo tee /etc/nginx/sites-available/velix
 server {
     listen 80 default_server;
     listen [::]:80 default_server;
-    server_name _ ${DOMAIN} ${WWW_DOMAIN};
+    server_name _ ${DOMAIN} ${WWW_DOMAIN} velix.moibluu.com *.moibluu.com;
 
     client_max_body_size 50M;
 
