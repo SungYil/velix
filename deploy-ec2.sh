@@ -36,6 +36,9 @@ npm install
 npm rebuild better-sqlite3
 rm -rf .next
 
+export NODE_OPTIONS="--max-old-space-size=2048"
+export NEXT_TELEMETRY_DISABLED=1
+
 echo "Executing npm run build..."
 npm run build
 
