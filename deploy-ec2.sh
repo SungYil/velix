@@ -1,16 +1,16 @@
 #!/bin/bash
 # =================================================================
-# VelixENT AWS EC2 Auto Deployment Script for moibluu.com
+# VelixENT AWS EC2 Auto Deployment Script for AWS ALB & moibluu.com
 # =================================================================
 
 DOMAIN="moibluu.com"
 WWW_DOMAIN="www.moibluu.com"
 
-echo "🚀 [1/6] 시스템 패키지 업데이트 및 기본 필요 도구 설치 중..."
+echo "🚀 [1/6] 시스템 패키지 업데이트 및 필요 도구 설치..."
 sudo apt-get update -y
-sudo apt-get install -y curl git build-essential nginx certbot python3-certbot-nginx sqlite3
+sudo apt-get install -y curl git build-essential nginx sqlite3
 
-echo "🚀 [2/6] Node.js 20 LTS 및 PM2 프로세스 매니저 설치 중..."
+echo "🚀 [2/6] Node.js 20 LTS 및 PM2 프로세스 매니저 설치..."
 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 sudo apt-get install -y nodejs
 sudo npm install -g pm2
@@ -34,11 +34,12 @@ pm2 delete velix 2>/dev/null || true
 pm2 start npm --name "velix" -- start
 pm2 save
 
-echo "🚀 [6/6] Nginx 리버스 프록시 및 SSL (HTTPS) 설정..."
+echo "🚀 [6/6] Nginx 설정 (AWS ALB 헬스체크 및 도메인 호환)..."
 sudo cat <<EOF | sudo tee /etc/nginx/sites-available/velix
 server {
-    listen 80;
-    server_name ${DOMAIN} ${WWW_DOMAIN};
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    server_name _ ${DOMAIN} ${WWW_DOMAIN};
 
     client_max_body_size 50M;
 
@@ -51,6 +52,7 @@ server {
         proxy_cache_bypass \$http_upgrade;
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$http_x_forwarded_proto;
     }
 }
 EOF
@@ -60,6 +62,5 @@ sudo rm -f /etc/nginx/sites-enabled/default
 sudo nginx -t
 sudo systemctl restart nginx
 
-echo "🎉 Nginx 설정이 완료되었습니다."
-echo "HTTPS 무료 SSL 인증서를 발급하려면 아래 명령어를 별도로 실행해 주세요:"
-echo "sudo certbot --nginx -d ${DOMAIN} -d ${WWW_DOMAIN}"
+echo "🎉 Nginx 및 Next.js 배포가 완료되었습니다!"
+echo "ALB 타깃그룹 헬스체크 상태 및 Nginx 동작을 확인해 주세요."
