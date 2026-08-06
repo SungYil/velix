@@ -39,6 +39,8 @@ rm -rf .next
 
 export NODE_OPTIONS="--max-old-space-size=2048"
 export NEXT_TELEMETRY_DISABLED=1
+export NEXT_PRIVATE_WORKERS=1
+export NEXT_MAX_WORKERS=1
 
 echo "Executing npm run build..."
 npm run build
