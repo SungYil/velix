@@ -22,6 +22,9 @@ import {
   Video as VideoIcon,
   Paperclip,
   ExternalLink,
+  Type,
+  Palette,
+  List,
 } from 'lucide-react';
 
 function getDisplayUrl(url: string) {
@@ -48,6 +51,127 @@ function getDownloadUrl(url: string, filename?: string) {
     if (search) key = decodeURIComponent(search.split('&')[0]);
   }
   return `/api/files?key=${encodeURIComponent(key)}&download=true${filename ? `&filename=${encodeURIComponent(filename)}` : ''}`;
+}
+
+// Rich Text Editor Formatting Toolbar Component
+function RichTextToolbar({
+  onInsertTag,
+  onInsertMedia,
+}: {
+  onInsertTag: (startTag: string, endTag: string, defaultText?: string) => void;
+  onInsertMedia: () => void;
+}) {
+  return (
+    <div className="flex flex-wrap items-center gap-1.5 p-2 rounded-xl bg-white/5 border border-white/10 mb-2">
+      {/* Bold */}
+      <button
+        type="button"
+        onClick={() => onInsertTag('<b>', '</b>', '굵은 텍스트')}
+        className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-xs"
+        title="굵게 (Bold)"
+      >
+        <b>B</b>
+      </button>
+
+      {/* Italic */}
+      <button
+        type="button"
+        onClick={() => onInsertTag('<i>', '</i>', '기울임 텍스트')}
+        className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs italic"
+        title="기울임 (Italic)"
+      >
+        <i>I</i>
+      </button>
+
+      {/* Underline */}
+      <button
+        type="button"
+        onClick={() => onInsertTag('<u>', '</u>', '밑줄 텍스트')}
+        className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs underline"
+        title="밑줄 (Underline)"
+      >
+        <u>U</u>
+      </button>
+
+      <span className="w-px h-4 bg-white/20 mx-1" />
+
+      {/* Headings */}
+      <button
+        type="button"
+        onClick={() => onInsertTag('<h2 style="font-size:22px; font-weight:bold; color:#ffffff; margin:16px 0;">', '</h2>', '대제목')}
+        className="px-2.5 py-1 rounded-lg bg-purple-600/30 hover:bg-purple-600/50 text-purple-300 font-bold text-xs"
+      >
+        H1 대제목
+      </button>
+      <button
+        type="button"
+        onClick={() => onInsertTag('<h3 style="font-size:18px; font-weight:bold; color:#c084fc; margin:12px 0;">', '</h3>', '중제목')}
+        className="px-2.5 py-1 rounded-lg bg-purple-600/30 hover:bg-purple-600/50 text-purple-300 font-bold text-xs"
+      >
+        H2 중제목
+      </button>
+
+      <span className="w-px h-4 bg-white/20 mx-1" />
+
+      {/* Font Size Selector */}
+      <select
+        onChange={(e) => {
+          if (e.target.value) {
+            onInsertTag(`<span style="font-size:${e.target.value}; font-weight:600;">`, '</span>', '글씨 크기');
+            e.target.value = '';
+          }
+        }}
+        className="px-2 py-1 rounded-lg bg-[#1a1d2d] text-gray-200 text-xs font-semibold border border-white/10 focus:outline-none cursor-pointer"
+      >
+        <option value="">글자 크기</option>
+        <option value="12px">작게 (12px)</option>
+        <option value="14px">보통 (14px)</option>
+        <option value="18px">크게 (18px)</option>
+        <option value="24px">매우 크게 (24px)</option>
+        <option value="32px">특대 (32px)</option>
+      </select>
+
+      {/* Text Color Selector */}
+      <select
+        onChange={(e) => {
+          if (e.target.value) {
+            onInsertTag(`<span style="color:${e.target.value};">`, '</span>', '색상 텍스트');
+            e.target.value = '';
+          }
+        }}
+        className="px-2 py-1 rounded-lg bg-[#1a1d2d] text-gray-200 text-xs font-semibold border border-white/10 focus:outline-none cursor-pointer"
+      >
+        <option value="">글자 색상</option>
+        <option value="#a855f7">🟣 보라색</option>
+        <option value="#ec4899">🩷 핑크색</option>
+        <option value="#eab308">🟡 골드/노랑</option>
+        <option value="#10b981">🟢 민트/초록</option>
+        <option value="#3b82f6">🔵 파란색</option>
+        <option value="#ffffff">⚪ 흰색</option>
+      </select>
+
+      <span className="w-px h-4 bg-white/20 mx-1" />
+
+      {/* Bullet List */}
+      <button
+        type="button"
+        onClick={() => onInsertTag('<ul style="list-style-type:disc; padding-left:20px; margin:12px 0;">\n  <li>', '</li>\n</ul>', '목록 항목')}
+        className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-gray-200 text-xs font-semibold"
+      >
+        • 목록
+      </button>
+
+      {/* Media Uploader */}
+      <button
+        type="button"
+        onClick={onInsertMedia}
+        className="px-2.5 py-1 rounded-lg bg-pink-600/40 hover:bg-pink-600/60 text-pink-200 font-bold text-xs flex items-center gap-1 ml-auto"
+      >
+        <ImageIcon className="w-3.5 h-3.5" />
+        <span>+ 사진/동영상 첨부</span>
+      </button>
+    </div>
+  );
 }
 
 export default function AdminDashboardPage() {
@@ -119,6 +243,20 @@ export default function AdminDashboardPage() {
   const handleLogout = async () => {
     await fetch('/api/admin/logout', { method: 'POST' });
     router.push('/admin/login');
+  };
+
+  // Insert Rich Text Formatting Tag into State
+  const handleInsertTag = (
+    targetSetter: React.Dispatch<React.SetStateAction<any>>,
+    field: string,
+    startTag: string,
+    endTag: string,
+    defaultText: string = '텍스트'
+  ) => {
+    targetSetter((prev: any) => ({
+      ...prev,
+      [field]: (prev[field] || '') + `${startTag}${defaultText}${endTag}`,
+    }));
   };
 
   // Upload inline media (Image/Video) into post content
@@ -381,11 +519,17 @@ export default function AdminDashboardPage() {
   const parseFilesList = (item: any) => {
     if (item.files_json) {
       try {
-        const parsed = JSON.parse(item.files_json);
+        const parsed = typeof item.files_json === 'string' ? JSON.parse(item.files_json) : item.files_json;
         if (Array.isArray(parsed) && parsed.length > 0) return parsed;
       } catch {}
     }
     if (item.file_url) {
+      if (typeof item.file_url === 'string' && item.file_url.startsWith('[')) {
+        try {
+          const parsed = JSON.parse(item.file_url);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        } catch {}
+      }
       return [{ url: item.file_url, name: item.file_name || '첨부파일' }];
     }
     return [];
@@ -495,7 +639,7 @@ export default function AdminDashboardPage() {
                       <th className="p-4">연락처</th>
                       <th className="p-4">이메일</th>
                       <th className="p-4">스튜디오</th>
-                      <th className="p-4">첨부파일(미디어)</th>
+                      <th className="p-4">첨부파일(미디어 목록)</th>
                       <th className="p-4 text-center">관리</th>
                     </tr>
                   </thead>
@@ -533,7 +677,7 @@ export default function AdminDashboardPage() {
                                       className="inline-flex items-center gap-1.5 text-xs text-purple-400 hover:text-purple-300 underline font-semibold"
                                     >
                                       <FileDown className="w-3.5 h-3.5" />
-                                      <span className="max-w-[140px] truncate">{f.name || `파일 ${idx + 1}`}</span>
+                                      <span className="max-w-[160px] truncate">{f.name || `파일 ${idx + 1}`}</span>
                                     </a>
                                   ))}
                                 </div>
@@ -586,7 +730,7 @@ export default function AdminDashboardPage() {
                       <th className="p-4">문의자/회사명</th>
                       <th className="p-4">연락처</th>
                       <th className="p-4">이메일</th>
-                      <th className="p-4">첨부 제안서</th>
+                      <th className="p-4">첨부 제안서 목록</th>
                       <th className="p-4 text-center">관리</th>
                     </tr>
                   </thead>
@@ -618,7 +762,7 @@ export default function AdminDashboardPage() {
                                       className="inline-flex items-center gap-1.5 text-xs text-purple-400 hover:text-purple-300 underline font-semibold"
                                     >
                                       <FileDown className="w-3.5 h-3.5" />
-                                      <span className="max-w-[140px] truncate">{f.name || `제안서 ${idx + 1}`}</span>
+                                      <span className="max-w-[160px] truncate">{f.name || `제안서 ${idx + 1}`}</span>
                                     </a>
                                   ))}
                                 </div>
@@ -697,23 +841,17 @@ export default function AdminDashboardPage() {
                   />
                 </div>
                 <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="block text-xs font-bold text-gray-400 uppercase">본문 내용</label>
-                    <button
-                      type="button"
-                      onClick={() => handleInsertMedia(setNewInsight, 'content')}
-                      className="px-2.5 py-1 rounded-lg bg-purple-600/30 hover:bg-purple-600/50 text-purple-300 text-xs font-bold flex items-center gap-1 transition-colors"
-                    >
-                      <ImageIcon className="w-3.5 h-3.5" />
-                      <span>+ 미디어(사진/영상) 본문 삽입</span>
-                    </button>
-                  </div>
+                  <label className="block text-xs font-bold text-gray-400 uppercase mb-1">본문 텍스트 서식 서명 툴바</label>
+                  <RichTextToolbar
+                    onInsertTag={(startTag, endTag, defaultText) => handleInsertTag(setNewInsight, 'content', startTag, endTag, defaultText)}
+                    onInsertMedia={() => handleInsertMedia(setNewInsight, 'content')}
+                  />
                   <textarea
-                    rows={8}
+                    rows={9}
                     required
                     value={newInsight.content}
                     onChange={(e) => setNewInsight({ ...newInsight, content: e.target.value })}
-                    placeholder="본문 내용을 입력하세요. 상단 버튼으로 사진 및 동영상을 본문에 다중 삽입할 수 있습니다."
+                    placeholder="본문 내용을 입력하세요. 상단 서식 툴바(굵게, 크기, 색상, 사진/동영상 첨부)를 활용해 서식을 자유롭게 스타일링할 수 있습니다."
                     className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-purple-500 font-mono"
                   />
                 </div>
@@ -796,19 +934,13 @@ export default function AdminDashboardPage() {
                   />
                 </div>
                 <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="block text-xs font-bold text-gray-400 uppercase">공지 내용</label>
-                    <button
-                      type="button"
-                      onClick={() => handleInsertMedia(setNewNotice, 'content')}
-                      className="px-2.5 py-1 rounded-lg bg-purple-600/30 hover:bg-purple-600/50 text-purple-300 text-xs font-bold flex items-center gap-1 transition-colors"
-                    >
-                      <ImageIcon className="w-3.5 h-3.5" />
-                      <span>+ 미디어 삽입</span>
-                    </button>
-                  </div>
+                  <label className="block text-xs font-bold text-gray-400 uppercase mb-1">공지 내용 서식 툴바</label>
+                  <RichTextToolbar
+                    onInsertTag={(startTag, endTag, defaultText) => handleInsertTag(setNewNotice, 'content', startTag, endTag, defaultText)}
+                    onInsertMedia={() => handleInsertMedia(setNewNotice, 'content')}
+                  />
                   <textarea
-                    rows={8}
+                    rows={9}
                     required
                     value={newNotice.content}
                     onChange={(e) => setNewNotice({ ...newNotice, content: e.target.value })}
@@ -889,7 +1021,11 @@ export default function AdminDashboardPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-gray-400 uppercase mb-1">답변 (Answer)</label>
+                  <label className="block text-xs font-bold text-gray-400 uppercase mb-1">답변 서식 툴바</label>
+                  <RichTextToolbar
+                    onInsertTag={(startTag, endTag, defaultText) => handleInsertTag(setNewFaq, 'answer', startTag, endTag, defaultText)}
+                    onInsertMedia={() => handleInsertMedia(setNewFaq, 'answer')}
+                  />
                   <textarea
                     rows={6}
                     required
@@ -917,7 +1053,7 @@ export default function AdminDashboardPage() {
                     <div>
                       <span className="px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 text-[10px] font-bold">{faq.category}</span>
                       <h3 className="font-bold text-white text-sm mt-1">Q. {faq.question}</h3>
-                      <p className="text-xs text-gray-400 mt-1 line-clamp-2">{faq.answer}</p>
+                      <p className="text-xs text-gray-400 mt-1 line-clamp-2">{faq.answer.replace(/<[^>]*>?/gm, '')}</p>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
                       <button
@@ -986,30 +1122,36 @@ export default function AdminDashboardPage() {
                 </p>
               </div>
 
-              {/* Attachments Section */}
+              {/* Attachments Section (Multiple Files Support) */}
               <div>
-                <span className="text-xs text-gray-400 block mb-2">첨부 미디어 및 파일 목록</span>
+                <span className="text-xs text-gray-400 block mb-2 font-bold uppercase tracking-wider">
+                  첨부 미디어 및 포트폴리오 파일 목록 ({parseFilesList(selectedItem.data).length}개)
+                </span>
                 {parseFilesList(selectedItem.data).length > 0 ? (
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     {parseFilesList(selectedItem.data).map((f: any, idx: number) => (
-                      <div key={idx} className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-3">
+                      <div key={idx} className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-3">
                         <div className="flex items-center justify-between">
-                          <span className="font-bold text-purple-300 text-sm">{f.name || `파일 ${idx + 1}`}</span>
+                          <div className="flex items-center gap-2 truncate">
+                            <Paperclip className="w-4 h-4 text-purple-400 shrink-0" />
+                            <span className="font-bold text-purple-300 text-sm truncate">{f.name || `첨부파일 ${idx + 1}`}</span>
+                          </div>
                           <a
                             href={getDownloadUrl(f.url, f.name)}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="px-3 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs flex items-center gap-1.5"
+                            className="px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs flex items-center gap-1.5 shrink-0 shadow-md"
                           >
                             <Download className="w-3.5 h-3.5" />
                             <span>다운로드</span>
                           </a>
                         </div>
-                        {/* Media Preview inside Modal */}
-                        {f.url && (f.url.endsWith('.mp4') || f.url.endsWith('.webm')) ? (
-                          <video src={getDisplayUrl(f.url)} controls className="w-full max-h-60 rounded-xl border border-white/10" />
-                        ) : f.url && (f.url.endsWith('.jpg') || f.url.endsWith('.jpeg') || f.url.endsWith('.png') || f.url.endsWith('.webp') || f.url.endsWith('.gif') || f.url.includes('/api/files')) ? (
-                          <img src={getDisplayUrl(f.url)} alt={f.name} className="w-full max-h-60 object-contain rounded-xl border border-white/10 bg-black/40" />
+
+                        {/* Media Preview inside Detail Modal */}
+                        {f.url && (f.url.endsWith('.mp4') || f.url.endsWith('.webm') || (f.type && f.type.startsWith('video/'))) ? (
+                          <video src={getDisplayUrl(f.url)} controls className="w-full max-h-72 rounded-xl border border-white/10 bg-black/60" />
+                        ) : f.url && (f.url.endsWith('.jpg') || f.url.endsWith('.jpeg') || f.url.endsWith('.png') || f.url.endsWith('.webp') || f.url.endsWith('.gif') || f.url.includes('/api/files') || (f.type && f.type.startsWith('image/'))) ? (
+                          <img src={getDisplayUrl(f.url)} alt={f.name} className="w-full max-h-72 object-contain rounded-xl border border-white/10 bg-black/40" />
                         ) : null}
                       </div>
                     ))}
@@ -1063,17 +1205,11 @@ export default function AdminDashboardPage() {
                 />
               </div>
               <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="block text-xs font-bold text-gray-400 uppercase">본문 내용 (사진/영상 다중 삽입 가능)</label>
-                  <button
-                    type="button"
-                    onClick={() => handleInsertMedia(setEditInsightModal, 'content')}
-                    className="px-2.5 py-1 rounded-lg bg-purple-600/30 hover:bg-purple-600/50 text-purple-300 text-xs font-bold flex items-center gap-1"
-                  >
-                    <ImageIcon className="w-3.5 h-3.5" />
-                    <span>+ 미디어 삽입</span>
-                  </button>
-                </div>
+                <label className="block text-xs font-bold text-gray-400 uppercase mb-1">본문 내용 서식 툴바</label>
+                <RichTextToolbar
+                  onInsertTag={(startTag, endTag, defaultText) => handleInsertTag(setEditInsightModal, 'content', startTag, endTag, defaultText)}
+                  onInsertMedia={() => handleInsertMedia(setEditInsightModal, 'content')}
+                />
                 <textarea
                   rows={8}
                   required
@@ -1134,17 +1270,11 @@ export default function AdminDashboardPage() {
                 />
               </div>
               <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="block text-xs font-bold text-gray-400 uppercase">내용</label>
-                  <button
-                    type="button"
-                    onClick={() => handleInsertMedia(setEditNoticeModal, 'content')}
-                    className="px-2.5 py-1 rounded-lg bg-purple-600/30 hover:bg-purple-600/50 text-purple-300 text-xs font-bold flex items-center gap-1"
-                  >
-                    <ImageIcon className="w-3.5 h-3.5" />
-                    <span>+ 미디어 삽입</span>
-                  </button>
-                </div>
+                <label className="block text-xs font-bold text-gray-400 uppercase mb-1">내용 서식 툴바</label>
+                <RichTextToolbar
+                  onInsertTag={(startTag, endTag, defaultText) => handleInsertTag(setEditNoticeModal, 'content', startTag, endTag, defaultText)}
+                  onInsertMedia={() => handleInsertMedia(setEditNoticeModal, 'content')}
+                />
                 <textarea
                   rows={8}
                   required
@@ -1205,7 +1335,11 @@ export default function AdminDashboardPage() {
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-gray-400 uppercase mb-1">답변</label>
+                <label className="block text-xs font-bold text-gray-400 uppercase mb-1">답변 서식 툴바</label>
+                <RichTextToolbar
+                  onInsertTag={(startTag, endTag, defaultText) => handleInsertTag(setEditFaqModal, 'answer', startTag, endTag, defaultText)}
+                  onInsertMedia={() => handleInsertMedia(setEditFaqModal, 'answer')}
+                />
                 <textarea
                   rows={6}
                   required
