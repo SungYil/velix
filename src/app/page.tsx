@@ -1,69 +1,207 @@
-import Image from "next/image";
+'use client';
+
+import React from 'react';
+import Link from 'next/link';
+import ScrollReveal from '@/components/ScrollReveal';
+import { Sparkles, ArrowRight, Video, Users, Award, ShieldCheck, PlayCircle, Star } from 'lucide-react';
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="space-y-24 pb-20">
+      {/* Hero Section */}
+      <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden pt-12">
+        {/* Ambient Glowing Background */}
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-tr from-purple-600/30 via-pink-500/20 to-cyan-500/10 rounded-full blur-[140px] pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center space-y-8">
+          <ScrollReveal direction="up" delay={0.1}>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-panel border border-purple-500/30 text-purple-300 text-xs sm:text-sm font-semibold mb-4">
+              <Sparkles className="w-4 h-4 text-pink-400 animate-spin-slow" />
+              <span>Next Generation Creator MCN Group</span>
+            </div>
+          </ScrollReveal>
+
+          <ScrollReveal direction="up" delay={0.2}>
+            <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight leading-[1.1] text-white">
+              CREATE THE <br />
+              <span className="gradient-text">FUTURE OF MEDIA</span>
+            </h1>
+          </ScrollReveal>
+
+          <ScrollReveal direction="up" delay={0.3}>
+            <p className="max-w-2xl mx-auto text-base sm:text-xl text-gray-300 font-light leading-relaxed">
+              VelixENT는 차세대 1인 미디어 크리에이터와 함께 새로운 문화 콘텐츠 생태계를 개척합니다.
+              독보적인 기획력과 스튜디오 인프라로 무한한 가능성을 경험하세요.
+            </p>
+          </ScrollReveal>
+
+          <ScrollReveal direction="up" delay={0.4}>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+              <Link
+                href="/creator/apply"
+                className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-purple-600 via-pink-600 to-amber-500 hover:opacity-95 text-white font-black text-base shadow-2xl hover:scale-105 transition-all flex items-center justify-center gap-3 group"
+              >
+                <span>BJ / 크리에이터 지원하기</span>
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </Link>
+              <Link
+                href="/velixent/about"
+                className="w-full sm:w-auto px-8 py-4 rounded-2xl glass-panel hover:bg-white/10 text-gray-200 font-bold text-base border border-white/15 transition-all flex items-center justify-center gap-2"
+              >
+                <span>회사소개 자세히 보기</span>
+              </Link>
+            </div>
+          </ScrollReveal>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </section>
+
+      {/* Stats Counter Section */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <ScrollReveal direction="up">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 p-8 rounded-3xl glass-panel border border-white/10">
+            <div className="text-center space-y-1">
+              <div className="text-3xl sm:text-5xl font-black gradient-text">150+</div>
+              <div className="text-xs sm:text-sm font-semibold text-gray-400">소속 크리에이터</div>
+            </div>
+            <div className="text-center space-y-1 border-l border-white/10">
+              <div className="text-3xl sm:text-5xl font-black text-purple-400">3,500만+</div>
+              <div className="text-xs sm:text-sm font-semibold text-gray-400">총 누적 구독자</div>
+            </div>
+            <div className="text-center space-y-1 border-l border-white/10">
+              <div className="text-3xl sm:text-5xl font-black text-pink-400">12개</div>
+              <div className="text-xs sm:text-sm font-semibold text-gray-400">자체 전용 스튜디오</div>
+            </div>
+            <div className="text-center space-y-1 border-l border-white/10">
+              <div className="text-3xl sm:text-5xl font-black text-emerald-400">98.5%</div>
+              <div className="text-xs sm:text-sm font-semibold text-gray-400">크리에이터 만족도</div>
+            </div>
+          </div>
+        </ScrollReveal>
+      </section>
+
+      {/* 4 Main Divisions Grid */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center space-y-4 mb-16">
+          <h2 className="text-3xl sm:text-5xl font-black text-white">
+            EXPLORE <span className="gradient-text">VELIXENT</span>
+          </h2>
+          <p className="text-gray-400 text-sm sm:text-base">원하시는 영역으로 바로 이동하여 자세한 정보를 확인하세요.</p>
         </div>
-      </main>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Card 1: VelixENT */}
+          <ScrollReveal direction="up" delay={0.1}>
+            <Link
+              href="/velixent/about"
+              className="group block p-8 rounded-3xl glass-panel glass-panel-hover border border-purple-500/20 relative overflow-hidden h-full"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-purple-600/20 text-purple-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <ShieldCheck className="w-6 h-6" />
+              </div>
+              <h3 className="text-2xl font-black text-white mb-2 group-hover:text-purple-300 transition-colors">
+                VelixENT
+              </h3>
+              <p className="text-xs text-gray-400 leading-relaxed mb-6">
+                회사소개, 대표 인삿말, 조직도 및 오시는 길 카카오맵 정보를 제공합니다.
+              </p>
+              <div className="flex items-center text-xs font-bold text-purple-400 gap-1 group-hover:translate-x-2 transition-transform">
+                <span>회사 둘러보기</span>
+                <ArrowRight className="w-4 h-4" />
+              </div>
+            </Link>
+          </ScrollReveal>
+
+          {/* Card 2: Creator */}
+          <ScrollReveal direction="up" delay={0.2}>
+            <Link
+              href="/creator/benefits"
+              className="group block p-8 rounded-3xl glass-panel glass-panel-hover border border-pink-500/20 relative overflow-hidden h-full"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-pink-600/20 text-pink-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <Star className="w-6 h-6" />
+              </div>
+              <h3 className="text-2xl font-black text-white mb-2 group-hover:text-pink-300 transition-colors">
+                크리에이터
+              </h3>
+              <p className="text-xs text-gray-400 leading-relaxed mb-6">
+                최신 장비/스튜디오 지원 혜택 및 미디어 크리에이터 공채 지원하기 양식.
+              </p>
+              <div className="flex items-center text-xs font-bold text-pink-400 gap-1 group-hover:translate-x-2 transition-transform">
+                <span>지원혜택 & 지원하기</span>
+                <ArrowRight className="w-4 h-4" />
+              </div>
+            </Link>
+          </ScrollReveal>
+
+          {/* Card 3: Business */}
+          <ScrollReveal direction="up" delay={0.3}>
+            <Link
+              href="/business/intro"
+              className="group block p-8 rounded-3xl glass-panel glass-panel-hover border border-cyan-500/20 relative overflow-hidden h-full"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-cyan-600/20 text-cyan-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <Video className="w-6 h-6" />
+              </div>
+              <h3 className="text-2xl font-black text-white mb-2 group-hover:text-cyan-300 transition-colors">
+                사업영역
+              </h3>
+              <p className="text-xs text-gray-400 leading-relaxed mb-6">
+                라이브 커머스, 브랜드 컬래버레이션 및 1:1 비즈니스 제휴 문의.
+              </p>
+              <div className="flex items-center text-xs font-bold text-cyan-400 gap-1 group-hover:translate-x-2 transition-transform">
+                <span>사업소개 & 비즈니스 문의</span>
+                <ArrowRight className="w-4 h-4" />
+              </div>
+            </Link>
+          </ScrollReveal>
+
+          {/* Card 4: Community */}
+          <ScrollReveal direction="up" delay={0.4}>
+            <Link
+              href="/community/insights"
+              className="group block p-8 rounded-3xl glass-panel glass-panel-hover border border-amber-500/20 relative overflow-hidden h-full"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-amber-600/20 text-amber-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <Users className="w-6 h-6" />
+              </div>
+              <h3 className="text-2xl font-black text-white mb-2 group-hover:text-amber-300 transition-colors">
+                커뮤니티
+              </h3>
+              <p className="text-xs text-gray-400 leading-relaxed mb-6">
+                트렌드 인사이트 칼럼, 주요 공지사항 및 자주묻는질문(FAQ) 아코디언.
+              </p>
+              <div className="flex items-center text-xs font-bold text-amber-400 gap-1 group-hover:translate-x-2 transition-transform">
+                <span>인사이트 & FAQ</span>
+                <ArrowRight className="w-4 h-4" />
+              </div>
+            </Link>
+          </ScrollReveal>
+        </div>
+      </section>
+
+      {/* Creator Apply CTA Banner */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <ScrollReveal direction="up">
+          <div className="relative rounded-3xl p-10 md:p-16 overflow-hidden glass-panel border border-purple-500/40 bg-gradient-to-r from-purple-900/40 via-indigo-900/30 to-pink-900/30 text-center space-y-6">
+            <h2 className="text-3xl sm:text-5xl font-black text-white">
+              당신의 특별한 개성을 <br className="sm:hidden" />
+              <span className="gradient-text">VelixENT</span>에서 펼치세요!
+            </h2>
+            <p className="max-w-xl mx-auto text-sm sm:text-base text-gray-300">
+              초보 BJ부터 정통 크리에이터까지 1:1 맞춤 스튜디오, 방송 장비, 개인 퍼스널 브랜딩 솔루션을 전폭 지원합니다.
+            </p>
+            <div className="pt-4">
+              <Link
+                href="/creator/apply"
+                className="inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-white text-purple-950 font-black text-base hover:bg-gray-100 transition-all shadow-xl hover:scale-105"
+              >
+                <span>지금 바로 크리에이터 지원하기</span>
+                <ArrowRight className="w-5 h-5 text-purple-600" />
+              </Link>
+            </div>
+          </div>
+        </ScrollReveal>
+      </section>
     </div>
   );
 }
