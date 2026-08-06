@@ -31,7 +31,11 @@ echo "🚀 [4/6] 디렉토리 및 이전 캐시 완전 소거..."
 rm -f server.js
 rm -rf .next node_modules/.cache
 mkdir -p data public/uploads
-chmod -R 777 data public/uploads
+
+# Nginx(www-data 유저)가 /home/ubuntu 접근 가능하도록 755 접근 권한 부여 (403 Forbidden 완벽 방지)
+sudo chmod 755 /home/ubuntu 2>/dev/null || true
+sudo chmod 755 ${CDIR} 2>/dev/null || true
+chmod -R 777 data public/uploads 2>/dev/null || true
 
 echo "🚀 [5/6] 패키지 설치 및 단일 스레드 클린 빌드..."
 npm install
@@ -45,7 +49,8 @@ if [ ! -d ".next" ]; then
     exit 1
 fi
 
-chmod -R 777 .next data public 2>/dev/null || true
+sudo chmod -R 755 ${CDIR}/.next 2>/dev/null || true
+chmod -R 777 data public/uploads 2>/dev/null || true
 
 echo "🚀 [6/6] PM2 무중단 프로세스 초기화 및 구동..."
 pm2 delete all 2>/dev/null || true
