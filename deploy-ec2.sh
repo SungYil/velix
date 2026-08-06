@@ -8,7 +8,7 @@ WWW_DOMAIN="www.moibluu.com"
 
 echo "🚀 [1/6] 시스템 패키지 업데이트 및 필요 도구 설치..."
 sudo apt-get update -y
-sudo apt-get install -y curl git build-essential nginx sqlite3
+sudo apt-get install -y curl git build-essential nginx sqlite3 libsqlite3-dev
 
 echo "🚀 [2/6] Node.js 20 LTS 및 PM2 프로세스 매니저 설치..."
 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
@@ -24,17 +24,22 @@ if [ ! -f /swapfile ]; then
     echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
 fi
 
-echo "🚀 [4/6] Next.js 앱 패키지 설치 및 빌드..."
+echo "🚀 [4/6] 데이터 및 업로드 디렉토리 권한 생성..."
+mkdir -p data public/uploads
+chmod -R 777 data public/uploads
+
+echo "🚀 [5/6] Next.js 앱 패키지 설치, 빌드 및 네이티브 모듈 재구성..."
 npm install
+npm rebuild better-sqlite3
 npm run build
 
-echo "🚀 [5/6] PM2 무중단 서비스 등록..."
+echo "🚀 [6/6] PM2 무중단 서비스 구동..."
 pm2 stop velix 2>/dev/null || true
 pm2 delete velix 2>/dev/null || true
-pm2 start npm --name "velix" -- start
+pm2 start node_modules/next/dist/bin/next --name "velix" -- start --port 3000
 pm2 save
 
-echo "🚀 [6/6] Nginx 설정 (AWS ALB 헬스체크 및 도메인 호환)..."
+echo "🚀 [7/7] Nginx 설정 (AWS ALB 헬스체크 및 도메인 호환)..."
 sudo cat <<EOF | sudo tee /etc/nginx/sites-available/velix
 server {
     listen 80 default_server;
@@ -62,5 +67,6 @@ sudo rm -f /etc/nginx/sites-enabled/default
 sudo nginx -t
 sudo systemctl restart nginx
 
-echo "🎉 Nginx 및 Next.js 배포가 완료되었습니다!"
-echo "ALB 타깃그룹 헬스체크 상태 및 Nginx 동작을 확인해 주세요."
+echo "🎉 Nginx 및 Next.js 배포 완료!"
+echo "PM2 상태:"
+pm2 status
