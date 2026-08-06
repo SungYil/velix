@@ -93,22 +93,25 @@ export default function Navbar() {
                   <ChevronDown className="w-4 h-4 opacity-70 group-hover:rotate-180 transition-transform" />
                 </button>
 
-                {/* Dropdown Menu */}
+                {/* Dropdown Menu with Seamless Hover Bridge */}
                 {activeDropdown === menu.key && (
-                  <div className="absolute top-full left-0 mt-1 w-48 rounded-2xl glass-panel p-2 shadow-2xl border border-white/15 animate-in fade-in slide-in-from-top-2 duration-200">
-                    {menu.items.map((item) => (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        className={`block px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-                          pathname === item.href
-                            ? 'bg-purple-600/30 text-purple-300 font-bold'
-                            : 'text-gray-300 hover:bg-white/10 hover:text-white'
-                        }`}
-                      >
-                        {item.label}
-                      </Link>
-                    ))}
+                  <div className="absolute top-full left-0 pt-2 w-48 z-50">
+                    <div className="rounded-2xl glass-panel p-2 shadow-2xl border border-white/15 animate-in fade-in slide-in-from-top-2 duration-200">
+                      {menu.items.map((item) => (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          onClick={() => setActiveDropdown(null)}
+                          className={`block px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+                            pathname === item.href
+                              ? 'bg-purple-600/30 text-purple-300 font-bold'
+                              : 'text-gray-300 hover:bg-white/10 hover:text-white'
+                          }`}
+                        >
+                          {item.label}
+                        </Link>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
