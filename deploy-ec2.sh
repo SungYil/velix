@@ -28,18 +28,19 @@ echo "🚀 [4/6] 데이터 및 업로드 디렉토리 권한 생성..."
 mkdir -p data public/uploads
 chmod -R 777 data public/uploads
 
-echo "🚀 [5/6] Next.js 앱 패키지 설치, 네이티브 모듈 빌드 및 프로덕션 빌드..."
+echo "🚀 [5/6] 이전 빌드 클리어 및 프로덕션 재빌드..."
 npm install
 npm rebuild better-sqlite3
+rm -rf .next
 npm run build
 
-# 빌드 결과 확인
+# 빌드 결과 검증
 if [ ! -d ".next" ]; then
-    echo "❌ error: .next 빌드 폴더가 생성되지 않았습니다!"
+    echo "❌ error: .next 빌드 폴더가 생성되지 않았습니다! npm run build 에러를 확인하세요."
     exit 1
 fi
 
-echo "🚀 [6/6] PM2 기존 프로세스 초기화 및 ecosystem 구동..."
+echo "🚀 [6/6] PM2 서비스 초기화 및 구동..."
 pm2 kill 2>/dev/null || true
 pm2 start ecosystem.config.js
 pm2 save

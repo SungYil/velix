@@ -1,11 +1,9 @@
-const path = require('path');
-
 module.exports = {
   apps: [
     {
       name: 'velix',
-      script: 'node_modules/next/dist/bin/next',
-      args: 'start -p 3000',
+      script: 'npm',
+      args: 'start',
       cwd: __dirname,
       instances: 1,
       autorestart: true,
@@ -13,7 +11,7 @@ module.exports = {
       max_memory_restart: '1G',
       env: {
         NODE_ENV: 'production',
-        PORT: 3000,
+        PORT: '3000',
       },
     },
   ],
