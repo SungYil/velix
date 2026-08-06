@@ -46,23 +46,8 @@ export UV_THREADPOOL_SIZE=1
 echo "Executing npm run build..."
 npm run build
 
-echo "Copying static assets and build manifests to standalone folder..."
-cp -r public .next/standalone/ 2>/dev/null || true
-cp -r .next/static .next/standalone/.next/ 2>/dev/null || true
-cp .next/BUILD_ID .next/standalone/.next/ 2>/dev/null || true
-cp .next/*.json .next/standalone/.next/ 2>/dev/null || true
-
-echo "Rebuilding better-sqlite3 native binary for Linux..."
-npm rebuild better-sqlite3
-if [ -d ".next/standalone/node_modules/better-sqlite3" ]; then
-    (cd .next/standalone/node_modules/better-sqlite3 && npm run build-release 2>/dev/null || npx node-gyp rebuild 2>/dev/null || true)
-fi
-
-mkdir -p data public/uploads .next/standalone/data .next/standalone/public/uploads
-chmod -R 777 data public/uploads .next/standalone/data 2>/dev/null || true
-
-if [ ! -f ".next/standalone/server.js" ]; then
-    echo "❌ error: .next/standalone/server.js 파일이 생성되지 않았습니다!"
+if [ ! -d ".next" ]; then
+    echo "❌ error: .next 빌드 폴더가 생성되지 않았습니다!"
     exit 1
 fi
 
@@ -110,5 +95,5 @@ sudo rm -f /etc/nginx/sites-enabled/default
 sudo nginx -t
 sudo systemctl restart nginx
 
-echo "🎉 Nginx 및 Next.js Standalone 배포 완벽 성공!"
+echo "🎉 Nginx 및 Next.js 배포 완벽 성공!"
 pm2 status
