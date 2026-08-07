@@ -54,6 +54,7 @@ export default function Navbar() {
       items: [
         { label: '사업소개', href: '/business/intro' },
         { label: '비즈니스 문의', href: '/business/inquire' },
+        { label: '에이전트 지원', href: '/business/agent' },
       ],
     },
     {

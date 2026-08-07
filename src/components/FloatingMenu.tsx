@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { MessageCircle, BookOpen, UserPlus, ChevronUp, Camera } from 'lucide-react';
+import { MessageCircle, UserCheck, UserPlus, ChevronUp, Camera } from 'lucide-react';
 
 export default function FloatingMenu() {
   const scrollToTop = () => {
@@ -15,11 +15,11 @@ export default function FloatingMenu() {
       <div className="flex flex-col gap-2.5 p-2 rounded-2xl glass-panel border border-cyan-500/30 shadow-2xl backdrop-blur-xl bg-[#060913]/90">
         {/* KakaoTalk Consultation */}
         <a
-          href="https://pf.kakao.com"
+          href="https://open.kakao.com/o/g3o55Cvi"
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-[#FEE500] hover:bg-[#FADA0A] text-[#191919] font-bold text-xs transition-all shadow-md group hover:scale-105"
-          title="카카오톡 상담하기"
+          title="카카오톡 오픈채팅 상담"
         >
           <MessageCircle className="w-4 h-4 fill-[#191919] text-[#191919] group-hover:scale-110 transition-transform" />
           <span className="hidden sm:inline">카톡 상담</span>
@@ -27,27 +27,25 @@ export default function FloatingMenu() {
 
         {/* Instagram */}
         <a
-          href="https://instagram.com"
+          href="https://www.instagram.com/velix_media0?igsh=ZWxvZ3NteWkybHJj&utm_source=qr"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-gradient-to-tr from-blue-600 via-cyan-500 to-indigo-600 hover:opacity-90 text-white font-bold text-xs transition-all shadow-md group hover:scale-105"
-          title="인스타그램 방문하기"
+          className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] hover:opacity-95 text-white font-bold text-xs transition-all shadow-md group hover:scale-105"
+          title="공식 인스타그램"
         >
           <Camera className="w-4 h-4 text-white group-hover:scale-110 transition-transform" />
           <span className="hidden sm:inline">인스타그램</span>
         </a>
 
-        {/* Naver Blog */}
-        <a
-          href="https://blog.naver.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-[#03C75A] hover:bg-[#02b350] text-white font-bold text-xs transition-all shadow-md group hover:scale-105"
-          title="공식 블로그"
+        {/* Agent Apply */}
+        <Link
+          href="/business/agent"
+          className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs transition-all shadow-md group hover:scale-105 border border-emerald-400/30"
+          title="에이전트 모집 지원"
         >
-          <BookOpen className="w-4 h-4 text-white group-hover:scale-110 transition-transform" />
-          <span className="hidden sm:inline">블로그</span>
-        </a>
+          <UserCheck className="w-4 h-4 text-emerald-200 group-hover:scale-110 transition-transform" />
+          <span className="hidden sm:inline">에이전트 지원</span>
+        </Link>
 
         {/* Creator / BJ Apply */}
         <Link

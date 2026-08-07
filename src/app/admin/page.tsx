@@ -22,6 +22,7 @@ import {
   Video as VideoIcon,
   Paperclip,
   ExternalLink,
+  UserCheck,
 } from 'lucide-react';
 
 function getDisplayUrl(url: string) {
@@ -127,7 +128,7 @@ function VisualRichTextEditor({
         <button
           type="button"
           onClick={() => execCmd('bold')}
-          className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-purple-600/50 text-white font-black text-xs"
+          className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-cyan-600/50 text-white font-black text-xs"
           title="굵게 (Bold)"
         >
           <b>B</b>
@@ -135,7 +136,7 @@ function VisualRichTextEditor({
         <button
           type="button"
           onClick={() => execCmd('italic')}
-          className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-purple-600/50 text-white text-xs italic"
+          className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-cyan-600/50 text-white text-xs italic"
           title="기울임 (Italic)"
         >
           <i>I</i>
@@ -143,7 +144,7 @@ function VisualRichTextEditor({
         <button
           type="button"
           onClick={() => execCmd('underline')}
-          className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-purple-600/50 text-white text-xs underline"
+          className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-cyan-600/50 text-white text-xs underline"
           title="밑줄 (Underline)"
         >
           <u>U</u>
@@ -154,14 +155,14 @@ function VisualRichTextEditor({
         <button
           type="button"
           onClick={() => execCmd('formatBlock', '<h2>')}
-          className="px-2.5 py-1 rounded-lg bg-purple-600/30 hover:bg-purple-600 text-purple-200 font-bold text-xs"
+          className="px-2.5 py-1 rounded-lg bg-blue-600/30 hover:bg-blue-600 text-cyan-200 font-bold text-xs"
         >
           H1 대제목
         </button>
         <button
           type="button"
           onClick={() => execCmd('formatBlock', '<h3>')}
-          className="px-2.5 py-1 rounded-lg bg-purple-600/30 hover:bg-purple-600 text-purple-200 font-bold text-xs"
+          className="px-2.5 py-1 rounded-lg bg-blue-600/30 hover:bg-blue-600 text-cyan-200 font-bold text-xs"
         >
           H2 중제목
         </button>
@@ -195,11 +196,11 @@ function VisualRichTextEditor({
           className="px-2 py-1 rounded-lg bg-[#1e2238] text-gray-200 text-xs font-semibold border border-white/10 focus:outline-none cursor-pointer"
         >
           <option value="">글자 색상</option>
-          <option value="#c084fc">🟣 보라색</option>
-          <option value="#f472b6">🩷 핑크색</option>
+          <option value="#38bdf8">🔵 사이버시안</option>
+          <option value="#60a5fa">🟦 블루</option>
           <option value="#facc15">🟡 노랑/골드</option>
           <option value="#34d399">🟢 민트/초록</option>
-          <option value="#60a5fa">🔵 파란색</option>
+          <option value="#c084fc">🟣 보라색</option>
           <option value="#ffffff">⚪ 흰색</option>
         </select>
 
@@ -226,7 +227,7 @@ function VisualRichTextEditor({
         <button
           type="button"
           onClick={handleInsertMedia}
-          className="px-3 py-1 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 hover:opacity-90 text-white font-bold text-xs flex items-center gap-1.5 ml-auto shadow-md"
+          className="px-3 py-1 rounded-lg bg-gradient-to-r from-blue-600 to-cyan-600 hover:opacity-90 text-white font-bold text-xs flex items-center gap-1.5 ml-auto shadow-md"
         >
           <ImageIcon className="w-3.5 h-3.5" />
           <span>+ 사진 / 동영상 실시간 본문 삽입</span>
@@ -239,7 +240,7 @@ function VisualRichTextEditor({
         contentEditable
         onInput={handleInput}
         onBlur={handleInput}
-        className="min-h-[240px] max-h-[500px] overflow-y-auto p-4 rounded-2xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-purple-500 font-sans leading-relaxed transition-colors select-text"
+        className="min-h-[240px] max-h-[500px] overflow-y-auto p-4 rounded-2xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-cyan-500 font-sans leading-relaxed transition-colors select-text"
         style={{ minHeight: '240px' }}
       />
     </div>
@@ -247,12 +248,13 @@ function VisualRichTextEditor({
 }
 
 export default function AdminDashboardPage() {
-  const [activeTab, setActiveTab] = useState<'creators' | 'business' | 'insights' | 'notices' | 'faqs'>('creators');
+  const [activeTab, setActiveTab] = useState<'creators' | 'agents' | 'business' | 'insights' | 'notices' | 'faqs'>('creators');
   const [authChecked, setAuthChecked] = useState(false);
   const router = useRouter();
 
   // Data states
   const [applications, setApplications] = useState<any[]>([]);
+  const [agentApplications, setAgentApplications] = useState<any[]>([]);
   const [inquiries, setInquiries] = useState<any[]>([]);
   const [insights, setInsights] = useState<any[]>([]);
   const [notices, setNotices] = useState<any[]>([]);
@@ -295,6 +297,10 @@ export default function AdminDashboardPage() {
       .then((res) => res.json())
       .then((data) => setApplications(data.applications || []));
 
+    fetch('/api/admin/agent-applications')
+      .then((res) => res.json())
+      .then((data) => setAgentApplications(data.applications || []));
+
     fetch('/api/admin/inquiries')
       .then((res) => res.json())
       .then((data) => setInquiries(data.inquiries || []));
@@ -321,6 +327,16 @@ export default function AdminDashboardPage() {
   const handleDeleteApplication = async (id: number) => {
     if (!confirm('이 지원서를 삭제하시겠습니까?')) return;
     await fetch('/api/admin/applications', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id }),
+    });
+    loadAllData();
+  };
+
+  const handleDeleteAgentApplication = async (id: number) => {
+    if (!confirm('이 에이전트 지원서를 삭제하시겠습니까?')) return;
+    await fetch('/api/admin/agent-applications', {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id }),
@@ -526,7 +542,7 @@ export default function AdminDashboardPage() {
     return (
       <div className="min-h-screen flex items-center justify-center text-white">
         <div className="flex items-center gap-3">
-          <Sparkles className="w-6 h-6 text-purple-400 animate-spin" />
+          <Sparkles className="w-6 h-6 text-cyan-400 animate-spin" />
           <span className="text-sm font-semibold">관리자 인증 상태 확인 중...</span>
         </div>
       </div>
@@ -554,19 +570,19 @@ export default function AdminDashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0B10] text-gray-100 p-4 sm:p-8">
+    <div className="min-h-screen bg-[#060913] text-gray-100 p-4 sm:p-8">
       {/* Top Admin Header */}
       <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-8 border-b border-white/10">
         <div>
-          <span className="text-xs uppercase font-bold tracking-widest text-purple-400 bg-purple-500/10 px-3 py-1 rounded-full border border-purple-500/20">
-            VelixENT Admin CMS
+          <span className="text-xs uppercase font-bold tracking-widest text-cyan-400 bg-cyan-500/10 px-3 py-1 rounded-full border border-cyan-500/20">
+            VelixMEDIA Admin CMS
           </span>
           <h1 className="text-3xl font-black text-white mt-2">관리자 종합 통합 대시보드</h1>
         </div>
         <div className="flex items-center gap-3">
           <button
             onClick={() => router.push('/')}
-            className="px-4 py-2 rounded-xl glass-panel hover:bg-white/10 text-xs font-semibold text-gray-300 flex items-center gap-1.5"
+            className="px-4 py-2 rounded-xl glass-panel hover:bg-white/10 text-xs font-semibold text-gray-300 flex items-center gap-1.5 border border-cyan-500/30"
           >
             <ExternalLink className="w-3.5 h-3.5" />
             <span>메인 웹사이트 이동</span>
@@ -593,16 +609,25 @@ export default function AdminDashboardPage() {
         <button
           onClick={() => setActiveTab('creators')}
           className={`px-5 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 transition-colors ${
-            activeTab === 'creators' ? 'bg-purple-600 text-white shadow-lg' : 'glass-panel text-gray-400 hover:text-white'
+            activeTab === 'creators' ? 'bg-blue-600 text-white shadow-lg border border-cyan-400/40' : 'glass-panel text-gray-400 hover:text-white'
           }`}
         >
           <Users className="w-4 h-4" />
           <span>크리에이터 지원서 ({applications.length})</span>
         </button>
         <button
+          onClick={() => setActiveTab('agents')}
+          className={`px-5 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 transition-colors ${
+            activeTab === 'agents' ? 'bg-emerald-600 text-white shadow-lg border border-emerald-400/40' : 'glass-panel text-gray-400 hover:text-white'
+          }`}
+        >
+          <UserCheck className="w-4 h-4" />
+          <span>에이전트 지원서 ({agentApplications.length})</span>
+        </button>
+        <button
           onClick={() => setActiveTab('business')}
           className={`px-5 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 transition-colors ${
-            activeTab === 'business' ? 'bg-purple-600 text-white shadow-lg' : 'glass-panel text-gray-400 hover:text-white'
+            activeTab === 'business' ? 'bg-blue-600 text-white shadow-lg border border-cyan-400/40' : 'glass-panel text-gray-400 hover:text-white'
           }`}
         >
           <Briefcase className="w-4 h-4" />
@@ -611,7 +636,7 @@ export default function AdminDashboardPage() {
         <button
           onClick={() => setActiveTab('insights')}
           className={`px-5 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 transition-colors ${
-            activeTab === 'insights' ? 'bg-purple-600 text-white shadow-lg' : 'glass-panel text-gray-400 hover:text-white'
+            activeTab === 'insights' ? 'bg-blue-600 text-white shadow-lg border border-cyan-400/40' : 'glass-panel text-gray-400 hover:text-white'
           }`}
         >
           <FileText className="w-4 h-4" />
@@ -620,7 +645,7 @@ export default function AdminDashboardPage() {
         <button
           onClick={() => setActiveTab('notices')}
           className={`px-5 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 transition-colors ${
-            activeTab === 'notices' ? 'bg-purple-600 text-white shadow-lg' : 'glass-panel text-gray-400 hover:text-white'
+            activeTab === 'notices' ? 'bg-blue-600 text-white shadow-lg border border-cyan-400/40' : 'glass-panel text-gray-400 hover:text-white'
           }`}
         >
           <Bell className="w-4 h-4" />
@@ -629,7 +654,7 @@ export default function AdminDashboardPage() {
         <button
           onClick={() => setActiveTab('faqs')}
           className={`px-5 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 transition-colors ${
-            activeTab === 'faqs' ? 'bg-purple-600 text-white shadow-lg' : 'glass-panel text-gray-400 hover:text-white'
+            activeTab === 'faqs' ? 'bg-blue-600 text-white shadow-lg border border-cyan-400/40' : 'glass-panel text-gray-400 hover:text-white'
           }`}
         >
           <HelpCircle className="w-4 h-4" />
@@ -643,7 +668,7 @@ export default function AdminDashboardPage() {
         {activeTab === 'creators' && (
           <div className="space-y-6">
             <h2 className="text-xl font-bold text-white flex items-center gap-2">
-              <Users className="w-5 h-5 text-purple-400" />
+              <Users className="w-5 h-5 text-cyan-400" />
               <span>접수된 크리에이터 / BJ 지원서 목록</span>
             </h2>
             <div className="glass-panel rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
@@ -676,7 +701,7 @@ export default function AdminDashboardPage() {
                             <td className="p-4 text-xs text-gray-400">{new Date(app.created_at).toLocaleString('ko-KR')}</td>
                             <td className="p-4 font-bold text-white">{app.name}</td>
                             <td className="p-4">{app.gender}</td>
-                            <td className="p-4 text-purple-300">{app.phone}</td>
+                            <td className="p-4 text-cyan-300">{app.phone}</td>
                             <td className="p-4">{app.email}</td>
                             <td className="p-4">
                               <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${app.has_studio === 'Y' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-amber-500/20 text-amber-300'}`}>
@@ -692,7 +717,7 @@ export default function AdminDashboardPage() {
                                       href={getDownloadUrl(f.url, f.name)}
                                       target="_blank"
                                       rel="noopener noreferrer"
-                                      className="inline-flex items-center gap-1.5 text-xs text-purple-400 hover:text-purple-300 underline font-semibold"
+                                      className="inline-flex items-center gap-1.5 text-xs text-cyan-400 hover:text-cyan-300 underline font-semibold"
                                     >
                                       <FileDown className="w-3.5 h-3.5" />
                                       <span className="max-w-[160px] truncate">{f.name || `파일 ${idx + 1}`}</span>
@@ -732,11 +757,100 @@ export default function AdminDashboardPage() {
           </div>
         )}
 
-        {/* Tab 2: Business Inquiries */}
+        {/* Tab 2: Agent Applications */}
+        {activeTab === 'agents' && (
+          <div className="space-y-6">
+            <h2 className="text-xl font-bold text-white flex items-center gap-2">
+              <UserCheck className="w-5 h-5 text-emerald-400" />
+              <span>접수된 에이전트 지원서 목록</span>
+            </h2>
+            <div className="glass-panel rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm">
+                  <thead className="bg-white/5 text-gray-400 text-xs font-semibold uppercase">
+                    <tr>
+                      <th className="p-4">접수일시</th>
+                      <th className="p-4">성명</th>
+                      <th className="p-4">성별</th>
+                      <th className="p-4">연락처</th>
+                      <th className="p-4">이메일</th>
+                      <th className="p-4">거주지역</th>
+                      <th className="p-4">첨부파일 목록</th>
+                      <th className="p-4 text-center">관리</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/5 text-gray-300">
+                    {agentApplications.length === 0 ? (
+                      <tr>
+                        <td colSpan={8} className="p-8 text-center text-gray-500">
+                          접수된 에이전트 지원서가 없습니다.
+                        </td>
+                      </tr>
+                    ) : (
+                      agentApplications.map((agent) => {
+                        const fileList = parseFilesList(agent);
+                        return (
+                          <tr key={agent.id} className="hover:bg-white/5 transition-colors">
+                            <td className="p-4 text-xs text-gray-400">{new Date(agent.created_at).toLocaleString('ko-KR')}</td>
+                            <td className="p-4 font-bold text-white">{agent.name}</td>
+                            <td className="p-4">{agent.gender}</td>
+                            <td className="p-4 text-emerald-300 font-bold">{agent.phone}</td>
+                            <td className="p-4">{agent.email}</td>
+                            <td className="p-4">{agent.residence || '-'}</td>
+                            <td className="p-4">
+                              {fileList.length > 0 ? (
+                                <div className="flex flex-col gap-1.5">
+                                  {fileList.map((f: any, idx: number) => (
+                                    <a
+                                      key={idx}
+                                      href={getDownloadUrl(f.url, f.name)}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="inline-flex items-center gap-1.5 text-xs text-emerald-400 hover:text-emerald-300 underline font-semibold"
+                                    >
+                                      <FileDown className="w-3.5 h-3.5" />
+                                      <span className="max-w-[160px] truncate">{f.name || `파일 ${idx + 1}`}</span>
+                                    </a>
+                                  ))}
+                                </div>
+                              ) : (
+                                <span className="text-gray-500 text-xs">-</span>
+                              )}
+                            </td>
+                            <td className="p-4 text-center">
+                              <div className="flex items-center justify-center gap-2">
+                                <button
+                                  onClick={() => setSelectedItem({ type: 'agent', data: agent })}
+                                  className="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-gray-300 hover:text-white transition-colors"
+                                  title="상세보기"
+                                >
+                                  <Eye className="w-4 h-4" />
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteAgentApplication(agent.id)}
+                                  className="p-2 rounded-lg bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 transition-colors"
+                                  title="삭제"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Tab 3: Business Inquiries */}
         {activeTab === 'business' && (
           <div className="space-y-6">
             <h2 className="text-xl font-bold text-white flex items-center gap-2">
-              <Briefcase className="w-5 h-5 text-purple-400" />
+              <Briefcase className="w-5 h-5 text-cyan-400" />
               <span>접수된 비즈니스 제휴 / 문의 목록</span>
             </h2>
             <div className="glass-panel rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
@@ -766,7 +880,7 @@ export default function AdminDashboardPage() {
                           <tr key={inq.id} className="hover:bg-white/5 transition-colors">
                             <td className="p-4 text-xs text-gray-400">{new Date(inq.created_at).toLocaleString('ko-KR')}</td>
                             <td className="p-4 font-bold text-white">{inq.name}</td>
-                            <td className="p-4 text-purple-300">{inq.phone}</td>
+                            <td className="p-4 text-cyan-300">{inq.phone}</td>
                             <td className="p-4">{inq.email}</td>
                             <td className="p-4">
                               {fileList.length > 0 ? (
@@ -777,7 +891,7 @@ export default function AdminDashboardPage() {
                                       href={getDownloadUrl(f.url, f.name)}
                                       target="_blank"
                                       rel="noopener noreferrer"
-                                      className="inline-flex items-center gap-1.5 text-xs text-purple-400 hover:text-purple-300 underline font-semibold"
+                                      className="inline-flex items-center gap-1.5 text-xs text-cyan-400 hover:text-cyan-300 underline font-semibold"
                                     >
                                       <FileDown className="w-3.5 h-3.5" />
                                       <span className="max-w-[160px] truncate">{f.name || `제안서 ${idx + 1}`}</span>
@@ -817,13 +931,13 @@ export default function AdminDashboardPage() {
           </div>
         )}
 
-        {/* Tab 3: Insights CMS */}
+        {/* Tab 4: Insights CMS */}
         {activeTab === 'insights' && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Create Form */}
             <div className="glass-panel p-6 rounded-2xl border border-white/10 space-y-6 h-fit">
               <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                <Plus className="w-5 h-5 text-purple-400" />
+                <Plus className="w-5 h-5 text-cyan-400" />
                 <span>새 인사이트 게시글 작성</span>
               </h2>
               <form onSubmit={handleCreateInsight} className="space-y-4">
@@ -835,7 +949,7 @@ export default function AdminDashboardPage() {
                     value={newInsight.title}
                     onChange={(e) => setNewInsight({ ...newInsight, title: e.target.value })}
                     placeholder="인사이트 게시글 제목"
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-purple-500"
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-cyan-500"
                   />
                 </div>
                 <div>
@@ -845,7 +959,7 @@ export default function AdminDashboardPage() {
                     value={newInsight.category}
                     onChange={(e) => setNewInsight({ ...newInsight, category: e.target.value })}
                     placeholder="예: 트렌드, 브랜딩, MCN"
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-purple-500"
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-cyan-500"
                   />
                 </div>
                 <div>
@@ -855,7 +969,7 @@ export default function AdminDashboardPage() {
                     value={newInsight.excerpt}
                     onChange={(e) => setNewInsight({ ...newInsight, excerpt: e.target.value })}
                     placeholder="목록에 노출될 간단한 대표 한 줄 요약"
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-purple-500"
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-cyan-500"
                   />
                 </div>
                 <div>
@@ -871,13 +985,13 @@ export default function AdminDashboardPage() {
                     type="file"
                     accept="image/*"
                     onChange={(e) => setInsightFile(e.target.files?.[0] || null)}
-                    className="w-full text-xs text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-purple-600 file:text-white hover:file:bg-purple-500"
+                    className="w-full text-xs text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-500"
                   />
                 </div>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-sm transition-all shadow-lg"
+                  className="w-full py-3.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm transition-all shadow-lg"
                 >
                   {loading ? '등록 중...' : '인사이트 등록하기'}
                 </button>
@@ -895,7 +1009,7 @@ export default function AdminDashboardPage() {
                         <img src={getDisplayUrl(item.thumbnail)} alt={item.title} className="w-16 h-16 rounded-xl object-cover border border-white/10 shrink-0" />
                       )}
                       <div className="truncate">
-                        <span className="px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 text-[10px] font-bold">{item.category}</span>
+                        <span className="px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 text-[10px] font-bold">{item.category}</span>
                         <h3 className="font-bold text-white text-sm truncate mt-1">{item.title}</h3>
                         <p className="text-xs text-gray-400 truncate">{item.excerpt}</p>
                       </div>
@@ -903,7 +1017,7 @@ export default function AdminDashboardPage() {
                     <div className="flex items-center gap-2 shrink-0">
                       <button
                         onClick={() => setEditInsightModal({ ...item })}
-                        className="px-3 py-2 rounded-xl bg-purple-600/30 hover:bg-purple-600/50 text-purple-300 font-bold text-xs flex items-center gap-1"
+                        className="px-3 py-2 rounded-xl bg-blue-600/30 hover:bg-blue-600/50 text-cyan-300 font-bold text-xs flex items-center gap-1 border border-cyan-500/30"
                       >
                         <Edit className="w-3.5 h-3.5" />
                         <span>수정</span>
@@ -923,12 +1037,12 @@ export default function AdminDashboardPage() {
           </div>
         )}
 
-        {/* Tab 4: Notices CMS */}
+        {/* Tab 5: Notices CMS */}
         {activeTab === 'notices' && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="glass-panel p-6 rounded-2xl border border-white/10 space-y-6 h-fit">
               <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                <Plus className="w-5 h-5 text-purple-400" />
+                <Plus className="w-5 h-5 text-cyan-400" />
                 <span>새 공지사항 작성</span>
               </h2>
               <form onSubmit={handleCreateNotice} className="space-y-4">
@@ -940,7 +1054,7 @@ export default function AdminDashboardPage() {
                     value={newNotice.title}
                     onChange={(e) => setNewNotice({ ...newNotice, title: e.target.value })}
                     placeholder="공지사항 제목"
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-purple-500"
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-cyan-500"
                   />
                 </div>
                 <div>
@@ -953,7 +1067,7 @@ export default function AdminDashboardPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-sm transition-all shadow-lg"
+                  className="w-full py-3.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm transition-all shadow-lg"
                 >
                   {loading ? '등록 중...' : '공지사항 등록하기'}
                 </button>
@@ -972,7 +1086,7 @@ export default function AdminDashboardPage() {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => setEditNoticeModal({ ...notice })}
-                        className="px-3 py-2 rounded-xl bg-purple-600/30 hover:bg-purple-600/50 text-purple-300 font-bold text-xs flex items-center gap-1"
+                        className="px-3 py-2 rounded-xl bg-blue-600/30 hover:bg-blue-600/50 text-cyan-300 font-bold text-xs flex items-center gap-1 border border-cyan-500/30"
                       >
                         <Edit className="w-3.5 h-3.5" />
                         <span>수정</span>
@@ -992,12 +1106,12 @@ export default function AdminDashboardPage() {
           </div>
         )}
 
-        {/* Tab 5: FAQs CMS */}
+        {/* Tab 6: FAQs CMS */}
         {activeTab === 'faqs' && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="glass-panel p-6 rounded-2xl border border-white/10 space-y-6 h-fit">
               <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                <Plus className="w-5 h-5 text-purple-400" />
+                <Plus className="w-5 h-5 text-cyan-400" />
                 <span>새 FAQ 항목 작성</span>
               </h2>
               <form onSubmit={handleCreateFaq} className="space-y-4">
@@ -1008,7 +1122,7 @@ export default function AdminDashboardPage() {
                     value={newFaq.category}
                     onChange={(e) => setNewFaq({ ...newFaq, category: e.target.value })}
                     placeholder="예: 지원관련, 계약관련, 정산"
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-purple-500"
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-cyan-500"
                   />
                 </div>
                 <div>
@@ -1019,7 +1133,7 @@ export default function AdminDashboardPage() {
                     value={newFaq.question}
                     onChange={(e) => setNewFaq({ ...newFaq, question: e.target.value })}
                     placeholder="자주 묻는 질문 항목"
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-purple-500"
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-cyan-500"
                   />
                 </div>
                 <div>
@@ -1032,7 +1146,7 @@ export default function AdminDashboardPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-sm transition-all shadow-lg"
+                  className="w-full py-3.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm transition-all shadow-lg"
                 >
                   {loading ? '등록 중...' : 'FAQ 등록하기'}
                 </button>
@@ -1045,14 +1159,14 @@ export default function AdminDashboardPage() {
                 {faqs.map((faq) => (
                   <div key={faq.id} className="p-4 rounded-2xl glass-panel border border-white/10 flex items-center justify-between gap-4">
                     <div>
-                      <span className="px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 text-[10px] font-bold">{faq.category}</span>
+                      <span className="px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 text-[10px] font-bold">{faq.category}</span>
                       <h3 className="font-bold text-white text-sm mt-1">Q. {faq.question}</h3>
                       <p className="text-xs text-gray-400 mt-1 line-clamp-2">{faq.answer.replace(/<[^>]*>?/gm, '')}</p>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
                       <button
                         onClick={() => setEditFaqModal({ ...faq })}
-                        className="px-3 py-2 rounded-xl bg-purple-600/30 hover:bg-purple-600/50 text-purple-300 font-bold text-xs flex items-center gap-1"
+                        className="px-3 py-2 rounded-xl bg-blue-600/30 hover:bg-blue-600/50 text-cyan-300 font-bold text-xs flex items-center gap-1 border border-cyan-500/30"
                       >
                         <Edit className="w-3.5 h-3.5" />
                         <span>수정</span>
@@ -1079,7 +1193,7 @@ export default function AdminDashboardPage() {
           <div className="glass-panel p-8 rounded-3xl border border-white/15 max-w-2xl w-full max-h-[90vh] overflow-y-auto space-y-6 animate-in fade-in zoom-in duration-200">
             <div className="flex items-center justify-between pb-4 border-b border-white/10">
               <h3 className="text-xl font-bold text-white">
-                {selectedItem.type === 'creator' ? '크리에이터 지원서 상세보기' : '비즈니스 제휴 문의 상세보기'}
+                {selectedItem.type === 'creator' ? '크리에이터 지원서 상세보기' : selectedItem.type === 'agent' ? '에이전트 지원서 상세보기' : '비즈니스 제휴 문의 상세보기'}
               </h3>
               <button
                 onClick={() => setSelectedItem(null)}
@@ -1101,7 +1215,7 @@ export default function AdminDashboardPage() {
                 </div>
                 <div>
                   <span className="text-xs text-gray-400 block">연락처</span>
-                  <span className="font-bold text-purple-300">{selectedItem.data.phone}</span>
+                  <span className="font-bold text-cyan-300">{selectedItem.data.phone}</span>
                 </div>
                 <div>
                   <span className="text-xs text-gray-400 block">이메일</span>
@@ -1127,14 +1241,14 @@ export default function AdminDashboardPage() {
                       <div key={idx} className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-3">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2 truncate">
-                            <Paperclip className="w-4 h-4 text-purple-400 shrink-0" />
-                            <span className="font-bold text-purple-300 text-sm truncate">{f.name || `첨부파일 ${idx + 1}`}</span>
+                            <Paperclip className="w-4 h-4 text-cyan-400 shrink-0" />
+                            <span className="font-bold text-cyan-300 text-sm truncate">{f.name || `첨부파일 ${idx + 1}`}</span>
                           </div>
                           <a
                             href={getDownloadUrl(f.url, f.name)}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs flex items-center gap-1.5 shrink-0 shadow-md"
+                            className="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs flex items-center gap-1.5 shrink-0 shadow-md border border-cyan-400/30"
                           >
                             <Download className="w-3.5 h-3.5" />
                             <span>다운로드</span>
@@ -1177,7 +1291,7 @@ export default function AdminDashboardPage() {
                   required
                   value={editInsightModal.title}
                   onChange={(e) => setEditInsightModal({ ...editInsightModal, title: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-purple-500"
+                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-cyan-500"
                 />
               </div>
               <div>
@@ -1186,7 +1300,7 @@ export default function AdminDashboardPage() {
                   type="text"
                   value={editInsightModal.category}
                   onChange={(e) => setEditInsightModal({ ...editInsightModal, category: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-purple-500"
+                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-cyan-500"
                 />
               </div>
               <div>
@@ -1195,7 +1309,7 @@ export default function AdminDashboardPage() {
                   type="text"
                   value={editInsightModal.excerpt || ''}
                   onChange={(e) => setEditInsightModal({ ...editInsightModal, excerpt: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-purple-500"
+                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-cyan-500"
                 />
               </div>
               <div>
@@ -1211,7 +1325,7 @@ export default function AdminDashboardPage() {
                   type="file"
                   accept="image/*"
                   onChange={(e) => setEditInsightFile(e.target.files?.[0] || null)}
-                  className="w-full text-xs text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-purple-600 file:text-white"
+                  className="w-full text-xs text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-600 file:text-white"
                 />
               </div>
               <div className="flex items-center justify-end gap-3 pt-4">
@@ -1225,7 +1339,7 @@ export default function AdminDashboardPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-sm shadow-lg"
+                  className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm shadow-lg"
                 >
                   {loading ? '수정 저장 중...' : '인사이트 수정 저장'}
                 </button>
@@ -1253,7 +1367,7 @@ export default function AdminDashboardPage() {
                   required
                   value={editNoticeModal.title}
                   onChange={(e) => setEditNoticeModal({ ...editNoticeModal, title: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-purple-500"
+                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-cyan-500"
                 />
               </div>
               <div>
@@ -1274,7 +1388,7 @@ export default function AdminDashboardPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-sm shadow-lg"
+                  className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm shadow-lg"
                 >
                   {loading ? '수정 저장 중...' : '공지사항 수정 저장'}
                 </button>
@@ -1301,7 +1415,7 @@ export default function AdminDashboardPage() {
                   type="text"
                   value={editFaqModal.category}
                   onChange={(e) => setEditFaqModal({ ...editFaqModal, category: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-purple-500"
+                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-cyan-500"
                 />
               </div>
               <div>
@@ -1311,7 +1425,7 @@ export default function AdminDashboardPage() {
                   required
                   value={editFaqModal.question}
                   onChange={(e) => setEditFaqModal({ ...editFaqModal, question: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-purple-500"
+                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-cyan-500"
                 />
               </div>
               <div>
@@ -1332,7 +1446,7 @@ export default function AdminDashboardPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-sm shadow-lg"
+                  className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm shadow-lg"
                 >
                   {loading ? '수정 저장 중...' : 'FAQ 수정 저장'}
                 </button>

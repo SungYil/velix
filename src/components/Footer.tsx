@@ -48,6 +48,7 @@ export default function Footer() {
               <li><Link href="/creator/apply" className="hover:text-cyan-400 transition-colors">BJ / 크리에이터 지원하기</Link></li>
               <li><Link href="/business/intro" className="hover:text-cyan-400 transition-colors">사업 영역 소개</Link></li>
               <li><Link href="/business/inquire" className="hover:text-cyan-400 transition-colors">비즈니스 문의하기</Link></li>
+              <li><Link href="/business/agent" className="hover:text-cyan-400 transition-colors">에이전트 모집 지원</Link></li>
             </ul>
           </div>
 
