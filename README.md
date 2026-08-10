@@ -1,36 +1,28 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🚀 VelixMEDIA (주)벨릭스미디어 공식 웹사이트 프로젝트
 
-## Getting Started
+차세대 MCN & 1인 라이브 크리에이터 브랜딩 그룹 **VelixMEDIA (주)벨릭스미디어** 공식 웹사이트 및 통합 관리자 CMS 시스템입니다.
 
-First, run the development server:
+## 📘 시스템 인수인계 & 유지보수 백서 (Handoff Document)
+프로젝트 아키텍처, 데이터베이스 접속/수정 방법, 관리자 ID/비밀번호, EC2 장애 복구 가이드는 아래 문서를 참고해 주세요:
 
+👉 **[HANDOVER.md (인수인계 백서 읽기)](./HANDOVER.md)**
+
+---
+
+## 🛠️ 간단 개발 및 배포 가이드
+
+### 1. 로컬 개발 서버 실행
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. EC2 서버 수동 배포
+```bash
+git pull
+./deploy-ec2.sh
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 3. 관리자 대시보드
+- **URL**: `https://velix.moibluu.com/admin`
+- **ID**: `admin`
+- **PW**: `velix2026!`
