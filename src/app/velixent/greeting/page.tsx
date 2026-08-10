@@ -36,7 +36,7 @@ export default function GreetingPage() {
                 />
               </div>
               <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black via-black/80 to-transparent">
-                <div className="text-xl font-black text-white">강현우</div>
+                <div className="text-xl font-black text-white">김태현</div>
                 <div className="text-xs font-semibold text-purple-400">VelixENT 대표이사 / CEO</div>
               </div>
             </div>
@@ -58,7 +58,7 @@ export default function GreetingPage() {
           <ScrollReveal direction="right" delay={0.4}>
             <div className="space-y-4 text-gray-300 text-base sm:text-lg leading-relaxed font-light">
               <p>
-                안녕하십니까, (주)벨릭스엔터테인먼트 대표이사 강현우입니다.
+                안녕하십니까, (주)벨릭스엔터테인먼트 대표이사 김태현입니다.
               </p>
               <p>
                 디지털 미디어 환경은 매 순간 급격하게 변화하고 있습니다. 1인 방송과 라이브 스트리밍은 단순한 엔터테인먼트를 넘어 대중과 가장 밀접하게 소통하는 새로운 시대의 문화적 흐름으로 자리 잡았습니다.
@@ -79,7 +79,7 @@ export default function GreetingPage() {
                 <div className="text-xs text-gray-400">Velix Entertainment Management Team</div>
               </div>
               <div className="font-serif italic text-purple-400 text-lg font-bold">
-                Kang Hyun Woo
+                Kim Tae Hyun
               </div>
             </div>
           </ScrollReveal>
