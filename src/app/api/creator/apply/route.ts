@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
-import { uploadFileToStorage } from '@/lib/s3';
+import { uploadFileToStorage, uploadDbBackupToS3 } from '@/lib/s3';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
     const hasStudio = formData.get('hasStudio') as string;
     const bio = formData.get('bio') as string;
     
-    // Support multiple files (images, videos, documents)
+    // Support multiple files (photos, videos, portfolios)
     const rawFiles = formData.getAll('files') as File[];
     const singleFile = formData.get('file') as File | null;
     
@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
           type: file.type,
         });
       } catch (err: any) {
-        console.error(`Error uploading application file ${file.name}:`, err);
+        console.error(`Error uploading creator file ${file.name}:`, err);
       }
     }
 
@@ -97,9 +97,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Trigger automatic background DB backup to S3 on new submission
+    uploadDbBackupToS3().catch((err) => console.error('Auto S3 DB backup failed:', err));
+
     return NextResponse.json({ success: true, id: result.lastInsertRowid });
   } catch (error: any) {
     console.error('Creator application error:', error);
-    return NextResponse.json({ error: error.message || '제출 중 오류가 발생했습니다.' }, { status: 500 });
+    return NextResponse.json({ error: error.message || '지원서 제출 중 오류가 발생했습니다.' }, { status: 500 });
   }
 }
