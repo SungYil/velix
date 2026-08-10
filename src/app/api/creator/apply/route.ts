@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
-import { uploadFileToStorage, uploadDbBackupToS3 } from '@/lib/s3';
+import { uploadFileToStorage } from '@/lib/s3';
 
 export const dynamic = 'force-dynamic';
 
@@ -96,9 +96,6 @@ export async function POST(req: NextRequest) {
         firstFile.name
       );
     }
-
-    // Trigger automatic background DB backup to S3 on new submission
-    uploadDbBackupToS3().catch((err) => console.error('Auto S3 DB backup failed:', err));
 
     return NextResponse.json({ success: true, id: result.lastInsertRowid });
   } catch (error: any) {
