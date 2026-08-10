@@ -12,20 +12,27 @@ export default function AboutPage() {
     {
       id: 0,
       title: 'CREATIVE DISRUPTION',
-      subtitle: '기존 미디어의 틀을 깨는 혁신적인 MCN 솔루션',
-      details: 'VelixENT는 기존의 단순 방송 중계형 MCN에서 벗어나 크리에이터 개개인의 독창적인 브랜드 아이덴티티를 구축합니다. 전문 제작 PD 및 전담 데이터 분석팀이 상주하여 개별 방송 스타일 및 시청자 트렌드를 체계적으로 보조합니다.',
+      subtitle: 'Velix Media의 핵심 가치',
+      details: `1) 빠른 성장
+우리는 크리에이터들이 그들의 콘텐츠와 커리어에서 즉각적인 성과를 낼 수 있도록 돕습니다. Velix Media는 전문적인 콘텐츠 전략과 마케팅 지원을 통해 크리에이터들이 보다 효율적으로 성장할 수 있는 최적의 환경을 제공합니다. 이를 통해 크리에이터는 짧은 시간 내에 더 큰 성공을 거두게 됩니다.
+
+2) 높은 수익
+Velix Media는 크리에이터들이 수익을 극대화할 수 있도록 다양한 채널과 방법을 제공합니다. 광고 수익, 브랜드 협찬, 상품 판매 등 다양한 수익 모델을 통해 크리에이터의 수익을 더욱 안정적이고 지속적으로 만들어갑니다. 수익 창출의 기회를 제공하는 것에 그치지 않고, 그 이상의 가능성을 열어드리고 있습니다.
+
+3) 혁신적이고 창의적인 지원
+우리는 크리에이터들에게 단순히 지원을 넘어서 혁신적이고 창의적인 방법으로 가치를 더해줍니다. 맞춤형 콘텐츠 제작, 팬과의 소통을 강화하는 전략, 디지털 마케팅 등 다양한 요소를 세심하게 관리하여, 크리에이터들이 최고의 결과를 얻을 수 있도록 합니다.`,
     },
     {
       id: 1,
       title: 'GLOBAL FAN DOMAIN',
       subtitle: '국내를 넘어 글로벌 시장으로 확장되는 팬덤 생태계',
-      details: '아시아 및 글로벌 메이저 플랫폼과의 제휴를 통해 해외 진출 및 다국어 자막/번역 시스템을 전폭 지원합니다. 국내를 넘어 전 세계 시청자와 소통할 수 있는 인프라를 제공합니다.',
+      details: `아시아 및 글로벌 메이저 플랫폼과의 제휴를 통해 해외 진출 및 다국어 자막/번역 시스템을 전폭 지원합니다. 국내를 넘어 전 세계 시청자와 소통할 수 있는 인프라를 제공합니다.`,
     },
     {
       id: 2,
       title: 'SUSTAINABLE GROWTH',
       subtitle: '크리에이터와 기업이 동반 성장하는 공생 파트너십',
-      details: '단기적 수익창출에 그치지 않고 장기적 라이프사이클 관리를 통해 크리에이터의 퍼스널 브랜드 가치를 극대화합니다. 법률 자문, 정산 투명화, 세무 컨설팅까지 다각도 종합 케어를 제공합니다.',
+      details: `단기적 수익창출에 그치지 않고 장기적 라이프사이클 관리를 통해 크리에이터의 퍼스널 브랜드 가치를 극대화합니다. 법률 자문, 정산 투명화, 세무 컨설팅까지 다각도 종합 케어를 제공합니다.`,
     },
   ];
 
@@ -34,30 +41,25 @@ export default function AboutPage() {
       {/* Header */}
       <div className="text-center space-y-4">
         <ScrollReveal direction="up">
-          <span className="text-xs uppercase font-bold tracking-widest text-purple-400 bg-purple-500/10 px-4 py-1.5 rounded-full border border-purple-500/20">
-            VelixENT About Us
+          <span className="text-xs uppercase font-bold tracking-widest text-cyan-400 bg-cyan-500/10 px-4 py-1.5 rounded-full border border-cyan-500/20">
+            VelixMEDIA About Us
           </span>
         </ScrollReveal>
         <ScrollReveal direction="up" delay={0.1}>
           <h1 className="text-4xl sm:text-6xl font-black text-white">
-            혁신을 이끄는 <span className="gradient-text">벨릭스엔터테인먼트</span>
+            미디어의 미래를 만드는 <br />
+            <span className="gradient-text">VelixMEDIA 브랜드 핵심가치</span>
           </h1>
         </ScrollReveal>
         <ScrollReveal direction="up" delay={0.2}>
-          <p className="max-w-3xl mx-auto text-base sm:text-lg text-gray-300 font-light leading-relaxed">
-            (주)벨릭스엔터테인먼트는 크리에이터와 대중, 그리고 브랜드 간의 경계를 허무는 차세대 미디어 그룹입니다.
-            콘텐츠에 관한 정교한 통찰력으로 시청자에게 진정한 감동을 전달합니다.
+          <p className="max-w-2xl mx-auto text-base sm:text-lg text-gray-300 font-light">
+            차세대 라이브 크리에이터 MCN 그룹 VelixMEDIA의 핵심 미션과 체계적인 크리에이터 케어 솔루션입니다.
           </p>
         </ScrollReveal>
       </div>
 
-      {/* Large Typography Interactive Statement Cards (Click to Expand Details) */}
-      <section className="space-y-6">
-        <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold text-white">비전 문구를 클릭하시면 자세한 내용이 공개됩니다</h2>
-          <p className="text-xs text-purple-400">Click any statement to reveal deep inside strategy</p>
-        </div>
-
+      {/* Accordion / Statement Cards */}
+      <section className="space-y-6 max-w-4xl mx-auto">
         <div className="space-y-4">
           {statements.map((st) => {
             const isExpanded = expandedStatement === st.id;
@@ -65,24 +67,24 @@ export default function AboutPage() {
               <ScrollReveal key={st.id} direction="up" delay={st.id * 0.1}>
                 <div
                   onClick={() => setExpandedStatement(isExpanded ? null : st.id)}
-                  className={`cursor-pointer rounded-3xl p-8 sm:p-10 glass-panel border transition-all duration-500 ${
+                  className={`p-6 sm:p-8 rounded-3xl cursor-pointer transition-all duration-300 border ${
                     isExpanded
-                      ? 'border-purple-500/60 bg-gradient-to-r from-purple-950/40 via-indigo-950/30 to-purple-900/30 shadow-2xl scale-[1.01]'
-                      : 'border-white/10 hover:border-white/20 hover:bg-white/5'
+                      ? 'glass-panel border-cyan-500/50 shadow-2xl shadow-cyan-500/10 bg-[#0d1424]/90'
+                      : 'glass-panel border-white/10 hover:border-white/20 bg-[#080e1e]/60'
                   }`}
                 >
                   <div className="flex items-center justify-between gap-4">
                     <div>
-                      <div className="text-xs font-black text-purple-400 tracking-widest mb-1">
-                        MISSION 0{st.id + 1}
-                      </div>
-                      <h3 className="text-3xl sm:text-5xl font-black tracking-tight text-white group-hover:text-purple-300 transition-colors">
+                      <span className="text-xs font-bold text-cyan-400 tracking-wider uppercase">
+                        VALUE STATEMENT #{st.id + 1}
+                      </span>
+                      <h3 className="text-2xl sm:text-3xl font-black text-white mt-1">
                         {st.title}
                       </h3>
                       <p className="text-sm sm:text-lg text-gray-300 font-medium mt-2">{st.subtitle}</p>
                     </div>
-                    <div className={`w-12 h-12 rounded-full glass-panel flex items-center justify-center text-purple-300 transition-transform duration-300 ${
-                      isExpanded ? 'rotate-180 bg-purple-600 text-white' : ''
+                    <div className={`w-12 h-12 rounded-full glass-panel flex items-center justify-center text-cyan-300 transition-transform duration-300 shrink-0 ${
+                      isExpanded ? 'rotate-180 bg-blue-600 text-white' : ''
                     }`}>
                       <ChevronDown className="w-6 h-6" />
                     </div>
@@ -98,7 +100,7 @@ export default function AboutPage() {
                         transition={{ duration: 0.4, ease: 'easeInOut' }}
                         className="overflow-hidden"
                       >
-                        <div className="mt-8 pt-6 border-t border-white/10 text-base sm:text-lg text-gray-200 leading-relaxed font-light whitespace-pre-line bg-black/20 p-6 rounded-2xl">
+                        <div className="mt-8 pt-6 border-t border-white/10 text-base sm:text-lg text-gray-200 leading-relaxed font-light whitespace-pre-line bg-black/30 p-6 sm:p-8 rounded-2xl border border-white/5">
                           {st.details}
                         </div>
                       </motion.div>
@@ -115,7 +117,7 @@ export default function AboutPage() {
       <section className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-10">
         <ScrollReveal direction="up" delay={0.1}>
           <div className="p-8 rounded-3xl glass-panel border border-white/10 space-y-4">
-            <div className="w-12 h-12 rounded-2xl bg-purple-600/20 text-purple-400 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-2xl bg-cyan-600/20 text-cyan-400 flex items-center justify-center">
               <Building2 className="w-6 h-6" />
             </div>
             <h3 className="text-xl font-bold text-white">최첨단 스튜디오</h3>
@@ -127,7 +129,7 @@ export default function AboutPage() {
 
         <ScrollReveal direction="up" delay={0.2}>
           <div className="p-8 rounded-3xl glass-panel border border-white/10 space-y-4">
-            <div className="w-12 h-12 rounded-2xl bg-pink-600/20 text-pink-400 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-2xl bg-blue-600/20 text-blue-400 flex items-center justify-center">
               <Target className="w-6 h-6" />
             </div>
             <h3 className="text-xl font-bold text-white">1:1 맞춤형 케어</h3>
@@ -139,7 +141,7 @@ export default function AboutPage() {
 
         <ScrollReveal direction="up" delay={0.3}>
           <div className="p-8 rounded-3xl glass-panel border border-white/10 space-y-4">
-            <div className="w-12 h-12 rounded-2xl bg-cyan-600/20 text-cyan-400 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-2xl bg-teal-600/20 text-teal-400 flex items-center justify-center">
               <Award className="w-6 h-6" />
             </div>
             <h3 className="text-xl font-bold text-white">투명한 정산 체계</h3>
