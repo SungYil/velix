@@ -36,7 +36,6 @@ export default function Footer() {
             <ul className="space-y-2 text-xs">
               <li><Link href="/velixent/about" className="hover:text-cyan-400 transition-colors">회사소개</Link></li>
               <li><Link href="/velixent/greeting" className="hover:text-cyan-400 transition-colors">인삿말</Link></li>
-              <li><Link href="/velixent/org" className="hover:text-cyan-400 transition-colors">조직도</Link></li>
               <li><Link href="/velixent/location" className="hover:text-cyan-400 transition-colors">오시는길</Link></li>
             </ul>
           </div>
