@@ -69,3 +69,57 @@ export async function uploadFileToStorage(
 
   return { fileUrl: `/uploads/${uniqueName}`, fileName: originalFilename };
 }
+
+// Automatic / Manual DB Backup to AWS S3
+export async function uploadDbBackupToS3(): Promise<{ success: boolean; backups: string[]; message: string }> {
+  const rootDir = getProjectRoot();
+  const dataDir = path.join(rootDir, 'data');
+  const dbFile = path.join(dataDir, 'velix.db');
+  const jsonFile = path.join(dataDir, 'velix_store.json');
+
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+  const uploadedKeys: string[] = [];
+
+  if (s3Client && bucketName) {
+    try {
+      if (fs.existsSync(dbFile)) {
+        const dbBuffer = fs.readFileSync(dbFile);
+        const s3Key = `backups/velix_${timestamp}.db`;
+        await s3Client.send(
+          new PutObjectCommand({
+            Bucket: bucketName,
+            Key: s3Key,
+            Body: dbBuffer,
+            ContentType: 'application/x-sqlite3',
+          })
+        );
+        uploadedKeys.push(s3Key);
+      }
+
+      if (fs.existsSync(jsonFile)) {
+        const jsonBuffer = fs.readFileSync(jsonFile);
+        const s3Key = `backups/velix_store_${timestamp}.json`;
+        await s3Client.send(
+          new PutObjectCommand({
+            Bucket: bucketName,
+            Key: s3Key,
+            Body: jsonBuffer,
+            ContentType: 'application/json',
+          })
+        );
+        uploadedKeys.push(s3Key);
+      }
+
+      return {
+        success: true,
+        backups: uploadedKeys,
+        message: `S3 DB 백업 완료: ${uploadedKeys.length}개 파일 업로드됨 (${timestamp})`,
+      };
+    } catch (err: any) {
+      console.error('S3 DB Backup Error:', err);
+      return { success: false, backups: [], message: `S3 백업 중 오류 발생: ${err.message}` };
+    }
+  }
+
+  return { success: false, backups: [], message: 'S3 클라이언트 또는 버킷 설정이 존재하지 않습니다.' };
+}

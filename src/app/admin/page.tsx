@@ -579,7 +579,32 @@ export default function AdminDashboardPage() {
           </span>
           <h1 className="text-3xl font-black text-white mt-2">관리자 종합 통합 대시보드</h1>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            onClick={async () => {
+              if (!confirm('현재 SQLite DB(velix.db 및 velix_store.json)를 AWS S3 버킷에 즉시 백업하시겠습니까?')) return;
+              setLoading(true);
+              try {
+                const res = await fetch('/api/admin/backup', { method: 'POST' });
+                const data = await res.json();
+                if (data.success) {
+                  setActionSuccess(data.message || 'S3 DB 백업이 성공적으로 전송되었습니다!');
+                  setTimeout(() => setActionSuccess(''), 4000);
+                } else {
+                  alert('S3 백업 실패: ' + (data.message || data.error));
+                }
+              } catch (e: any) {
+                alert('백업 중 오류 발생: ' + e.message);
+              } finally {
+                setLoading(false);
+              }
+            }}
+            className="px-4 py-2 rounded-xl bg-cyan-600/30 hover:bg-cyan-600/50 text-cyan-300 text-xs font-bold flex items-center gap-1.5 border border-cyan-500/40 transition-colors"
+            title="S3에 DB 백업 업로드"
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>☁️ S3에 DB 백업하기</span>
+          </button>
           <button
             onClick={() => router.push('/')}
             className="px-4 py-2 rounded-xl glass-panel hover:bg-white/10 text-xs font-semibold text-gray-300 flex items-center gap-1.5 border border-cyan-500/30"
