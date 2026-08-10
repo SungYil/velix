@@ -25,14 +25,25 @@ Velix Media는 크리에이터들이 수익을 극대화할 수 있도록 다양
     {
       id: 1,
       title: 'GLOBAL FAN DOMAIN',
-      subtitle: '국내를 넘어 글로벌 시장으로 확장되는 팬덤 생태계',
-      details: `아시아 및 글로벌 메이저 플랫폼과의 제휴를 통해 해외 진출 및 다국어 자막/번역 시스템을 전폭 지원합니다. 국내를 넘어 전 세계 시청자와 소통할 수 있는 인프라를 제공합니다.`,
+      subtitle: '크리에이터의 성공을 위한 파트너',
+      details: `우리는 크리에이터와 함께하는 파트너로서, 그들의 꿈과 목표를 실현시킬 수 있도록 끊임없이 도전하고 지원합니다. 크리에이터가 자신의 가능성을 최대한 발휘할 수 있는 환경을 만들어가며, 지속 가능한 성장을 위한 전략을 제공합니다.
+
+우리는 각 크리에이터가 자신의 아이덴티티를 확립하고, 그들의 고유한 브랜드를 세상에 알릴 수 있도록 지원하며, 그 과정에서 함께 성장합니다. 빠르게 변화하는 디지털 세계에서 (주) 노크 엔터테인먼트는 크리에이터의 성공을 이끌어가는 든든한 파트너입니다.`,
     },
     {
       id: 2,
       title: 'SUSTAINABLE GROWTH',
-      subtitle: '크리에이터와 기업이 동반 성장하는 공생 파트너십',
-      details: `단기적 수익창출에 그치지 않고 장기적 라이프사이클 관리를 통해 크리에이터의 퍼스널 브랜드 가치를 극대화합니다. 법률 자문, 정산 투명화, 세무 컨설팅까지 다각도 종합 케어를 제공합니다.`,
+      subtitle: '크리에이터 맞춤형 지원 시스템',
+      details: `Velix Entertainment는 크리에이터 개개인의 특징과 목표에 맞춘 맞춤형 지원을 제공합니다. 각 크리에이터에게 전담 매니저를 배정하여, 그들이 효율적으로 콘텐츠를 생산하고 팬들과 소통할 수 있도록 지속적으로 관리합니다.
+
+1) 콘텐츠 기획 및 제작 지원
+우리는 콘텐츠의 품질이 성공에 큰 영향을 미친다고 믿습니다. 크리에이터와 협력하여 차별화된 콘텐츠 기획을 진행하고, 최신 트렌드와 기술을 반영하여 고품질 콘텐츠를 제작할 수 있도록 지원합니다. 이 과정에서 크리에이터가 가진 독창성을 존중하며, 그들의 스타일에 맞는 맞춤형 콘텐츠 전략을 수립합니다.
+
+2) 팬 관리 및 소통
+크리에이터와 팬의 관계는 그들의 성공에 큰 영향을 미칩니다. Velix Ent는 팬들이 크리에이터와 더 가까워지고, 지속적으로 참여할 수 있는 환경을 제공합니다. 팬들의 반응을 실시간으로 분석하고, 팬 맞춤형 콘텐츠를 통해 그들의 관심을 끌어내며, 충성도 높은 팬층을 구축하는 데 중점을 둡니다.
+
+3) 데이터 분석 및 최적화
+크리에이터의 성장을 가속화하기 위해 데이터 분석을 활용합니다. 각종 분석 도구를 통해 팬들의 반응과 콘텐츠의 성과를 실시간으로 추적하고, 그에 따라 콘텐츠 전략을 최적화하여, 최상의 결과를 얻을 수 있도록 돕습니다. 또한, 크리에이터에게 성장 지표와 목표 달성을 위한 피드백을 제공하여 그들이 점진적으로 더 나은 방향으로 나아갈 수 있도록 지원합니다.`,
     },
   ];
 
@@ -67,11 +78,10 @@ Velix Media는 크리에이터들이 수익을 극대화할 수 있도록 다양
               <ScrollReveal key={st.id} direction="up" delay={st.id * 0.1}>
                 <div
                   onClick={() => setExpandedStatement(isExpanded ? null : st.id)}
-                  className={`p-6 sm:p-8 rounded-3xl cursor-pointer transition-all duration-300 border ${
-                    isExpanded
-                      ? 'glass-panel border-cyan-500/50 shadow-2xl shadow-cyan-500/10 bg-[#0d1424]/90'
-                      : 'glass-panel border-white/10 hover:border-white/20 bg-[#080e1e]/60'
-                  }`}
+                  className={`p-6 sm:p-8 rounded-3xl cursor-pointer transition-all duration-300 border ${isExpanded
+                    ? 'glass-panel border-cyan-500/50 shadow-2xl shadow-cyan-500/10 bg-[#0d1424]/90'
+                    : 'glass-panel border-white/10 hover:border-white/20 bg-[#080e1e]/60'
+                    }`}
                 >
                   <div className="flex items-center justify-between gap-4">
                     <div>
@@ -83,9 +93,8 @@ Velix Media는 크리에이터들이 수익을 극대화할 수 있도록 다양
                       </h3>
                       <p className="text-sm sm:text-lg text-gray-300 font-medium mt-2">{st.subtitle}</p>
                     </div>
-                    <div className={`w-12 h-12 rounded-full glass-panel flex items-center justify-center text-cyan-300 transition-transform duration-300 shrink-0 ${
-                      isExpanded ? 'rotate-180 bg-blue-600 text-white' : ''
-                    }`}>
+                    <div className={`w-12 h-12 rounded-full glass-panel flex items-center justify-center text-cyan-300 transition-transform duration-300 shrink-0 ${isExpanded ? 'rotate-180 bg-blue-600 text-white' : ''
+                      }`}>
                       <ChevronDown className="w-6 h-6" />
                     </div>
                   </div>
