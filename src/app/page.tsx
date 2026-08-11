@@ -58,16 +58,16 @@ export default function Home() {
       {/* Stats Counter Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <ScrollReveal direction="up">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 p-8 rounded-3xl glass-panel border border-cyan-500/20 bg-[#080e1e]/60">
-            <div className="text-center space-y-1">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 p-8 sm:p-10 rounded-3xl glass-panel border border-cyan-500/20 bg-[#080e1e]/60 divide-y sm:divide-y-0 sm:divide-x divide-white/10">
+            <div className="text-center space-y-1 py-2 sm:py-0">
               <div className="text-3xl sm:text-5xl font-black gradient-text">15+</div>
               <div className="text-xs sm:text-sm font-semibold text-gray-400">소속 크리에이터</div>
             </div>
-            <div className="text-center space-y-1 border-l border-white/10">
+            <div className="text-center space-y-1 py-2 sm:py-0">
               <div className="text-3xl sm:text-5xl font-black text-cyan-400">3,500만+</div>
               <div className="text-xs sm:text-sm font-semibold text-gray-400">총 누적 구독자</div>
             </div>
-            <div className="text-center space-y-1 border-l border-white/10">
+            <div className="text-center space-y-1 py-2 sm:py-0">
               <div className="text-3xl sm:text-5xl font-black text-emerald-400">98.5%</div>
               <div className="text-xs sm:text-sm font-semibold text-gray-400">크리에이터 만족도</div>
             </div>

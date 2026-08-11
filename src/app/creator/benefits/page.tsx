@@ -9,11 +9,11 @@ export default function CreatorBenefitsPage() {
   const benefits = [
     {
       id: 1,
-      title: '최신 방송 스튜디오 & 고성능 장비 지원',
-      subtitle: '캠, 마이크, 조명부터 최고사양 PC 세팅까지 무상 지원',
-      description: 'VelixMEDIA 본사 전용 오프라인 방음 스튜디오 시설과 함께 초고화질 방송 진행을 위한 최첨단 방송 기자를 풀세트로 지원합니다.',
+      title: '고성능 장비 지원',
+      subtitle: '캠, 마이크, 조명부터 최고사양 PC 세팅까지 지원',
+      description: 'VELIX MEDIA 본사 매니저진들과 함께 초고화질 방송 진행을 위한 최첨단 방송 장비를 풀세트로 지원합니다.',
       image: 'https://images.unsplash.com/photo-1590602847861-f357a9332bbc?auto=format&fit=crop&w=1000&q=80',
-      tag: '장비 / 스튜디오',
+      tag: '장비',
     },
     {
       id: 2,
@@ -60,7 +60,7 @@ export default function CreatorBenefitsPage() {
         </ScrollReveal>
         <ScrollReveal direction="up" delay={0.1}>
           <h1 className="text-4xl sm:text-6xl font-black text-white">
-            VelixMEDIA 크리에이터 <span className="gradient-text">지원 혜택</span>
+            VELIX MEDIA 크리에이터 <span className="gradient-text">지원 혜택</span>
           </h1>
         </ScrollReveal>
         <ScrollReveal direction="up" delay={0.2}>

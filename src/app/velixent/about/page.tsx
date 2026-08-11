@@ -123,22 +123,22 @@ Velix Media는 크리에이터들이 수익을 극대화할 수 있도록 다양
       </section>
 
       {/* Core Strengths Grid */}
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-10">
-        <ScrollReveal direction="up" delay={0.1}>
-          <div className="p-8 rounded-3xl glass-panel border border-white/10 space-y-4">
-            <div className="w-12 h-12 rounded-2xl bg-cyan-600/20 text-cyan-400 flex items-center justify-center">
+      <section className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-10 items-stretch">
+        <ScrollReveal direction="up" delay={0.1} className="h-full">
+          <div className="p-8 rounded-3xl glass-panel border border-white/10 space-y-4 h-full flex flex-col justify-start">
+            <div className="w-12 h-12 rounded-2xl bg-cyan-600/20 text-cyan-400 flex items-center justify-center shrink-0">
               <Building2 className="w-6 h-6" />
             </div>
             <h3 className="text-xl font-bold text-white">방송 장비 지원</h3>
             <p className="text-sm text-gray-400 leading-relaxed">
-              스트리밍 방송에 필요한 장비 전폭 지원
+              스트리밍 방송에 필요한 최첨단 방송 장비 전폭 지원.
             </p>
           </div>
         </ScrollReveal>
 
-        <ScrollReveal direction="up" delay={0.2}>
-          <div className="p-8 rounded-3xl glass-panel border border-white/10 space-y-4">
-            <div className="w-12 h-12 rounded-2xl bg-blue-600/20 text-blue-400 flex items-center justify-center">
+        <ScrollReveal direction="up" delay={0.2} className="h-full">
+          <div className="p-8 rounded-3xl glass-panel border border-white/10 space-y-4 h-full flex flex-col justify-start">
+            <div className="w-12 h-12 rounded-2xl bg-blue-600/20 text-blue-400 flex items-center justify-center shrink-0">
               <Target className="w-6 h-6" />
             </div>
             <h3 className="text-xl font-bold text-white">1:1 맞춤형 케어</h3>
@@ -148,9 +148,9 @@ Velix Media는 크리에이터들이 수익을 극대화할 수 있도록 다양
           </div>
         </ScrollReveal>
 
-        <ScrollReveal direction="up" delay={0.3}>
-          <div className="p-8 rounded-3xl glass-panel border border-white/10 space-y-4">
-            <div className="w-12 h-12 rounded-2xl bg-teal-600/20 text-teal-400 flex items-center justify-center">
+        <ScrollReveal direction="up" delay={0.3} className="h-full">
+          <div className="p-8 rounded-3xl glass-panel border border-white/10 space-y-4 h-full flex flex-col justify-start">
+            <div className="w-12 h-12 rounded-2xl bg-teal-600/20 text-teal-400 flex items-center justify-center shrink-0">
               <Award className="w-6 h-6" />
             </div>
             <h3 className="text-xl font-bold text-white">투명한 정산 체계</h3>
