@@ -113,18 +113,6 @@ export default function AgentApplyPage() {
         </ScrollReveal>
 
         <ScrollReveal direction="up" delay={0.2}>
-          <div className="p-6 rounded-2xl glass-panel border border-cyan-500/20 space-y-3 bg-[#080e1e]/60">
-            <div className="w-10 h-10 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center">
-              <ShieldCheck className="w-5 h-5" />
-            </div>
-            <h3 className="text-lg font-bold text-white">본사 전폭 기획 & 스튜디오 지원</h3>
-            <p className="text-xs text-gray-400 leading-relaxed">
-              에이전트가 영입한 크리에이터에게 본사 12개 전용 스튜디오 및 전담 방송 기획 매니저를 전폭 제공합니다.
-            </p>
-          </div>
-        </ScrollReveal>
-
-        <ScrollReveal direction="up" delay={0.3}>
           <div className="p-6 rounded-2xl glass-panel border border-blue-500/20 space-y-3 bg-[#080e1e]/60">
             <div className="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center">
               <Award className="w-5 h-5" />
@@ -304,7 +292,7 @@ export default function AgentApplyPage() {
               <label className="block text-xs font-bold text-gray-300 uppercase tracking-wider">
                 사진, 동영상 및 이력서/포트폴리오 첨부 (다중 첨부 가능)
               </label>
-              
+
               <div className="relative border-2 border-dashed border-emerald-500/40 hover:border-emerald-400 rounded-2xl p-6 text-center cursor-pointer transition-colors bg-white/5">
                 <input
                   type="file"

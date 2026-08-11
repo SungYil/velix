@@ -39,7 +39,7 @@ export default function InsightsPage() {
     try {
       const res = await fetch(`/api/insights?page=${pageNum}&limit=4`);
       const data = await res.json();
-      
+
       if (isLoadMore) {
         setInsights((prev) => [...prev, ...data.insights]);
       } else {
@@ -74,7 +74,7 @@ export default function InsightsPage() {
         </ScrollReveal>
         <ScrollReveal direction="up" delay={0.1}>
           <h1 className="text-4xl sm:text-6xl font-black text-white">
-            VelixENT <span className="gradient-text">인사이트</span>
+            VELIX ENT <span className="gradient-text">인사이트</span>
           </h1>
         </ScrollReveal>
         <ScrollReveal direction="up" delay={0.2}>

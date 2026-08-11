@@ -30,7 +30,7 @@ export default function Home() {
 
           <ScrollReveal direction="up" delay={0.3}>
             <p className="max-w-2xl mx-auto text-base sm:text-xl text-gray-300 font-light leading-relaxed">
-              VelixMEDIA는 차세대 1인 미디어 크리에이터와 함께 새로운 문화 콘텐츠 생태계를 개척합니다.
+              VELIX MEDIA는 차세대 1인 미디어 크리에이터와 함께 새로운 문화 콘텐츠 생태계를 개척합니다.
               독보적인 기획력과 스튜디오 인프라로 무한한 가능성을 경험하세요.
             </p>
           </ScrollReveal>
@@ -60,16 +60,12 @@ export default function Home() {
         <ScrollReveal direction="up">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 p-8 rounded-3xl glass-panel border border-cyan-500/20 bg-[#080e1e]/60">
             <div className="text-center space-y-1">
-              <div className="text-3xl sm:text-5xl font-black gradient-text">150+</div>
+              <div className="text-3xl sm:text-5xl font-black gradient-text">15+</div>
               <div className="text-xs sm:text-sm font-semibold text-gray-400">소속 크리에이터</div>
             </div>
             <div className="text-center space-y-1 border-l border-white/10">
               <div className="text-3xl sm:text-5xl font-black text-cyan-400">3,500만+</div>
               <div className="text-xs sm:text-sm font-semibold text-gray-400">총 누적 구독자</div>
-            </div>
-            <div className="text-center space-y-1 border-l border-white/10">
-              <div className="text-3xl sm:text-5xl font-black text-blue-400">12개</div>
-              <div className="text-xs sm:text-sm font-semibold text-gray-400">자체 전용 스튜디오</div>
             </div>
             <div className="text-center space-y-1 border-l border-white/10">
               <div className="text-3xl sm:text-5xl font-black text-emerald-400">98.5%</div>
@@ -83,7 +79,7 @@ export default function Home() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center space-y-4 mb-16">
           <h2 className="text-3xl sm:text-5xl font-black text-white">
-            EXPLORE <span className="gradient-text">VELIXMEDIA</span>
+            EXPLORE <span className="gradient-text">VELIX MEDIA</span>
           </h2>
           <p className="text-gray-400 text-sm sm:text-base">원하시는 영역으로 바로 이동하여 자세한 정보를 확인하세요.</p>
         </div>
@@ -99,7 +95,7 @@ export default function Home() {
                 <ShieldCheck className="w-6 h-6" />
               </div>
               <h3 className="text-2xl font-black text-white mb-2 group-hover:text-cyan-300 transition-colors">
-                VelixENT
+                VELIX ENT
               </h3>
               <p className="text-xs text-gray-400 leading-relaxed mb-6">
                 회사소개, 대표 인삿말, 조직도 및 오시는 길 카카오맵 정보를 제공합니다.
@@ -185,10 +181,10 @@ export default function Home() {
           <div className="relative rounded-3xl p-10 md:p-16 overflow-hidden glass-panel border border-cyan-500/40 bg-gradient-to-r from-blue-950/60 via-slate-900/60 to-cyan-950/60 text-center space-y-6">
             <h2 className="text-3xl sm:text-5xl font-black text-white">
               당신의 특별한 개성을 <br className="sm:hidden" />
-              <span className="gradient-text">VelixMEDIA</span>에서 펼치세요!
+              <span className="gradient-text">VELIX MEDIA</span>에서 펼치세요!
             </h2>
             <p className="max-w-xl mx-auto text-sm sm:text-base text-gray-300">
-              초보 BJ부터 정통 크리에이터까지 1:1 맞춤 스튜디오, 방송 장비, 개인 퍼스널 브랜딩 솔루션을 전폭 지원합니다.
+              초보 BJ부터 정통 크리에이터까지 방송 장비, 개인 퍼스널 브랜딩 솔루션을 전폭 지원합니다.
             </p>
             <div className="pt-4">
               <Link

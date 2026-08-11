@@ -37,7 +37,7 @@ export default function NoticesPage() {
         </ScrollReveal>
         <ScrollReveal direction="up" delay={0.1}>
           <h1 className="text-4xl sm:text-6xl font-black text-white">
-            VelixENT <span className="gradient-text">공지사항</span>
+            VELIX ENT <span className="gradient-text">공지사항</span>
           </h1>
         </ScrollReveal>
         <ScrollReveal direction="up" delay={0.2}>
@@ -53,9 +53,8 @@ export default function NoticesPage() {
           const isOpen = openNoticeId === n.id;
           return (
             <ScrollReveal key={n.id} direction="up" delay={idx * 0.05}>
-              <div className={`rounded-2xl glass-panel border transition-all ${
-                isOpen ? 'border-violet-500/50 bg-white/5 shadow-xl' : 'border-white/10 hover:border-white/20'
-              }`}>
+              <div className={`rounded-2xl glass-panel border transition-all ${isOpen ? 'border-violet-500/50 bg-white/5 shadow-xl' : 'border-white/10 hover:border-white/20'
+                }`}>
                 <button
                   onClick={() => toggleNotice(n.id)}
                   className="w-full p-6 text-left flex items-start sm:items-center justify-between gap-4 focus:outline-none"
@@ -87,9 +86,8 @@ export default function NoticesPage() {
                   </div>
 
                   <ChevronDown
-                    className={`w-5 h-5 text-gray-400 shrink-0 transition-transform duration-300 ${
-                      isOpen ? 'rotate-180 text-violet-400' : ''
-                    }`}
+                    className={`w-5 h-5 text-gray-400 shrink-0 transition-transform duration-300 ${isOpen ? 'rotate-180 text-violet-400' : ''
+                      }`}
                   />
                 </button>
 

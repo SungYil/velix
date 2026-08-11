@@ -12,7 +12,7 @@ export default function AboutPage() {
     {
       id: 0,
       title: 'CREATIVE DISRUPTION',
-      subtitle: 'Velix Media의 핵심 가치',
+      subtitle: 'VELIX MEDIA의 핵심 가치',
       details: `1) 빠른 성장
 우리는 크리에이터들이 그들의 콘텐츠와 커리어에서 즉각적인 성과를 낼 수 있도록 돕습니다. Velix Media는 전문적인 콘텐츠 전략과 마케팅 지원을 통해 크리에이터들이 보다 효율적으로 성장할 수 있는 최적의 환경을 제공합니다. 이를 통해 크리에이터는 짧은 시간 내에 더 큰 성공을 거두게 됩니다.
 
@@ -28,13 +28,13 @@ Velix Media는 크리에이터들이 수익을 극대화할 수 있도록 다양
       subtitle: '크리에이터의 성공을 위한 파트너',
       details: `우리는 크리에이터와 함께하는 파트너로서, 그들의 꿈과 목표를 실현시킬 수 있도록 끊임없이 도전하고 지원합니다. 크리에이터가 자신의 가능성을 최대한 발휘할 수 있는 환경을 만들어가며, 지속 가능한 성장을 위한 전략을 제공합니다.
 
-우리는 각 크리에이터가 자신의 아이덴티티를 확립하고, 그들의 고유한 브랜드를 세상에 알릴 수 있도록 지원하며, 그 과정에서 함께 성장합니다. 빠르게 변화하는 디지털 세계에서 (주) 노크 엔터테인먼트는 크리에이터의 성공을 이끌어가는 든든한 파트너입니다.`,
+우리는 각 크리에이터가 자신의 아이덴티티를 확립하고, 그들의 고유한 브랜드를 세상에 알릴 수 있도록 지원하며, 그 과정에서 함께 성장합니다. 빠르게 변화하는 디지털 세계에서 VELIX ENT는 크리에이터의 성공을 이끌어가는 든든한 파트너입니다.`,
     },
     {
       id: 2,
       title: 'SUSTAINABLE GROWTH',
       subtitle: '크리에이터 맞춤형 지원 시스템',
-      details: `Velix Entertainment는 크리에이터 개개인의 특징과 목표에 맞춘 맞춤형 지원을 제공합니다. 각 크리에이터에게 전담 매니저를 배정하여, 그들이 효율적으로 콘텐츠를 생산하고 팬들과 소통할 수 있도록 지속적으로 관리합니다.
+      details: `VELIX Entertainment는 크리에이터 개개인의 특징과 목표에 맞춘 맞춤형 지원을 제공합니다. 각 크리에이터에게 전담 매니저를 배정하여, 그들이 효율적으로 콘텐츠를 생산하고 팬들과 소통할 수 있도록 지속적으로 관리합니다.
 
 1) 콘텐츠 기획 및 제작 지원
 우리는 콘텐츠의 품질이 성공에 큰 영향을 미친다고 믿습니다. 크리에이터와 협력하여 차별화된 콘텐츠 기획을 진행하고, 최신 트렌드와 기술을 반영하여 고품질 콘텐츠를 제작할 수 있도록 지원합니다. 이 과정에서 크리에이터가 가진 독창성을 존중하며, 그들의 스타일에 맞는 맞춤형 콘텐츠 전략을 수립합니다.
@@ -59,12 +59,12 @@ Velix Media는 크리에이터들이 수익을 극대화할 수 있도록 다양
         <ScrollReveal direction="up" delay={0.1}>
           <h1 className="text-4xl sm:text-6xl font-black text-white">
             미디어의 미래를 만드는 <br />
-            <span className="gradient-text">VelixMEDIA 브랜드 핵심가치</span>
+            <span className="gradient-text">VELIX MEDIA 브랜드 핵심가치</span>
           </h1>
         </ScrollReveal>
         <ScrollReveal direction="up" delay={0.2}>
           <p className="max-w-2xl mx-auto text-base sm:text-lg text-gray-300 font-light">
-            차세대 라이브 크리에이터 MCN 그룹 VelixMEDIA의 핵심 미션과 체계적인 크리에이터 케어 솔루션입니다.
+            차세대 라이브 크리에이터 MCN 그룹 VELIX MEDIA의 핵심 미션과 체계적인 크리에이터 케어 솔루션입니다.
           </p>
         </ScrollReveal>
       </div>
@@ -129,9 +129,9 @@ Velix Media는 크리에이터들이 수익을 극대화할 수 있도록 다양
             <div className="w-12 h-12 rounded-2xl bg-cyan-600/20 text-cyan-400 flex items-center justify-center">
               <Building2 className="w-6 h-6" />
             </div>
-            <h3 className="text-xl font-bold text-white">최첨단 스튜디오</h3>
+            <h3 className="text-xl font-bold text-white">방송 장비 지원</h3>
             <p className="text-sm text-gray-400 leading-relaxed">
-              강남 본사 초고화질 방송 캡처, 조명, 방음 스튜디오 인프라 완비.
+              스트리밍 방송에 필요한 장비 전폭 지원
             </p>
           </div>
         </ScrollReveal>

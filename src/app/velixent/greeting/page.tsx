@@ -37,7 +37,7 @@ export default function GreetingPage() {
               </div>
               <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black via-black/80 to-transparent">
                 <div className="text-xl font-black text-white">김태현</div>
-                <div className="text-xs font-semibold text-purple-400">VelixENT 대표이사 / CEO</div>
+                <div className="text-xs font-semibold text-purple-400">VELIX ENT 대표이사 / CEO</div>
               </div>
             </div>
           </ScrollReveal>

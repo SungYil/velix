@@ -11,7 +11,7 @@ export default function BusinessIntroPage() {
       num: '01',
       title: 'LIVE MCN & STREAMING',
       subtitle: '라이브 방송 매니지먼트 및 아티스트 육성',
-      description: '아프리카TV, 트위치, 유튜브, 틱톡 등 국내외 메이저 플랫폼에서 1인 스트리머의 고화질 방송 환경 및 브랜딩 전략을 기획합니다.',
+      description: '틱톡, SOOP, 유튜브 등 국내외 메이저 플랫폼에서 1인 스트리머의 고화질 방송 환경 및 브랜딩 전략을 기획합니다.',
       tags: ['라이브 스트리밍', '아티스트 관리', '채널 가속화'],
       image: 'https://images.unsplash.com/photo-1598899134739-24c46f58b8c0?auto=format&fit=crop&w=1000&q=80',
     },
@@ -30,14 +30,6 @@ export default function BusinessIntroPage() {
       description: '초단기 몰입감을 주는 숏폼 바이럴 콘텐츠 제작 전문 팀이 상주하여 핵심 소구점을 공략하는 고효율 영상 마케팅을 집행합니다.',
       tags: ['숏폼 바이럴', '유튜브 숏츠', '릴스 기획'],
       image: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&w=1000&q=80',
-    },
-    {
-      num: '04',
-      title: 'STUDIO RENTAL & INFRASTRUCTURE',
-      subtitle: '전문 방송 스튜디오 및 초고화질 제작 장비 인프라',
-      description: '강남 중심가에 위치한 전용 방음 스튜디오 12개소 및 방송 조명, 크로마키, 4K 카메라 시스템을 엔터테인먼트 제휴사에 제공합니다.',
-      tags: ['스튜디오 대관', '4K 방송 인프라', '음향 시스템'],
-      image: 'https://images.unsplash.com/photo-1590602847861-f357a9332bbc?auto=format&fit=crop&w=1000&q=80',
     },
   ];
 
