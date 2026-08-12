@@ -60,7 +60,7 @@ export default function Home() {
         <ScrollReveal direction="up">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 p-8 sm:p-10 rounded-3xl glass-panel border border-cyan-500/20 bg-[#080e1e]/60 divide-y sm:divide-y-0 sm:divide-x divide-white/10">
             <div className="text-center space-y-1 py-2 sm:py-0">
-              <div className="text-3xl sm:text-5xl font-black gradient-text">15+</div>
+              <div className="text-3xl sm:text-5xl font-black gradient-text">100+</div>
               <div className="text-xs sm:text-sm font-semibold text-gray-400">소속 크리에이터</div>
             </div>
             <div className="text-center space-y-1 py-2 sm:py-0">
@@ -120,7 +120,7 @@ export default function Home() {
                 크리에이터
               </h3>
               <p className="text-xs text-gray-400 leading-relaxed mb-6">
-                최신 장비/스튜디오 지원 혜택 및 미디어 크리에이터 공채 지원하기 양식.
+                최신 장비 지원 혜택 및 미디어 크리에이터 공채 지원하기 양식.
               </p>
               <div className="flex items-center text-xs font-bold text-cyan-400 gap-1 group-hover:translate-x-2 transition-transform">
                 <span>지원혜택 & 지원하기</span>

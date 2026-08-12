@@ -31,7 +31,7 @@ export default function Navbar() {
 
   const navLinks = [
     {
-      name: 'VelixENT',
+      name: 'VELIXENT',
       key: 'velixent',
       items: [
         { label: '회사소개', href: '/velixent/about' },
@@ -70,9 +70,8 @@ export default function Navbar() {
   return (
     <header
       ref={navRef}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled ? 'glass-panel py-3 border-b border-cyan-500/20 shadow-2xl bg-[#060913]/90' : 'bg-gradient-to-b from-[#060913]/90 to-transparent py-4'
-      }`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'glass-panel py-3 border-b border-cyan-500/20 shadow-2xl bg-[#060913]/90' : 'bg-gradient-to-b from-[#060913]/90 to-transparent py-4'
+        }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
@@ -104,9 +103,8 @@ export default function Navbar() {
                 <button
                   type="button"
                   onClick={() => setActiveDropdown(activeDropdown === menu.key ? null : menu.key)}
-                  className={`flex items-center gap-1.5 text-sm font-bold transition-colors ${
-                    activeDropdown === menu.key ? 'text-cyan-400 font-extrabold' : 'text-gray-200 hover:text-cyan-400'
-                  }`}
+                  className={`flex items-center gap-1.5 text-sm font-bold transition-colors ${activeDropdown === menu.key ? 'text-cyan-400 font-extrabold' : 'text-gray-200 hover:text-cyan-400'
+                    }`}
                 >
                   <span>{menu.name}</span>
                   <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${activeDropdown === menu.key ? 'rotate-180 text-cyan-400' : 'opacity-70'}`} />
@@ -125,11 +123,10 @@ export default function Navbar() {
                           href={item.href}
                           prefetch={false}
                           onClick={() => setActiveDropdown(null)}
-                          className={`block px-4 py-2.5 rounded-xl text-sm font-bold transition-colors ${
-                            pathname === item.href
-                              ? 'bg-blue-600/40 text-cyan-300 border border-cyan-500/30'
-                              : 'text-gray-300 hover:bg-white/10 hover:text-white'
-                          }`}
+                          className={`block px-4 py-2.5 rounded-xl text-sm font-bold transition-colors ${pathname === item.href
+                            ? 'bg-blue-600/40 text-cyan-300 border border-cyan-500/30'
+                            : 'text-gray-300 hover:bg-white/10 hover:text-white'
+                            }`}
                         >
                           {item.label}
                         </Link>
@@ -195,11 +192,10 @@ export default function Navbar() {
                     href={item.href}
                     prefetch={false}
                     onClick={() => setMobileMenuOpen(false)}
-                    className={`block px-3 py-2 rounded-xl text-sm font-semibold ${
-                      pathname === item.href
-                        ? 'bg-blue-600/40 text-cyan-300 font-bold border border-cyan-500/30'
-                        : 'bg-white/5 text-gray-300 hover:bg-white/10'
-                    }`}
+                    className={`block px-3 py-2 rounded-xl text-sm font-semibold ${pathname === item.href
+                      ? 'bg-blue-600/40 text-cyan-300 font-bold border border-cyan-500/30'
+                      : 'bg-white/5 text-gray-300 hover:bg-white/10'
+                      }`}
                   >
                     {item.label}
                   </Link>
