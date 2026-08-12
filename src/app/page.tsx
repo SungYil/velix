@@ -23,15 +23,15 @@ export default function Home() {
 
           <ScrollReveal direction="up" delay={0.2}>
             <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight leading-[1.1] text-white">
-              CREATE THE <br />
-              <span className="gradient-text">FUTURE OF MEDIA</span>
+              "크리에이터의 가능성을 현실로, <br />
+              <span className="gradient-text">라이브의 새로운 기준을 만듭니다."</span>
             </h1>
           </ScrollReveal>
 
           <ScrollReveal direction="up" delay={0.3}>
             <p className="max-w-2xl mx-auto text-base sm:text-xl text-gray-300 font-light leading-relaxed">
-              VELIX MEDIA는 차세대 1인 미디어 크리에이터와 함께 새로운 문화 콘텐츠 생태계를 개척합니다.
-              독보적인 기획력과 스튜디오 인프라로 무한한 가능성을 경험하세요.
+              VELIX MEDIA는 라이브 크리에이터와 함께 성장하며 체계적인 매니지먼트와 맞춤형 지원으로
+              당신의 가능성을 더 큰 기회로 만들어갑니다.
             </p>
           </ScrollReveal>
 
