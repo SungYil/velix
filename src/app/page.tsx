@@ -22,7 +22,7 @@ export default function Home() {
           </ScrollReveal>
 
           <ScrollReveal direction="up" delay={0.2}>
-            <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight leading-[1.1] text-white">
+            <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight leading-snug sm:leading-tight text-white">
               "크리에이터의 가능성을 현실로, <br />
               <span className="gradient-text">라이브의 새로운 기준을 만듭니다."</span>
             </h1>
