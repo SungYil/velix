@@ -131,7 +131,7 @@ Velix Media는 크리에이터들이 수익을 극대화할 수 있도록 다양
             </div>
             <h3 className="text-xl font-bold text-white">방송 장비 지원</h3>
             <p className="text-sm text-gray-400 leading-relaxed">
-              스트리밍 방송에 필요한 최첨단 방송 장비 전폭 지원.
+              스트리밍 방송에 필요한 방송 장비 지원.
             </p>
           </div>
         </ScrollReveal>
@@ -143,7 +143,7 @@ Velix Media는 크리에이터들이 수익을 극대화할 수 있도록 다양
             </div>
             <h3 className="text-xl font-bold text-white">1:1 맞춤형 케어</h3>
             <p className="text-sm text-gray-400 leading-relaxed">
-              전담 방송 매니저의 실시간 모니터링 및 멘토링 프로그램 운영.
+              실시간 모니터링 및 멘토링 프로그램 운영.
             </p>
           </div>
         </ScrollReveal>
