@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ChevronDown, Phone, Menu, X, Sparkles } from 'lucide-react';
+import { ChevronDown, Menu, X, Sparkles } from 'lucide-react';
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -139,14 +139,13 @@ export default function Navbar() {
 
           {/* Right Header Buttons */}
           <div className="hidden md:flex items-center gap-3">
-            {/* Phone Call Link Button */}
-            <a
-              href="tel:01081131997"
-              className="flex items-center gap-2 px-4 py-2 rounded-full glass-panel hover:bg-cyan-500/20 text-gray-200 hover:text-white border border-cyan-500/30 text-sm font-semibold transition-all group"
+            <Link
+              href="/business/inquire"
+              prefetch={false}
+              className="px-4 py-2 rounded-full glass-panel hover:bg-cyan-500/20 text-gray-200 hover:text-white border border-cyan-500/30 text-sm font-semibold transition-all"
             >
-              <Phone className="w-4 h-4 text-cyan-400 group-hover:scale-110 transition-transform" />
-              <span>대표전화: 010-8113-1997</span>
-            </a>
+              제휴 문의
+            </Link>
 
             <Link
               href="/admin"
@@ -160,15 +159,9 @@ export default function Navbar() {
 
           {/* Mobile Menu Button */}
           <div className="md:hidden flex items-center gap-2">
-            <a
-              href="tel:01081131997"
-              className="p-2 rounded-xl glass-panel text-cyan-400 hover:text-white border border-cyan-500/30"
-            >
-              <Phone className="w-5 h-5" />
-            </a>
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-xl glass-panel text-gray-200 hover:text-white border border-cyan-500/30"
+              className="p-2.5 rounded-xl glass-panel text-gray-200 hover:text-white border border-cyan-500/30"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -203,19 +196,20 @@ export default function Navbar() {
             </div>
           ))}
 
-          <div className="pt-4 border-t border-white/10 flex items-center justify-between">
-            <a
-              href="tel:01081131997"
-              className="flex-1 text-center py-3 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg"
+          <div className="pt-4 border-t border-white/10 flex items-center gap-2">
+            <Link
+              href="/business/inquire"
+              prefetch={false}
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex-1 text-center py-3 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold text-sm shadow-lg"
             >
-              <Phone className="w-4 h-4" />
-              대표전화 연결 (010-8113-1997)
-            </a>
+              비즈니스 문의하기
+            </Link>
             <Link
               href="/admin"
               prefetch={false}
               onClick={() => setMobileMenuOpen(false)}
-              className="ml-2 px-4 py-3 rounded-xl bg-white/10 text-gray-300 hover:text-white text-sm font-bold"
+              className="px-4 py-3 rounded-xl bg-white/10 text-gray-300 hover:text-white text-sm font-bold"
             >
               관리자
             </Link>
