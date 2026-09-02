@@ -9,11 +9,11 @@ export default function CreatorBenefitsPage() {
   const benefits = [
     {
       id: 1,
-      title: '고성능 장비 지원',
-      subtitle: '캠, 마이크, 조명부터 최고사양 PC 세팅까지 지원',
-      description: 'VELIX MEDIA 본사 매니저진들과 함께 초고화질 방송 진행을 위한 최첨단 방송 장비를 풀세트로 지원합니다.',
+      title: '방송 장비 지원',
+      subtitle: '전담 매니저진 케어 및 방송 필수 장비 세트 지원',
+      description: 'VELIX MEDIA 본사 매니저진들과 함께 성공적인 라이브 스트리밍 방송을 시작할 수 있도록 필요한 방송 장비를 아낌없이 지원합니다.',
       image: 'https://images.unsplash.com/photo-1590602847861-f357a9332bbc?auto=format&fit=crop&w=1000&q=80',
-      tag: '장비',
+      tag: '장비 지원',
     },
     {
       id: 2,

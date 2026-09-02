@@ -141,11 +141,11 @@ export default function Navbar() {
           <div className="hidden md:flex items-center gap-3">
             {/* Phone Call Link Button */}
             <a
-              href="tel:025550199"
+              href="tel:01081131997"
               className="flex items-center gap-2 px-4 py-2 rounded-full glass-panel hover:bg-cyan-500/20 text-gray-200 hover:text-white border border-cyan-500/30 text-sm font-semibold transition-all group"
             >
               <Phone className="w-4 h-4 text-cyan-400 group-hover:scale-110 transition-transform" />
-              <span>대표전화: 02-555-0199</span>
+              <span>대표전화: 010-8113-1997</span>
             </a>
 
             <Link
@@ -161,7 +161,7 @@ export default function Navbar() {
           {/* Mobile Menu Button */}
           <div className="md:hidden flex items-center gap-2">
             <a
-              href="tel:025550199"
+              href="tel:01081131997"
               className="p-2 rounded-xl glass-panel text-cyan-400 hover:text-white border border-cyan-500/30"
             >
               <Phone className="w-5 h-5" />
@@ -205,11 +205,11 @@ export default function Navbar() {
 
           <div className="pt-4 border-t border-white/10 flex items-center justify-between">
             <a
-              href="tel:025550199"
+              href="tel:01081131997"
               className="flex-1 text-center py-3 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg"
             >
               <Phone className="w-4 h-4" />
-              대표전화 연결 (02-555-0199)
+              대표전화 연결 (010-8113-1997)
             </a>
             <Link
               href="/admin"
