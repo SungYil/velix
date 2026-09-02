@@ -142,18 +142,10 @@ export default function Navbar() {
             <Link
               href="/business/inquire"
               prefetch={false}
-              className="px-4 py-2 rounded-full glass-panel hover:bg-cyan-500/20 text-gray-200 hover:text-white border border-cyan-500/30 text-sm font-semibold transition-all"
-            >
-              제휴 문의
-            </Link>
-
-            <Link
-              href="/admin"
-              prefetch={false}
               className="flex items-center gap-1.5 px-5 py-2 rounded-full bg-gradient-to-r from-blue-600 via-cyan-600 to-blue-700 hover:from-blue-500 hover:to-cyan-500 text-white text-sm font-bold shadow-lg shadow-blue-600/40 transition-all hover:scale-105 border border-cyan-400/30"
             >
               <Sparkles className="w-4 h-4" />
-              <span>관리자</span>
+              <span>제휴 문의</span>
             </Link>
           </div>
 
@@ -196,22 +188,14 @@ export default function Navbar() {
             </div>
           ))}
 
-          <div className="pt-4 border-t border-white/10 flex items-center gap-2">
+          <div className="pt-4 border-t border-white/10 flex items-center">
             <Link
               href="/business/inquire"
               prefetch={false}
               onClick={() => setMobileMenuOpen(false)}
-              className="flex-1 text-center py-3 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold text-sm shadow-lg"
+              className="w-full text-center py-3 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold text-sm shadow-lg"
             >
               비즈니스 문의하기
-            </Link>
-            <Link
-              href="/admin"
-              prefetch={false}
-              onClick={() => setMobileMenuOpen(false)}
-              className="px-4 py-3 rounded-xl bg-white/10 text-gray-300 hover:text-white text-sm font-bold"
-            >
-              관리자
             </Link>
           </div>
         </div>
