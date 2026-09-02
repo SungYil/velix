@@ -98,7 +98,7 @@ export default function Home() {
                 VELIX ENT
               </h3>
               <p className="text-xs text-gray-400 leading-relaxed mb-6">
-                회사소개, 대표 인삿말, 조직도 및 오시는 길 카카오맵 정보를 제공합니다.
+                회사소개 및 대표 인삿말 정보를 제공합니다.
               </p>
               <div className="flex items-center text-xs font-bold text-cyan-400 gap-1 group-hover:translate-x-2 transition-transform">
                 <span>회사 둘러보기</span>

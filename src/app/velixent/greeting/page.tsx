@@ -2,7 +2,6 @@
 
 import React from 'react';
 import ScrollReveal from '@/components/ScrollReveal';
-import Image from 'next/image';
 import { Quote, Sparkles } from 'lucide-react';
 
 export default function GreetingPage() {
@@ -11,7 +10,7 @@ export default function GreetingPage() {
       {/* Header */}
       <div className="text-center space-y-3">
         <ScrollReveal direction="up">
-          <span className="text-xs uppercase font-bold tracking-widest text-pink-400 bg-pink-500/10 px-4 py-1.5 rounded-full border border-pink-500/20">
+          <span className="text-xs uppercase font-bold tracking-widest text-cyan-400 bg-cyan-500/10 px-4 py-1.5 rounded-full border border-cyan-500/20">
             CEO Greeting
           </span>
         </ScrollReveal>
@@ -27,17 +26,17 @@ export default function GreetingPage() {
         {/* Photo Column */}
         <div className="lg:col-span-5">
           <ScrollReveal direction="left" delay={0.2}>
-            <div className="relative rounded-3xl overflow-hidden glass-panel border border-purple-500/30 shadow-2xl group">
+            <div className="relative rounded-3xl overflow-hidden glass-panel border border-cyan-500/30 shadow-2xl group">
               <div className="aspect-[3/4] relative w-full overflow-hidden">
                 <img
-                  src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=1000&q=80"
-                  alt="VelixENT CEO"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 filter grayscale hover:grayscale-0"
+                  src="/ceo.jpg"
+                  alt="VELIX MEDIA 대표이사 김태현"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                 />
               </div>
               <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black via-black/80 to-transparent">
                 <div className="text-xl font-black text-white">김태현</div>
-                <div className="text-xs font-semibold text-purple-400">VELIX ENT 대표이사 / CEO</div>
+                <div className="text-xs font-semibold text-cyan-400">VELIX MEDIA 대표이사 / CEO</div>
               </div>
             </div>
           </ScrollReveal>
@@ -46,7 +45,7 @@ export default function GreetingPage() {
         {/* Text Column with Staggered Scroll Reveal Animations */}
         <div className="lg:col-span-7 space-y-6">
           <ScrollReveal direction="right" delay={0.3}>
-            <div className="w-12 h-12 rounded-2xl bg-purple-600/20 text-purple-400 flex items-center justify-center mb-4">
+            <div className="w-12 h-12 rounded-2xl bg-cyan-600/20 text-cyan-400 flex items-center justify-center mb-4">
               <Quote className="w-6 h-6" />
             </div>
             <h2 className="text-2xl sm:text-4xl font-black text-white leading-tight">
@@ -58,27 +57,27 @@ export default function GreetingPage() {
           <ScrollReveal direction="right" delay={0.4}>
             <div className="space-y-4 text-gray-300 text-base sm:text-lg leading-relaxed font-light">
               <p>
-                안녕하십니까, (주)벨릭스엔터테인먼트 대표이사 김태현입니다.
+                안녕하십니까, (주)벨릭스미디어 대표이사 김태현입니다.
               </p>
               <p>
                 디지털 미디어 환경은 매 순간 급격하게 변화하고 있습니다. 1인 방송과 라이브 스트리밍은 단순한 엔터테인먼트를 넘어 대중과 가장 밀접하게 소통하는 새로운 시대의 문화적 흐름으로 자리 잡았습니다.
               </p>
               <p>
-                VelixENT는 이러한 시대적 요구에 맞추어, 소속 크리에이터들이 콘텐츠 제작 본연의 가치에 집중하고 최고의 잠재력을 발현할 수 있도록 정교하고 아낌없는 지원을 약속드립니다.
+                VELIX MEDIA는 단순히 크리에이터의 영입에 그치지 않고, 각 개인의 독창적인 브랜드 가치를 발굴하고 안정적인 체계 속에서 최고의 기량을 펼칠 수 있도록 1:1 전담 매니지먼트와 전폭적인 방송 장비 인프라를 제공합니다.
               </p>
               <p>
-                단순히 숫자에 치중하는 것이 아닌, 건강하고 지속 가능한 크리에이터 생태계를 구축하여 여러분의 매 순간을 돋보이게 만들어 드릴 것입니다.
+                크리에이터의 성장이 곧 회사의 성장이라는 확고한 철학 아래, 끊임없는 혁신과 지원으로 글로벌 미디어 시장을 선도하는 든든한 파트너가 될 것을 약속드립니다.
               </p>
             </div>
           </ScrollReveal>
 
           <ScrollReveal direction="right" delay={0.5}>
-            <div className="pt-6 border-t border-white/10 flex items-center justify-between">
+            <div className="pt-4 border-t border-white/10 flex items-center justify-between">
               <div>
-                <div className="text-sm font-bold text-white">(주)벨릭스엔터테인먼트 임직원 일동</div>
-                <div className="text-xs text-gray-400">Velix Entertainment Management Team</div>
+                <div className="text-sm font-bold text-white">(주)벨릭스미디어 대표이사</div>
+                <div className="text-xs text-gray-400">VELIX MEDIA Executive Management</div>
               </div>
-              <div className="font-serif italic text-purple-400 text-lg font-bold">
+              <div className="font-serif italic text-cyan-400 text-lg font-bold">
                 Kim Tae Hyun
               </div>
             </div>

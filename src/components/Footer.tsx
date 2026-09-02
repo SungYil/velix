@@ -36,7 +36,6 @@ export default function Footer() {
             <ul className="space-y-2 text-xs">
               <li><Link href="/velixent/about" className="hover:text-cyan-400 transition-colors">회사소개</Link></li>
               <li><Link href="/velixent/greeting" className="hover:text-cyan-400 transition-colors">인삿말</Link></li>
-              <li><Link href="/velixent/location" className="hover:text-cyan-400 transition-colors">오시는길</Link></li>
             </ul>
           </div>
 
@@ -54,9 +53,9 @@ export default function Footer() {
           <div className="space-y-3">
             <h4 className="text-sm font-bold text-white uppercase tracking-wider">고객센터 & 위치</h4>
             <div className="space-y-1.5 text-xs leading-relaxed">
-              <p><strong className="text-white">대표전화:</strong> 02-555-0199</p>
-              <p><strong className="text-white">이메일:</strong> contact@velixent.com</p>
-              <p><strong className="text-white">주소:</strong> 서울특별시 강남구 테헤란로 123 벨릭스타워 8층</p>
+              <p><strong className="text-white">대표전화:</strong> 010-8113-1997</p>
+              <p><strong className="text-white">이메일:</strong> velixmedia00@gmail.com</p>
+              <p><strong className="text-white">주소:</strong> 서울 강남구 압구정로 306 (신사동 코워크시티)</p>
               <p><strong className="text-white">운영시간:</strong> 평일 10:00 - 19:00 (주말/공휴일 휴무)</p>
             </div>
           </div>
