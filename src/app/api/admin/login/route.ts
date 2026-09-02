@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getAdminPassword } from '@/lib/auth';
 
 export async function POST(req: NextRequest) {
   try {
     const { password } = await req.json();
     
-    // Default admin password for VelixENT
-    const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'velix1234';
+    // Dynamic admin password for VelixMEDIA
+    const currentAdminPassword = getAdminPassword();
 
-    if (password === ADMIN_PASSWORD) {
+    if (password === currentAdminPassword) {
       const response = NextResponse.json({ success: true, message: '로그인 성공' });
       response.cookies.set('velix_admin_auth', 'authenticated_token_velix_2026', {
         httpOnly: true,

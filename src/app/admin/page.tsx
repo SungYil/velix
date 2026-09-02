@@ -23,6 +23,7 @@ import {
   Paperclip,
   ExternalLink,
   UserCheck,
+  Lock,
 } from 'lucide-react';
 
 function getDisplayUrl(url: string) {
@@ -277,6 +278,40 @@ export default function AdminDashboardPage() {
 
   const [loading, setLoading] = useState(false);
   const [actionSuccess, setActionSuccess] = useState('');
+
+  // Password Change State
+  const [passwordModalOpen, setPasswordModalOpen] = useState(false);
+  const [passForm, setPassForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (passForm.newPassword !== passForm.confirmPassword) {
+      alert('새 비밀번호와 비밀번호 확인이 일치하지 않습니다.');
+      return;
+    }
+    setLoading(true);
+    try {
+      const res = await fetch('/api/admin/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          currentPassword: passForm.currentPassword,
+          newPassword: passForm.newPassword,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || '비밀번호 변경 실패');
+
+      setActionSuccess('관리자 비밀번호가 성공적으로 변경되었습니다!');
+      setPasswordModalOpen(false);
+      setPassForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+      setTimeout(() => setActionSuccess(''), 3000);
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Check auth
   useEffect(() => {
@@ -586,6 +621,13 @@ export default function AdminDashboardPage() {
           >
             <ExternalLink className="w-3.5 h-3.5" />
             <span>메인 웹사이트 이동</span>
+          </button>
+          <button
+            onClick={() => setPasswordModalOpen(true)}
+            className="px-4 py-2 rounded-xl bg-cyan-600/20 border border-cyan-500/30 hover:bg-cyan-600/30 text-cyan-300 text-xs font-bold flex items-center gap-1.5"
+          >
+            <Lock className="w-3.5 h-3.5" />
+            <span>비밀번호 변경</span>
           </button>
           <button
             onClick={handleLogout}
@@ -1449,6 +1491,86 @@ export default function AdminDashboardPage() {
                   className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm shadow-lg"
                 >
                   {loading ? '수정 저장 중...' : 'FAQ 수정 저장'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Password Change Modal */}
+      {passwordModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+          <div className="w-full max-w-md p-6 sm:p-8 rounded-3xl glass-panel border border-cyan-500/40 bg-[#0c1222] shadow-2xl space-y-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center">
+                  <Lock className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-white">관리자 비밀번호 변경</h3>
+                  <p className="text-xs text-gray-400">시스템 접속 인증 비밀번호를 새롭게 설정합니다.</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setPasswordModalOpen(false)}
+                className="p-2 rounded-xl text-gray-400 hover:text-white bg-white/5"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleChangePassword} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-gray-300 uppercase mb-1">현재 비밀번호</label>
+                <input
+                  type="password"
+                  required
+                  value={passForm.currentPassword}
+                  onChange={(e) => setPassForm({ ...passForm, currentPassword: e.target.value })}
+                  placeholder="현재 사용 중인 비밀번호"
+                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-cyan-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-300 uppercase mb-1">새 비밀번호</label>
+                <input
+                  type="password"
+                  required
+                  value={passForm.newPassword}
+                  onChange={(e) => setPassForm({ ...passForm, newPassword: e.target.value })}
+                  placeholder="변경할 새 비밀번호"
+                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-cyan-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-300 uppercase mb-1">새 비밀번호 확인</label>
+                <input
+                  type="password"
+                  required
+                  value={passForm.confirmPassword}
+                  onChange={(e) => setPassForm({ ...passForm, confirmPassword: e.target.value })}
+                  placeholder="새 비밀번호 다시 입력"
+                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-cyan-500"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-white/10">
+                <button
+                  type="button"
+                  onClick={() => setPasswordModalOpen(false)}
+                  className="px-5 py-2.5 rounded-xl bg-white/10 text-gray-300 text-sm font-bold hover:bg-white/20"
+                >
+                  취소
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 via-cyan-600 to-blue-700 hover:opacity-90 text-white font-bold text-sm shadow-lg disabled:opacity-50"
+                >
+                  {loading ? '변경 중...' : '비밀번호 변경 완료'}
                 </button>
               </div>
             </form>

@@ -56,8 +56,7 @@ velix/
 
 ### 3-1. 관리자 대시보드 웹로그인 (Admin Web Login)
 - **접속 URL**: `https://velix.moibluu.com/admin` 또는 `/admin/login`
-- **관리자 ID**: `admin`
-- **관리자 비밀번호**: `velix2026!`
+- **관리자 초기 비밀번호**: `velix1234` (관리자 대시보드 로그인 후 **[비밀번호 변경]** 버튼을 통해 자유롭게 변경하실 수 있으며, 변경된 비밀번호는 `data/admin_password.json` 파일에 저장되어 영구 유지됩니다).
 - **인증 세션 방식**: HTTP-Only 암호화 쿠키 (`velix_admin_auth`)
 
 ---
