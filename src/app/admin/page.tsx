@@ -249,7 +249,7 @@ function VisualRichTextEditor({
 }
 
 export default function AdminDashboardPage() {
-  const [activeTab, setActiveTab] = useState<'creators' | 'agents' | 'business' | 'insights' | 'notices' | 'faqs'>('creators');
+  const [activeTab, setActiveTab] = useState<'creators' | 'agents' | 'hosts' | 'business' | 'insights' | 'notices' | 'faqs'>('creators');
   const [authChecked, setAuthChecked] = useState(false);
   const router = useRouter();
 
@@ -260,6 +260,7 @@ export default function AdminDashboardPage() {
   const [insights, setInsights] = useState<any[]>([]);
   const [notices, setNotices] = useState<any[]>([]);
   const [faqs, setFaqs] = useState<any[]>([]);
+  const [hosts, setHosts] = useState<any[]>([]);
 
   // Selected Detail Modal
   const [selectedItem, setSelectedItem] = useState<any | null>(null);
@@ -275,6 +276,17 @@ export default function AdminDashboardPage() {
   const [editInsightFile, setEditInsightFile] = useState<File | null>(null);
   const [newNotice, setNewNotice] = useState({ title: '', content: '' });
   const [newFaq, setNewFaq] = useState({ question: '', answer: '', category: '일반' });
+  const [newHost, setNewHost] = useState({
+    name: '',
+    stage_name: '',
+    category: '토크 & 소통',
+    platform: 'SOOP / 틱톡',
+    tag: '#보이는라디오 #소통',
+    description: '',
+    display_order: 0,
+    imageUrl: '',
+  });
+  const [hostFile, setHostFile] = useState<File | null>(null);
 
   const [loading, setLoading] = useState(false);
   const [actionSuccess, setActionSuccess] = useState('');
@@ -351,6 +363,10 @@ export default function AdminDashboardPage() {
     fetch('/api/faqs')
       .then((res) => res.json())
       .then((data) => setFaqs(data.faqs || []));
+
+    fetch('/api/admin/creators')
+      .then((res) => res.json())
+      .then((data) => setHosts(data.creators || []));
   };
 
   const handleLogout = async () => {
@@ -417,6 +433,61 @@ export default function AdminDashboardPage() {
       body: JSON.stringify({ id }),
     });
     loadAllData();
+  };
+
+  const handleDeleteHost = async (id: number) => {
+    if (!confirm('이 호스트/크리에이터를 삭제하시겠습니까?')) return;
+    await fetch('/api/admin/creators', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id }),
+    });
+    loadAllData();
+  };
+
+  const handleCreateHost = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const form = new FormData();
+      form.append('name', newHost.name);
+      form.append('stage_name', newHost.stage_name);
+      form.append('category', newHost.category);
+      form.append('platform', newHost.platform);
+      form.append('tag', newHost.tag);
+      form.append('description', newHost.description);
+      form.append('display_order', String(newHost.display_order));
+      form.append('imageUrl', newHost.imageUrl);
+      if (hostFile) {
+        form.append('image', hostFile);
+      }
+
+      const res = await fetch('/api/admin/creators', {
+        method: 'POST',
+        body: form,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || '호스트 등록 실패');
+
+      setActionSuccess('새로운 호스트가 성공적으로 등록되었습니다!');
+      setNewHost({
+        name: '',
+        stage_name: '',
+        category: '토크 & 소통',
+        platform: 'SOOP / 틱톡',
+        tag: '#보이는라디오 #소통',
+        description: '',
+        display_order: 0,
+        imageUrl: '',
+      });
+      setHostFile(null);
+      loadAllData();
+      setTimeout(() => setActionSuccess(''), 3000);
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Create Handlers
@@ -667,6 +738,15 @@ export default function AdminDashboardPage() {
           <span>에이전트 지원서 ({agentApplications.length})</span>
         </button>
         <button
+          onClick={() => setActiveTab('hosts')}
+          className={`px-5 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 transition-colors ${
+            activeTab === 'hosts' ? 'bg-cyan-600 text-white shadow-lg border border-cyan-400/40' : 'glass-panel text-gray-400 hover:text-white'
+          }`}
+        >
+          <Sparkles className="w-4 h-4" />
+          <span>소속 호스트 관리 ({hosts.length})</span>
+        </button>
+        <button
           onClick={() => setActiveTab('business')}
           className={`px-5 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 transition-colors ${
             activeTab === 'business' ? 'bg-blue-600 text-white shadow-lg border border-cyan-400/40' : 'glass-panel text-gray-400 hover:text-white'
@@ -884,6 +964,224 @@ export default function AdminDashboardPage() {
                   </tbody>
                 </table>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Tab: Exclusive Hosts Management */}
+        {activeTab === 'hosts' && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Create Host Form */}
+            <div className="glass-panel p-6 rounded-2xl border border-white/10 space-y-6 h-fit">
+              <div>
+                <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-cyan-400" />
+                  <span>새 소속 호스트 등록</span>
+                </h2>
+                <p className="text-xs text-gray-400 mt-1">
+                  메인 화면 슬라이더 및 &apos;소속크리에이터&apos; 페이지에 노출됩니다.
+                </p>
+              </div>
+
+              <form onSubmit={handleCreateHost} className="space-y-4">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-300 mb-1">이름 / 활동명 *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="예: 민우"
+                      value={newHost.name}
+                      onChange={(e) => setNewHost({ ...newHost, name: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-xs focus:border-cyan-500 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-300 mb-1">영문 STAGE NAME</label>
+                    <input
+                      type="text"
+                      placeholder="예: MINWOO"
+                      value={newHost.stage_name}
+                      onChange={(e) => setNewHost({ ...newHost, stage_name: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-xs focus:border-cyan-500 focus:outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-300 mb-1">카테고리</label>
+                    <input
+                      type="text"
+                      placeholder="예: 토크 & 소통"
+                      value={newHost.category}
+                      onChange={(e) => setNewHost({ ...newHost, category: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-xs focus:border-cyan-500 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-300 mb-1">활동 플랫폼</label>
+                    <input
+                      type="text"
+                      placeholder="예: SOOP / 틱톡"
+                      value={newHost.platform}
+                      onChange={(e) => setNewHost({ ...newHost, platform: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-xs focus:border-cyan-500 focus:outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-gray-300 mb-1">태그 / 키워드</label>
+                  <input
+                    type="text"
+                    placeholder="예: #보이는라디오 #소통 #감성"
+                    value={newHost.tag}
+                    onChange={(e) => setNewHost({ ...newHost, tag: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-xs focus:border-cyan-500 focus:outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-gray-300 mb-1">한 줄 소개글</label>
+                  <textarea
+                    rows={3}
+                    placeholder="호스트의 매력과 방송 특징을 간략히 소개해 주세요."
+                    value={newHost.description}
+                    onChange={(e) => setNewHost({ ...newHost, description: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-xs focus:border-cyan-500 focus:outline-none resize-none"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-300 mb-1">노출 순서 (작을수록 앞)</label>
+                    <input
+                      type="number"
+                      value={newHost.display_order}
+                      onChange={(e) => setNewHost({ ...newHost, display_order: parseInt(e.target.value, 10) || 0 })}
+                      className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-xs focus:border-cyan-500 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-300 mb-1">기본 이미지 URL (선택)</label>
+                    <input
+                      type="text"
+                      placeholder="예: /creators/creator1.jpg"
+                      value={newHost.imageUrl}
+                      onChange={(e) => setNewHost({ ...newHost, imageUrl: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-xs focus:border-cyan-500 focus:outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-gray-300 mb-1">프로필 사진 파일 업로드</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setHostFile(e.target.files?.[0] || null)}
+                    className="w-full text-xs text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-cyan-600 file:text-white hover:file:bg-cyan-500"
+                  />
+                  {hostFile && (
+                    <p className="text-[11px] text-cyan-300 mt-1">선택된 파일: {hostFile.name}</p>
+                  )}
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-3.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold text-sm transition-all shadow-lg flex items-center justify-center gap-2"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  <span>{loading ? '호스트 등록 중...' : '새 소속 호스트 등록하기'}</span>
+                </button>
+              </form>
+            </div>
+
+            {/* Hosts List */}
+            <div className="lg:col-span-2 space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                    <Sparkles className="w-5 h-5 text-cyan-400" />
+                    <span>현재 소속 호스트 목록 ({hosts.length})</span>
+                  </h2>
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    웹사이트 메인 호스트 슬라이더 및 소속크리에이터 페이지에 실시간 반영됩니다.
+                  </p>
+                </div>
+              </div>
+
+              {hosts.length === 0 ? (
+                <div className="p-12 text-center rounded-2xl glass-panel border border-white/10 text-gray-400 text-sm">
+                  등록된 소속 호스트가 없습니다. 왼쪽 폼에서 호스트를 등록해 보세요.
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {hosts.map((host) => (
+                    <div
+                      key={host.id}
+                      className="p-4 rounded-2xl glass-panel border border-white/10 flex flex-col justify-between hover:border-cyan-500/40 transition-all group"
+                    >
+                      <div className="flex gap-4">
+                        <div className="w-24 h-32 rounded-xl overflow-hidden bg-slate-900 border border-white/10 shrink-0 relative">
+                          <img
+                            src={getDisplayUrl(host.image)}
+                            alt={host.name}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = '/creators/creator1.jpg';
+                            }}
+                          />
+                          <span className="absolute top-1 left-1 bg-black/70 text-cyan-300 text-[10px] font-mono font-bold px-1.5 py-0.5 rounded">
+                            #{host.display_order ?? host.id}
+                          </span>
+                        </div>
+                        <div className="flex-1 min-w-0 flex flex-col justify-between">
+                          <div>
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <span className="px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 text-[10px] font-bold">
+                                {host.category || '토크 & 소통'}
+                              </span>
+                              <span className="text-[11px] text-gray-400">
+                                {host.platform}
+                              </span>
+                            </div>
+                            <h3 className="font-bold text-white text-base mt-1 flex items-baseline gap-1.5">
+                              <span>{host.name}</span>
+                              {host.stage_name && (
+                                <span className="text-xs font-semibold text-cyan-400 uppercase tracking-wider">
+                                  ({host.stage_name})
+                                </span>
+                              )}
+                            </h3>
+                            <p className="text-[11px] text-cyan-400/80 font-medium mt-0.5">
+                              {host.tag}
+                            </p>
+                            <p className="text-xs text-gray-300 mt-2 line-clamp-2 leading-relaxed">
+                              {host.description || '소개글이 없습니다.'}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between text-xs">
+                        <span className="text-gray-500 text-[11px]">
+                          등록 ID: {host.id}
+                        </span>
+                        <button
+                          onClick={() => handleDeleteHost(host.id)}
+                          className="px-3 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 font-semibold text-xs flex items-center gap-1.5 transition-colors"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                          <span>호스트 삭제</span>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         )}

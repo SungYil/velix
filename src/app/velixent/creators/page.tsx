@@ -1,13 +1,47 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ScrollReveal from '@/components/ScrollReveal';
 import Link from 'next/link';
 import { Sparkles, ArrowRight, Video, Radio, Flame, Award, Heart } from 'lucide-react';
 import { CREATORS_DATA, CreatorItem } from '@/data/creators';
 
+function getDisplayUrl(url: string) {
+  if (!url) return '/creators/creator1.jpg';
+  if (url.startsWith('/api/files') || url.startsWith('/uploads/') || url.startsWith('http://') || url.startsWith('https://')) {
+    if (url.includes('s3.ap-northeast-2.amazonaws.com/')) {
+      const key = url.split('amazonaws.com/')[1] || '';
+      return `/api/files?key=${encodeURIComponent(key)}`;
+    }
+    return url;
+  }
+  return url;
+}
+
 export default function CreatorsPage() {
+  const [creators, setCreators] = useState<CreatorItem[]>(CREATORS_DATA);
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
+
+  useEffect(() => {
+    fetch('/api/creators')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.creators && Array.isArray(data.creators) && data.creators.length > 0) {
+          const mapped: CreatorItem[] = data.creators.map((c: any) => ({
+            id: c.id,
+            name: c.name,
+            stageName: c.stage_name || c.stageName || '',
+            category: c.category || '토크 & 소통',
+            platform: c.platform || 'SOOP / 틱톡',
+            tag: c.tag || '#라이브 #소통',
+            image: c.image || '/creators/creator1.jpg',
+            description: c.description || '',
+          }));
+          setCreators(mapped);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const categories = [
     { key: 'ALL', label: '전체보기' },
@@ -17,8 +51,8 @@ export default function CreatorsPage() {
   ];
 
   const filteredCreators = selectedCategory === 'ALL'
-    ? CREATORS_DATA
-    : CREATORS_DATA.filter(c => {
+    ? creators
+    : creators.filter(c => {
       if (selectedCategory === 'TALK') return c.category.includes('토크') || c.category.includes('소통');
       if (selectedCategory === 'RADIO') return c.category.includes('라디오') || c.category.includes('버라이어티');
       if (selectedCategory === 'LIFESTYLE') return c.category.includes('라이프') || c.category.includes('뷰티') || c.category.includes('일상');
@@ -80,9 +114,12 @@ export default function CreatorsPage() {
                   <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-blue-600 via-cyan-400 to-purple-600 p-[3px] shadow-xl group-hover:scale-105 transition-transform duration-500">
                     <div className="w-full h-full rounded-full overflow-hidden bg-[#0a0f1d] relative">
                       <img
-                        src={creator.image}
+                        src={getDisplayUrl(creator.image)}
                         alt={`${creator.name} 프로필 사진`}
                         className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-700"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = '/creators/creator1.jpg';
+                        }}
                       />
                     </div>
                   </div>

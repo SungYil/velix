@@ -1,12 +1,46 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import ScrollReveal from '@/components/ScrollReveal';
 import { Sparkles, ArrowRight, Video, Users, Award, ShieldCheck, PlayCircle, Star } from 'lucide-react';
 import { CREATORS_DATA } from '@/data/creators';
 
+function getDisplayUrl(url: string) {
+  if (!url) return '/creators/creator1.jpg';
+  if (url.startsWith('/api/files') || url.startsWith('/uploads/') || url.startsWith('http://') || url.startsWith('https://')) {
+    if (url.includes('s3.ap-northeast-2.amazonaws.com/')) {
+      const key = url.split('amazonaws.com/')[1] || '';
+      return `/api/files?key=${encodeURIComponent(key)}`;
+    }
+    return url;
+  }
+  return url;
+}
+
 export default function Home() {
+  const [creators, setCreators] = useState<any[]>(CREATORS_DATA);
+
+  useEffect(() => {
+    fetch('/api/creators')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.creators && Array.isArray(data.creators) && data.creators.length > 0) {
+          const mapped = data.creators.map((c: any) => ({
+            id: c.id,
+            name: c.name,
+            stageName: c.stage_name || c.stageName || '',
+            category: c.category || '토크 & 소통',
+            platform: c.platform || 'SOOP / 틱톡',
+            tag: c.tag || '#라이브 #소통',
+            image: c.image || '/creators/creator1.jpg',
+            description: c.description || '',
+          }));
+          setCreators(mapped);
+        }
+      })
+      .catch(() => {});
+  }, []);
   return (
     <div className="space-y-24 pb-20">
       {/* Hero Section */}
@@ -109,7 +143,7 @@ export default function Home() {
           <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-32 bg-gradient-to-l from-[#060913] to-transparent z-10 pointer-events-none" />
 
           <div className="animate-marquee flex gap-6">
-            {[...CREATORS_DATA, ...CREATORS_DATA, ...CREATORS_DATA].map((creator, i) => (
+            {[...creators, ...creators, ...creators].map((creator, i) => (
               <Link
                 key={`${creator.id}-${i}`}
                 href="/velixent/creators"
@@ -119,9 +153,12 @@ export default function Home() {
                   <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full p-[2px] bg-gradient-to-tr from-blue-600 via-cyan-400 to-purple-600 flex-shrink-0 group-hover:scale-105 transition-transform duration-300">
                     <div className="w-full h-full rounded-full overflow-hidden bg-[#0a0f1d]">
                       <img
-                        src={creator.image}
+                        src={getDisplayUrl(creator.image)}
                         alt={`${creator.name} 호스트`}
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = '/creators/creator1.jpg';
+                        }}
                       />
                     </div>
                     <span className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-emerald-500 border-2 border-[#060913]" />

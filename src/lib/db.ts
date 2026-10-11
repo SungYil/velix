@@ -77,6 +77,68 @@ function getJsonStorePath() {
           created_at: new Date().toISOString(),
         },
       ],
+      creators: [
+        {
+          id: 1,
+          name: '민우',
+          stage_name: 'MINWOO',
+          category: '토크 & 라이프스타일',
+          platform: 'SOOP / 틱톡',
+          tag: '#보이는라디오 #소통',
+          image: '/creators/creator1.jpg',
+          description: '스마트한 매력과 진솔한 입담으로 시청자들과 실시간으로 소통하는 VELIX 대표 남성 라이브 호스트',
+          display_order: 1,
+          created_at: new Date().toISOString(),
+        },
+        {
+          id: 2,
+          name: '루아',
+          stage_name: 'LUA',
+          category: '보이는 라디오 & 버라이어티',
+          platform: '틱톡 / 라이브',
+          tag: '#엔터테인먼트 #토크',
+          image: '/creators/creator2.jpg',
+          description: '톡톡 튀는 사랑스러운 에너지와 다채로운 콘텐츠로 팬들의 뜨거운 사랑을 받는 비주얼 크리에이터',
+          display_order: 2,
+          created_at: new Date().toISOString(),
+        },
+        {
+          id: 3,
+          name: '서아',
+          stage_name: 'SEOA',
+          category: '토크 & 뷰티 라이프',
+          platform: 'SOOP / 인스타그램',
+          tag: '#소통 #글로벌팬덤',
+          image: '/creators/creator3.jpg',
+          description: '우아한 무드와 흡입력 있는 진행으로 폭넓은 국내외 팬덤을 구축한 정상급 라이브 스트리머',
+          display_order: 3,
+          created_at: new Date().toISOString(),
+        },
+        {
+          id: 4,
+          name: '다은',
+          stage_name: 'DAEUN',
+          category: '음악 & 힐링 소통',
+          platform: '틱톡 / 유튜브',
+          tag: '#감성라이브 #음악방송',
+          image: '/creators/creator4.jpg',
+          description: '청순한 비주얼과 따뜻한 감성 보이스로 시청자들의 일상에 힐링을 선사하는 라이브 아티스트',
+          display_order: 4,
+          created_at: new Date().toISOString(),
+        },
+        {
+          id: 5,
+          name: '지우',
+          stage_name: 'JIWOO',
+          category: '일상 소통 & 야외 라이브',
+          platform: 'SOOP / 틱톡',
+          tag: '#일상Vlog #실시간소통',
+          image: '/creators/creator5.jpg',
+          description: '꾸밈없는 친근한 매력과 자연스러운 소통으로 강력한 팬층을 이끌어가는 라이징 스트리머',
+          display_order: 5,
+          created_at: new Date().toISOString(),
+        },
+      ],
     };
     fs.writeFileSync(filePath, JSON.stringify(initialData, null, 2), 'utf-8');
     try { fs.chmodSync(filePath, 0o777); } catch {}
@@ -90,9 +152,39 @@ function readJsonStore() {
     const data = fs.readFileSync(filePath, 'utf-8');
     const parsed = JSON.parse(data);
     if (!parsed.agent_applications) parsed.agent_applications = [];
+    if (!parsed.creators || parsed.creators.length === 0) {
+      parsed.creators = [
+        {
+          id: 1, name: '민우', stage_name: 'MINWOO', category: '토크 & 라이프스타일', platform: 'SOOP / 틱톡',
+          tag: '#보이는라디오 #소통', image: '/creators/creator1.jpg',
+          description: '스마트한 매력과 진솔한 입담으로 시청자들과 실시간으로 소통하는 VELIX 대표 남성 라이브 호스트', display_order: 1, created_at: new Date().toISOString()
+        },
+        {
+          id: 2, name: '루아', stage_name: 'LUA', category: '보이는 라디오 & 버라이어티', platform: '틱톡 / 라이브',
+          tag: '#엔터테인먼트 #토크', image: '/creators/creator2.jpg',
+          description: '톡톡 튀는 사랑스러운 에너지와 다채로운 콘텐츠로 팬들의 뜨거운 사랑을 받는 비주얼 크리에이터', display_order: 2, created_at: new Date().toISOString()
+        },
+        {
+          id: 3, name: '서아', stage_name: 'SEOA', category: '토크 & 뷰티 라이프', platform: 'SOOP / 인스타그램',
+          tag: '#소통 #글로벌팬덤', image: '/creators/creator3.jpg',
+          description: '우아한 무드와 흡입력 있는 진행으로 폭넓은 국내외 팬덤을 구축한 정상급 라이브 스트리머', display_order: 3, created_at: new Date().toISOString()
+        },
+        {
+          id: 4, name: '다은', stage_name: 'DAEUN', category: '음악 & 힐링 소통', platform: '틱톡 / 유튜브',
+          tag: '#감성라이브 #음악방송', image: '/creators/creator4.jpg',
+          description: '청순한 비주얼과 따뜻한 감성 보이스로 시청자들의 일상에 힐링을 선사하는 라이브 아티스트', display_order: 4, created_at: new Date().toISOString()
+        },
+        {
+          id: 5, name: '지우', stage_name: 'JIWOO', category: '일상 소통 & 야외 라이브', platform: 'SOOP / 틱톡',
+          tag: '#일상Vlog #실시간소통', image: '/creators/creator5.jpg',
+          description: '꾸밈없는 친근한 매력과 자연스러운 소통으로 강력한 팬층을 이끌어가는 라이징 스트리머', display_order: 5, created_at: new Date().toISOString()
+        },
+      ];
+      writeJsonStore(parsed);
+    }
     return parsed;
   } catch {
-    return { creator_applications: [], business_inquiries: [], agent_applications: [], insights: [], notices: [], faqs: [] };
+    return { creator_applications: [], business_inquiries: [], agent_applications: [], insights: [], notices: [], faqs: [], creators: [] };
   }
 }
 
@@ -155,10 +247,39 @@ try {
       question TEXT NOT NULL, answer TEXT NOT NULL, category TEXT DEFAULT '일반',
       order_index INTEGER DEFAULT 0, created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
+    CREATE TABLE IF NOT EXISTS creators (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL, stage_name TEXT, category TEXT, platform TEXT, tag TEXT,
+      image TEXT NOT NULL, description TEXT, display_order INTEGER DEFAULT 0,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
   `);
   try { sqliteDb.exec(`ALTER TABLE creator_applications ADD COLUMN files_json TEXT;`); } catch {}
   try { sqliteDb.exec(`ALTER TABLE business_inquiries ADD COLUMN files_json TEXT;`); } catch {}
   try { sqliteDb.exec(`ALTER TABLE agent_applications ADD COLUMN files_json TEXT;`); } catch {}
+
+  // Seed default creators into SQLite if empty
+  try {
+    const creatorCount = sqliteDb.prepare(`SELECT COUNT(*) as count FROM creators`).get();
+    if (!creatorCount || creatorCount.count === 0) {
+      const insertCreator = sqliteDb.prepare(`
+        INSERT INTO creators (id, name, stage_name, category, platform, tag, image, description, display_order)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `);
+      const defaultCreators = [
+        [1, '민우', 'MINWOO', '토크 & 라이프스타일', 'SOOP / 틱톡', '#보이는라디오 #소통', '/creators/creator1.jpg', '스마트한 매력과 진솔한 입담으로 시청자들과 실시간으로 소통하는 VELIX 대표 남성 라이브 호스트', 1],
+        [2, '루아', 'LUA', '보이는 라디오 & 버라이어티', '틱톡 / 라이브', '#엔터테인먼트 #토크', '/creators/creator2.jpg', '톡톡 튀는 사랑스러운 에너지와 다채로운 콘텐츠로 팬들의 뜨거운 사랑을 받는 비주얼 크리에이터', 2],
+        [3, '서아', 'SEOA', '토크 & 뷰티 라이프', 'SOOP / 인스타그램', '#소통 #글로벌팬덤', '/creators/creator3.jpg', '우아한 무드와 흡입력 있는 진행으로 폭넓은 국내외 팬덤을 구축한 정상급 라이브 스트리머', 3],
+        [4, '다은', 'DAEUN', '음악 & 힐링 소통', '틱톡 / 유튜브', '#감성라이브 #음악방송', '/creators/creator4.jpg', '청순한 비주얼과 따뜻한 감성 보이스로 시청자들의 일상에 힐링을 선사하는 라이브 아티스트', 4],
+        [5, '지우', 'JIWOO', '일상 소통 & 야외 라이브', 'SOOP / 틱톡', '#일상Vlog #실시간소통', '/creators/creator5.jpg', '꾸밈없는 친근한 매력과 자연스러운 소통으로 강력한 팬층을 이끌어가는 라이징 스트리머', 5],
+      ];
+      for (const c of defaultCreators) {
+        insertCreator.run(...c);
+      }
+    }
+  } catch (err) {
+    console.warn('Error seeding default creators into SQLite:', err);
+  }
 } catch (e) {
   console.warn('SQLite init failed, using JSON store fallback:', e);
   useSqlite = false;
@@ -192,6 +313,22 @@ const db = {
                   id: res.lastInsertRowid, name: args[0], gender: args[1], phone: args[2], email: args[3],
                   residence: args[4], sns: args[5], bio: args[6], file_url: args[7], file_name: args[8], files_json: args[9] || null, created_at: now
                 });
+              } else if (sql.includes('creators')) {
+                store.creators.push({
+                  id: res.lastInsertRowid, name: args[0], stage_name: args[1], category: args[2],
+                  platform: args[3], tag: args[4], image: args[5], description: args[6],
+                  display_order: args[7] || 0, created_at: now
+                });
+              }
+              if (sql.includes('DELETE FROM')) {
+                const targetId = args[0];
+                if (sql.includes('creator_applications')) store.creator_applications = store.creator_applications.filter((c: any) => String(c.id) !== String(targetId));
+                if (sql.includes('business_inquiries')) store.business_inquiries = store.business_inquiries.filter((b: any) => String(b.id) !== String(targetId));
+                if (sql.includes('agent_applications')) store.agent_applications = store.agent_applications.filter((a: any) => String(a.id) !== String(targetId));
+                if (sql.includes('insights')) store.insights = store.insights.filter((i: any) => String(i.id) !== String(targetId));
+                if (sql.includes('notices')) store.notices = store.notices.filter((n: any) => String(n.id) !== String(targetId));
+                if (sql.includes('faqs')) store.faqs = store.faqs.filter((f: any) => String(f.id) !== String(targetId));
+                if (sql.includes('creators')) store.creators = store.creators.filter((c: any) => String(c.id) !== String(targetId));
               }
               writeJsonStore(store);
             } catch {}
@@ -244,6 +381,12 @@ const db = {
           store.faqs.push({
             id: lastId, question: args[0], answer: args[1], category: args[2], order_index: args[3], created_at: now
           });
+        } else if (sql.includes('creators')) {
+          store.creators.push({
+            id: lastId, name: args[0], stage_name: args[1], category: args[2],
+            platform: args[3], tag: args[4], image: args[5], description: args[6],
+            display_order: args[7] || 0, created_at: now
+          });
         } else if (sql.includes('DELETE FROM')) {
           const targetId = args[0];
           if (sql.includes('creator_applications')) store.creator_applications = store.creator_applications.filter((c: any) => String(c.id) !== String(targetId));
@@ -252,6 +395,7 @@ const db = {
           if (sql.includes('insights')) store.insights = store.insights.filter((i: any) => String(i.id) !== String(targetId));
           if (sql.includes('notices')) store.notices = store.notices.filter((n: any) => String(n.id) !== String(targetId));
           if (sql.includes('faqs')) store.faqs = store.faqs.filter((f: any) => String(f.id) !== String(targetId));
+          if (sql.includes('creators')) store.creators = store.creators.filter((c: any) => String(c.id) !== String(targetId));
         }
 
         writeJsonStore(store);
@@ -263,6 +407,7 @@ const db = {
           if (sql.includes('insights')) return { count: store.insights.length };
           if (sql.includes('notices')) return { count: store.notices.length };
           if (sql.includes('faqs')) return { count: store.faqs.length };
+          if (sql.includes('creators')) return { count: store.creators.length };
         }
         return null;
       },
@@ -274,6 +419,7 @@ const db = {
         if (sql.includes('insights')) return store.insights;
         if (sql.includes('notices')) return store.notices;
         if (sql.includes('faqs')) return store.faqs;
+        if (sql.includes('creators')) return store.creators;
         return [];
       }
     };
