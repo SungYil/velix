@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import ScrollReveal from '@/components/ScrollReveal';
 import { Sparkles, ArrowRight, Video, Users, Award, ShieldCheck, PlayCircle, Star } from 'lucide-react';
+import { CREATORS_DATA } from '@/data/creators';
 
 export default function Home() {
   return (
@@ -75,6 +76,78 @@ export default function Home() {
         </ScrollReveal>
       </section>
 
+      {/* Exclusive Creators Slide Row */}
+      <section className="space-y-6 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-end justify-between">
+          <div>
+            <ScrollReveal direction="up">
+              <span className="text-xs uppercase font-bold tracking-widest text-cyan-400 bg-cyan-500/10 px-3 py-1 rounded-full border border-cyan-500/20">
+                VELIX EXCLUSIVE HOSTS
+              </span>
+            </ScrollReveal>
+            <ScrollReveal direction="up" delay={0.1}>
+              <h2 className="text-2xl sm:text-4xl font-black text-white mt-2">
+                VELIX MEDIA <span className="gradient-text">소속 크리에이터</span>
+              </h2>
+            </ScrollReveal>
+          </div>
+          <ScrollReveal direction="up" delay={0.2}>
+            <Link
+              href="/velixent/creators"
+              className="text-xs sm:text-sm font-bold text-cyan-400 hover:text-cyan-300 flex items-center gap-1.5 group transition-colors"
+            >
+              <span>소속 크리에이터 전체보기</span>
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </Link>
+          </ScrollReveal>
+        </div>
+
+        {/* Continuous Infinite Marquee Track */}
+        <div className="relative w-full overflow-hidden py-4">
+          {/* Gradient fade edge masks */}
+          <div className="absolute left-0 top-0 bottom-0 w-16 sm:w-32 bg-gradient-to-r from-[#060913] to-transparent z-10 pointer-events-none" />
+          <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-32 bg-gradient-to-l from-[#060913] to-transparent z-10 pointer-events-none" />
+
+          <div className="animate-marquee flex gap-6">
+            {[...CREATORS_DATA, ...CREATORS_DATA, ...CREATORS_DATA].map((creator, i) => (
+              <Link
+                key={`${creator.id}-${i}`}
+                href="/velixent/creators"
+                className="group flex-shrink-0 w-64 sm:w-72 rounded-3xl p-5 glass-panel border border-cyan-500/20 hover:border-cyan-400/60 transition-all duration-300 bg-[#080e1e]/80 hover:bg-[#0c1428] hover:shadow-2xl hover:shadow-cyan-500/20 hover:-translate-y-1 block"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full p-[2px] bg-gradient-to-tr from-blue-600 via-cyan-400 to-purple-600 flex-shrink-0 group-hover:scale-105 transition-transform duration-300">
+                    <div className="w-full h-full rounded-full overflow-hidden bg-[#0a0f1d]">
+                      <img
+                        src={creator.image}
+                        alt={`${creator.name} 호스트`}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      />
+                    </div>
+                    <span className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-emerald-500 border-2 border-[#060913]" />
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <span className="text-[10px] font-bold text-cyan-400 uppercase tracking-wider block truncate">
+                      {creator.stageName}
+                    </span>
+                    <h3 className="text-lg font-black text-white group-hover:text-cyan-300 transition-colors truncate">
+                      {creator.name}
+                    </h3>
+                    <p className="text-xs text-gray-400 truncate mt-0.5">
+                      {creator.category}
+                    </p>
+                    <span className="inline-block mt-2 text-[10px] font-semibold px-2 py-0.5 rounded-md bg-blue-600/20 text-cyan-300 border border-cyan-500/20">
+                      {creator.platform}
+                    </span>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* 4 Main Divisions Grid */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center space-y-4 mb-16">
@@ -98,7 +171,7 @@ export default function Home() {
                 VELIX ENT
               </h3>
               <p className="text-xs text-gray-400 leading-relaxed mb-6">
-                회사소개 및 대표 인삿말 정보를 제공합니다.
+                회사소개, 대표 인삿말 및 소속 크리에이터 정보를 제공합니다.
               </p>
               <div className="flex items-center text-xs font-bold text-cyan-400 gap-1 group-hover:translate-x-2 transition-transform">
                 <span>회사 둘러보기</span>

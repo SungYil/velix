@@ -36,6 +36,7 @@ export default function Navbar() {
       items: [
         { label: '회사소개', href: '/velixent/about' },
         { label: '인삿말', href: '/velixent/greeting' },
+        { label: '소속크리에이터', href: '/velixent/creators' },
       ],
     },
     {
