@@ -35,6 +35,7 @@ export default function Home() {
             tag: c.tag || '#라이브 #소통',
             image: c.image || '/creators/creator1.jpg',
             description: c.description || '',
+            link_url: c.link_url || '',
           }));
           setCreators(mapped);
         }
@@ -146,7 +147,9 @@ export default function Home() {
             {[...creators, ...creators, ...creators].map((creator, i) => (
               <Link
                 key={`${creator.id}-${i}`}
-                href="/velixent/creators"
+                href={creator.link_url || "/velixent/creators"}
+                target={creator.link_url ? "_blank" : undefined}
+                rel={creator.link_url ? "noopener noreferrer" : undefined}
                 className="group flex-shrink-0 w-64 sm:w-72 rounded-3xl p-5 glass-panel border border-cyan-500/20 hover:border-cyan-400/60 transition-all duration-300 bg-[#080e1e]/80 hover:bg-[#0c1428] hover:shadow-2xl hover:shadow-cyan-500/20 hover:-translate-y-1 block"
               >
                 <div className="flex items-center gap-4">

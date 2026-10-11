@@ -285,6 +285,7 @@ export default function AdminDashboardPage() {
     description: '',
     display_order: 0,
     imageUrl: '',
+    link_url: '',
   });
   const [hostFile, setHostFile] = useState<File | null>(null);
 
@@ -458,6 +459,7 @@ export default function AdminDashboardPage() {
       form.append('description', newHost.description);
       form.append('display_order', String(newHost.display_order));
       form.append('imageUrl', newHost.imageUrl);
+      form.append('link_url', newHost.link_url);
       if (hostFile) {
         form.append('image', hostFile);
       }
@@ -479,6 +481,7 @@ export default function AdminDashboardPage() {
         description: '',
         display_order: 0,
         imageUrl: '',
+        link_url: '',
       });
       setHostFile(null);
       loadAllData();
@@ -1076,6 +1079,22 @@ export default function AdminDashboardPage() {
                 </div>
 
                 <div>
+                  <label className="block text-xs font-semibold text-gray-300 mb-1">
+                    호스트 방송국 / 채널 바로가기 링크 URL (선택)
+                  </label>
+                  <input
+                    type="url"
+                    placeholder="예: https://ch.sooplive.co.kr/..., https://tiktok.com/@..."
+                    value={newHost.link_url}
+                    onChange={(e) => setNewHost({ ...newHost, link_url: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-xs focus:border-cyan-500 focus:outline-none"
+                  />
+                  <p className="text-[11px] text-gray-400 mt-1">
+                    소속 크리에이터 페이지에서 사진을 클릭했을 때 이 링크로 이동합니다.
+                  </p>
+                </div>
+
+                <div>
                   <label className="block text-xs font-semibold text-gray-300 mb-1">프로필 사진 파일 업로드</label>
                   <input
                     type="file"
@@ -1162,6 +1181,17 @@ export default function AdminDashboardPage() {
                             <p className="text-xs text-gray-300 mt-2 line-clamp-2 leading-relaxed">
                               {host.description || '소개글이 없습니다.'}
                             </p>
+                            {host.link_url && (
+                              <a
+                                href={host.link_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-[11px] text-cyan-400 hover:text-cyan-300 underline inline-flex items-center gap-1 mt-2 max-w-full truncate"
+                              >
+                                <ExternalLink className="w-3 h-3 shrink-0" />
+                                <span className="truncate">{host.link_url}</span>
+                              </a>
+                            )}
                           </div>
                         </div>
                       </div>

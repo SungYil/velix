@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import ScrollReveal from '@/components/ScrollReveal';
 import Link from 'next/link';
-import { Sparkles, ArrowRight, Video, Radio, Flame, Award, Heart } from 'lucide-react';
+import { Sparkles, ArrowRight, ExternalLink } from 'lucide-react';
 import { CREATORS_DATA, CreatorItem } from '@/data/creators';
 
 function getDisplayUrl(url: string) {
@@ -20,7 +20,6 @@ function getDisplayUrl(url: string) {
 
 export default function CreatorsPage() {
   const [creators, setCreators] = useState<CreatorItem[]>(CREATORS_DATA);
-  const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
 
   useEffect(() => {
     fetch('/api/creators')
@@ -36,28 +35,13 @@ export default function CreatorsPage() {
             tag: c.tag || '#라이브 #소통',
             image: c.image || '/creators/creator1.jpg',
             description: c.description || '',
+            link_url: c.link_url || '',
           }));
           setCreators(mapped);
         }
       })
       .catch(() => {});
   }, []);
-
-  const categories = [
-    { key: 'ALL', label: '전체보기' },
-    { key: 'TALK', label: '토크 & 소통' },
-    { key: 'RADIO', label: '보이는 라디오' },
-    { key: 'LIFESTYLE', label: '라이프스타일 & 뷰티' },
-  ];
-
-  const filteredCreators = selectedCategory === 'ALL'
-    ? creators
-    : creators.filter(c => {
-      if (selectedCategory === 'TALK') return c.category.includes('토크') || c.category.includes('소통');
-      if (selectedCategory === 'RADIO') return c.category.includes('라디오') || c.category.includes('버라이어티');
-      if (selectedCategory === 'LIFESTYLE') return c.category.includes('라이프') || c.category.includes('뷰티') || c.category.includes('일상');
-      return true;
-    });
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-20">
@@ -82,27 +66,9 @@ export default function CreatorsPage() {
         </ScrollReveal>
       </div>
 
-      {/* Filter Tabs */}
-      <ScrollReveal direction="up" delay={0.25}>
-        <div className="flex flex-wrap items-center justify-center gap-3">
-          {categories.map((cat) => (
-            <button
-              key={cat.key}
-              onClick={() => setSelectedCategory(cat.key)}
-              className={`px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all ${selectedCategory === cat.key
-                ? 'bg-gradient-to-r from-blue-600 to-cyan-500 text-white shadow-lg shadow-cyan-500/20 border border-cyan-400/40'
-                : 'glass-panel text-gray-400 hover:text-white border-white/10 hover:border-cyan-500/30'
-                }`}
-            >
-              {cat.label}
-            </button>
-          ))}
-        </div>
-      </ScrollReveal>
-
       {/* Creators Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-        {filteredCreators.map((creator, idx) => (
+        {creators.map((creator, idx) => (
           <ScrollReveal key={creator.id} direction="up" delay={idx * 0.1}>
             <div className="group rounded-3xl p-6 glass-panel border border-cyan-500/20 hover:border-cyan-400/50 transition-all duration-500 bg-[#080e1e]/80 hover:bg-[#0c1428] hover:shadow-2xl hover:shadow-cyan-500/10 flex flex-col justify-between h-full relative overflow-hidden">
               {/* Background ambient glow on hover */}
@@ -110,26 +76,60 @@ export default function CreatorsPage() {
 
               <div className="space-y-6">
                 {/* Profile Image with refined frame */}
-                <div className="relative mx-auto w-48 h-48 sm:w-52 sm:h-52">
-                  <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-blue-600 via-cyan-400 to-purple-600 p-[3px] shadow-xl group-hover:scale-105 transition-transform duration-500">
-                    <div className="w-full h-full rounded-full overflow-hidden bg-[#0a0f1d] relative">
-                      <img
-                        src={getDisplayUrl(creator.image)}
-                        alt={`${creator.name} 프로필 사진`}
-                        className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-700"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = '/creators/creator1.jpg';
-                        }}
-                      />
+                {creator.link_url ? (
+                  <a
+                    href={creator.link_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block relative mx-auto w-48 h-48 sm:w-52 sm:h-52 cursor-pointer group/photo focus:outline-none"
+                    title={`${creator.name} 호스트 채널 바로가기`}
+                  >
+                    <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-blue-600 via-cyan-400 to-purple-600 p-[3px] shadow-xl group-hover/photo:scale-105 group-hover/photo:shadow-cyan-500/30 transition-all duration-500">
+                      <div className="w-full h-full rounded-full overflow-hidden bg-[#0a0f1d] relative">
+                        <img
+                          src={getDisplayUrl(creator.image)}
+                          alt={`${creator.name} 프로필 사진`}
+                          className="w-full h-full object-cover object-center group-hover/photo:scale-110 transition-transform duration-700"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = '/creators/creator1.jpg';
+                          }}
+                        />
+                        {/* Hover overlay hint */}
+                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover/photo:opacity-100 flex flex-col items-center justify-center text-white transition-opacity duration-300 backdrop-blur-[1px]">
+                          <ExternalLink className="w-6 h-6 text-cyan-300 mb-1 animate-bounce" />
+                          <span className="text-xs font-bold text-cyan-200">채널 바로가기</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Live Badge */}
+                    <div className="absolute bottom-1 right-3 px-3 py-1 rounded-full bg-[#060913]/90 border border-cyan-500/40 text-[11px] font-extrabold text-cyan-300 flex items-center gap-1.5 shadow-lg backdrop-blur-md">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                      <span>HOST</span>
+                    </div>
+                  </a>
+                ) : (
+                  <div className="relative mx-auto w-48 h-48 sm:w-52 sm:h-52">
+                    <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-blue-600 via-cyan-400 to-purple-600 p-[3px] shadow-xl group-hover:scale-105 transition-transform duration-500">
+                      <div className="w-full h-full rounded-full overflow-hidden bg-[#0a0f1d] relative">
+                        <img
+                          src={getDisplayUrl(creator.image)}
+                          alt={`${creator.name} 프로필 사진`}
+                          className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-700"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = '/creators/creator1.jpg';
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Live Badge */}
+                    <div className="absolute bottom-1 right-3 px-3 py-1 rounded-full bg-[#060913]/90 border border-cyan-500/40 text-[11px] font-extrabold text-cyan-300 flex items-center gap-1.5 shadow-lg backdrop-blur-md">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                      <span>HOST</span>
                     </div>
                   </div>
-
-                  {/* Live Badge */}
-                  <div className="absolute bottom-1 right-3 px-3 py-1 rounded-full bg-[#060913]/90 border border-cyan-500/40 text-[11px] font-extrabold text-cyan-300 flex items-center gap-1.5 shadow-lg backdrop-blur-md">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                    <span>HOST</span>
-                  </div>
-                </div>
+                )}
 
                 {/* Info Text */}
                 <div className="text-center space-y-2 pt-2">
@@ -154,6 +154,21 @@ export default function CreatorsPage() {
                   <p className="text-xs sm:text-sm text-gray-300 leading-relaxed font-light pt-2 px-2">
                     {creator.description}
                   </p>
+
+                  {/* Optional Channel Link Button */}
+                  {creator.link_url && (
+                    <div className="pt-2">
+                      <a
+                        href={creator.link_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-gradient-to-r from-cyan-600/20 to-blue-600/20 hover:from-cyan-500/40 hover:to-blue-500/40 text-cyan-300 hover:text-white text-xs font-bold border border-cyan-500/40 hover:border-cyan-400 transition-all hover:scale-105 shadow-md"
+                      >
+                        <span>방송국 / 채널 바로가기</span>
+                        <ExternalLink className="w-3.5 h-3.5" />
+                      </a>
+                    </div>
+                  )}
                 </div>
               </div>
 

@@ -182,6 +182,12 @@ function readJsonStore() {
       ];
       writeJsonStore(parsed);
     }
+    if (parsed.creators) {
+      parsed.creators = parsed.creators.map((c: any) => ({
+        ...c,
+        link_url: c.link_url || '',
+      }));
+    }
     return parsed;
   } catch {
     return { creator_applications: [], business_inquiries: [], agent_applications: [], insights: [], notices: [], faqs: [], creators: [] };
@@ -251,27 +257,29 @@ try {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL, stage_name TEXT, category TEXT, platform TEXT, tag TEXT,
       image TEXT NOT NULL, description TEXT, display_order INTEGER DEFAULT 0,
+      link_url TEXT DEFAULT '',
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
   `);
   try { sqliteDb.exec(`ALTER TABLE creator_applications ADD COLUMN files_json TEXT;`); } catch {}
   try { sqliteDb.exec(`ALTER TABLE business_inquiries ADD COLUMN files_json TEXT;`); } catch {}
   try { sqliteDb.exec(`ALTER TABLE agent_applications ADD COLUMN files_json TEXT;`); } catch {}
+  try { sqliteDb.exec(`ALTER TABLE creators ADD COLUMN link_url TEXT DEFAULT '';`); } catch {}
 
   // Seed default creators into SQLite if empty
   try {
     const creatorCount = sqliteDb.prepare(`SELECT COUNT(*) as count FROM creators`).get();
     if (!creatorCount || creatorCount.count === 0) {
       const insertCreator = sqliteDb.prepare(`
-        INSERT INTO creators (id, name, stage_name, category, platform, tag, image, description, display_order)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO creators (id, name, stage_name, category, platform, tag, image, description, display_order, link_url)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `);
       const defaultCreators = [
-        [1, '민우', 'MINWOO', '토크 & 라이프스타일', 'SOOP / 틱톡', '#보이는라디오 #소통', '/creators/creator1.jpg', '스마트한 매력과 진솔한 입담으로 시청자들과 실시간으로 소통하는 VELIX 대표 남성 라이브 호스트', 1],
-        [2, '루아', 'LUA', '보이는 라디오 & 버라이어티', '틱톡 / 라이브', '#엔터테인먼트 #토크', '/creators/creator2.jpg', '톡톡 튀는 사랑스러운 에너지와 다채로운 콘텐츠로 팬들의 뜨거운 사랑을 받는 비주얼 크리에이터', 2],
-        [3, '서아', 'SEOA', '토크 & 뷰티 라이프', 'SOOP / 인스타그램', '#소통 #글로벌팬덤', '/creators/creator3.jpg', '우아한 무드와 흡입력 있는 진행으로 폭넓은 국내외 팬덤을 구축한 정상급 라이브 스트리머', 3],
-        [4, '다은', 'DAEUN', '음악 & 힐링 소통', '틱톡 / 유튜브', '#감성라이브 #음악방송', '/creators/creator4.jpg', '청순한 비주얼과 따뜻한 감성 보이스로 시청자들의 일상에 힐링을 선사하는 라이브 아티스트', 4],
-        [5, '지우', 'JIWOO', '일상 소통 & 야외 라이브', 'SOOP / 틱톡', '#일상Vlog #실시간소통', '/creators/creator5.jpg', '꾸밈없는 친근한 매력과 자연스러운 소통으로 강력한 팬층을 이끌어가는 라이징 스트리머', 5],
+        [1, '민우', 'MINWOO', '토크 & 라이프스타일', 'SOOP / 틱톡', '#보이는라디오 #소통', '/creators/creator1.jpg', '스마트한 매력과 진솔한 입담으로 시청자들과 실시간으로 소통하는 VELIX 대표 남성 라이브 호스트', 1, ''],
+        [2, '루아', 'LUA', '보이는 라디오 & 버라이어티', '틱톡 / 라이브', '#엔터테인먼트 #토크', '/creators/creator2.jpg', '톡톡 튀는 사랑스러운 에너지와 다채로운 콘텐츠로 팬들의 뜨거운 사랑을 받는 비주얼 크리에이터', 2, ''],
+        [3, '서아', 'SEOA', '토크 & 뷰티 라이프', 'SOOP / 인스타그램', '#소통 #글로벌팬덤', '/creators/creator3.jpg', '우아한 무드와 흡입력 있는 진행으로 폭넓은 국내외 팬덤을 구축한 정상급 라이브 스트리머', 3, ''],
+        [4, '다은', 'DAEUN', '음악 & 힐링 소통', '틱톡 / 유튜브', '#감성라이브 #음악방송', '/creators/creator4.jpg', '청순한 비주얼과 따뜻한 감성 보이스로 시청자들의 일상에 힐링을 선사하는 라이브 아티스트', 4, ''],
+        [5, '지우', 'JIWOO', '일상 소통 & 야외 라이브', 'SOOP / 틱톡', '#일상Vlog #실시간소통', '/creators/creator5.jpg', '꾸밈없는 친근한 매력과 자연스러운 소통으로 강력한 팬층을 이끌어가는 라이징 스트리머', 5, ''],
       ];
       for (const c of defaultCreators) {
         insertCreator.run(...c);
@@ -317,7 +325,7 @@ const db = {
                 store.creators.push({
                   id: res.lastInsertRowid, name: args[0], stage_name: args[1], category: args[2],
                   platform: args[3], tag: args[4], image: args[5], description: args[6],
-                  display_order: args[7] || 0, created_at: now
+                  display_order: args[7] || 0, link_url: args[8] || '', created_at: now
                 });
               }
               if (sql.includes('DELETE FROM')) {
@@ -385,7 +393,7 @@ const db = {
           store.creators.push({
             id: lastId, name: args[0], stage_name: args[1], category: args[2],
             platform: args[3], tag: args[4], image: args[5], description: args[6],
-            display_order: args[7] || 0, created_at: now
+            display_order: args[7] || 0, link_url: args[8] || '', created_at: now
           });
         } else if (sql.includes('DELETE FROM')) {
           const targetId = args[0];

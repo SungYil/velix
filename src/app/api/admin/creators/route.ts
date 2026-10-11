@@ -36,6 +36,7 @@ export async function POST(req: NextRequest) {
     const tag = (formData.get('tag') || '#라이브 #호스트') as string;
     const description = (formData.get('description') || '') as string;
     const displayOrder = parseInt((formData.get('display_order') || '0') as string, 10);
+    const linkUrl = (formData.get('link_url') || formData.get('linkUrl') || '') as string;
     const imageFile = formData.get('image') as File | null;
     const imageUrlInput = (formData.get('imageUrl') || '') as string;
 
@@ -57,11 +58,11 @@ export async function POST(req: NextRequest) {
     }
 
     const stmt = db.prepare(`
-      INSERT INTO creators (name, stage_name, category, platform, tag, image, description, display_order)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO creators (name, stage_name, category, platform, tag, image, description, display_order, link_url)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
-    const result = stmt.run(name, stageName, category, platform, tag, image, description, displayOrder);
+    const result = stmt.run(name, stageName, category, platform, tag, image, description, displayOrder, linkUrl);
 
     return NextResponse.json({ success: true, id: result.lastInsertRowid });
   } catch (error: any) {

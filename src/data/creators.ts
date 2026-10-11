@@ -7,6 +7,7 @@ export interface CreatorItem {
   tag: string;
   image: string;
   description: string;
+  link_url?: string;
 }
 
 export const CREATORS_DATA: CreatorItem[] = [
