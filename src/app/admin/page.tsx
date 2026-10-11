@@ -269,6 +269,8 @@ export default function AdminDashboardPage() {
   const [editInsightModal, setEditInsightModal] = useState<any | null>(null);
   const [editNoticeModal, setEditNoticeModal] = useState<any | null>(null);
   const [editFaqModal, setEditFaqModal] = useState<any | null>(null);
+  const [editHostModal, setEditHostModal] = useState<any | null>(null);
+  const [editHostFile, setEditHostFile] = useState<File | null>(null);
 
   // Form states for CMS Creation
   const [newInsight, setNewInsight] = useState({ title: '', category: 'INSIGHT', excerpt: '', content: '', thumbnailUrl: '' });
@@ -484,6 +486,45 @@ export default function AdminDashboardPage() {
         link_url: '',
       });
       setHostFile(null);
+      loadAllData();
+      setTimeout(() => setActionSuccess(''), 3000);
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpdateHost = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editHostModal) return;
+    setLoading(true);
+    try {
+      const form = new FormData();
+      form.append('id', String(editHostModal.id));
+      form.append('name', editHostModal.name);
+      form.append('stage_name', editHostModal.stage_name || '');
+      form.append('category', editHostModal.category || '토크 & 소통');
+      form.append('platform', editHostModal.platform || 'SOOP / 틱톡');
+      form.append('tag', editHostModal.tag || '#라이브 #호스트');
+      form.append('description', editHostModal.description || '');
+      form.append('display_order', String(editHostModal.display_order ?? 0));
+      form.append('link_url', editHostModal.link_url || '');
+      form.append('existingImage', editHostModal.image || '');
+      if (editHostFile) {
+        form.append('image', editHostFile);
+      }
+
+      const res = await fetch('/api/admin/creators', {
+        method: 'PUT',
+        body: form,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || '호스트 수정 실패');
+
+      setActionSuccess('호스트 정보가 성공적으로 수정되었습니다!');
+      setEditHostModal(null);
+      setEditHostFile(null);
       loadAllData();
       setTimeout(() => setActionSuccess(''), 3000);
     } catch (err: any) {
@@ -1200,13 +1241,25 @@ export default function AdminDashboardPage() {
                         <span className="text-gray-500 text-[11px]">
                           등록 ID: {host.id}
                         </span>
-                        <button
-                          onClick={() => handleDeleteHost(host.id)}
-                          className="px-3 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 font-semibold text-xs flex items-center gap-1.5 transition-colors"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                          <span>호스트 삭제</span>
-                        </button>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => {
+                              setEditHostModal({ ...host });
+                              setEditHostFile(null);
+                            }}
+                            className="px-3 py-1.5 rounded-lg bg-blue-600/30 hover:bg-blue-600/50 text-cyan-300 font-semibold text-xs flex items-center gap-1.5 transition-colors border border-cyan-500/30"
+                          >
+                            <Edit className="w-3.5 h-3.5" />
+                            <span>수정</span>
+                          </button>
+                          <button
+                            onClick={() => handleDeleteHost(host.id)}
+                            className="px-3 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 font-semibold text-xs flex items-center gap-1.5 transition-colors"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            <span>삭제</span>
+                          </button>
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -1819,6 +1872,171 @@ export default function AdminDashboardPage() {
                   className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm shadow-lg"
                 >
                   {loading ? '수정 저장 중...' : 'FAQ 수정 저장'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Host Edit Modal */}
+      {editHostModal && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-cyan-500/30 max-w-2xl w-full max-h-[90vh] overflow-y-auto space-y-6 animate-in fade-in zoom-in duration-200 bg-[#0c1428] shadow-2xl">
+            <div className="flex items-center justify-between pb-4 border-b border-white/10">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center">
+                  <Sparkles className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-white">소속 호스트 정보 수정</h3>
+                  <p className="text-xs text-gray-400">호스트의 프로필 정보, 사진 및 방송 채널 링크를 수정합니다.</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setEditHostModal(null)}
+                className="p-2 rounded-xl bg-white/10 text-gray-300 hover:text-white"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleUpdateHost} className="space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-300 mb-1">이름 / 활동명 *</label>
+                  <input
+                    type="text"
+                    required
+                    value={editHostModal.name}
+                    onChange={(e) => setEditHostModal({ ...editHostModal, name: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-xs focus:border-cyan-500 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-300 mb-1">영문 STAGE NAME</label>
+                  <input
+                    type="text"
+                    value={editHostModal.stage_name || ''}
+                    onChange={(e) => setEditHostModal({ ...editHostModal, stage_name: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-xs focus:border-cyan-500 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-300 mb-1">카테고리</label>
+                  <input
+                    type="text"
+                    value={editHostModal.category || ''}
+                    onChange={(e) => setEditHostModal({ ...editHostModal, category: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-xs focus:border-cyan-500 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-300 mb-1">활동 플랫폼</label>
+                  <input
+                    type="text"
+                    value={editHostModal.platform || ''}
+                    onChange={(e) => setEditHostModal({ ...editHostModal, platform: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-xs focus:border-cyan-500 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-300 mb-1">태그 / 키워드</label>
+                <input
+                  type="text"
+                  value={editHostModal.tag || ''}
+                  onChange={(e) => setEditHostModal({ ...editHostModal, tag: e.target.value })}
+                  className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-xs focus:border-cyan-500 focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-300 mb-1">한 줄 소개글</label>
+                <textarea
+                  rows={3}
+                  value={editHostModal.description || ''}
+                  onChange={(e) => setEditHostModal({ ...editHostModal, description: e.target.value })}
+                  className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-xs focus:border-cyan-500 focus:outline-none resize-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-300 mb-1">노출 순서 (작을수록 앞)</label>
+                  <input
+                    type="number"
+                    value={editHostModal.display_order ?? 0}
+                    onChange={(e) => setEditHostModal({ ...editHostModal, display_order: parseInt(e.target.value, 10) || 0 })}
+                    className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-xs focus:border-cyan-500 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-300 mb-1">기존 이미지 URL</label>
+                  <input
+                    type="text"
+                    value={editHostModal.image || ''}
+                    onChange={(e) => setEditHostModal({ ...editHostModal, image: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-xs focus:border-cyan-500 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-300 mb-1">
+                  호스트 방송국 / 채널 바로가기 링크 URL (선택)
+                </label>
+                <input
+                  type="url"
+                  placeholder="예: https://ch.sooplive.co.kr/..., https://tiktok.com/@..."
+                  value={editHostModal.link_url || ''}
+                  onChange={(e) => setEditHostModal({ ...editHostModal, link_url: e.target.value })}
+                  className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-xs focus:border-cyan-500 focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-300 mb-1">새 프로필 사진 교체 (선택)</label>
+                {editHostModal.image && (
+                  <div className="flex items-center gap-3 mb-2 p-2 rounded-xl bg-white/5 border border-white/10 w-fit">
+                    <img
+                      src={getDisplayUrl(editHostModal.image)}
+                      alt="현재 이미지"
+                      className="w-12 h-14 object-cover rounded-lg border border-white/10"
+                    />
+                    <span className="text-xs text-gray-400">현재 등록된 사진</span>
+                  </div>
+                )}
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setEditHostFile(e.target.files?.[0] || null)}
+                  className="w-full text-xs text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-cyan-600 file:text-white hover:file:bg-cyan-500"
+                />
+                {editHostFile && (
+                  <p className="text-[11px] text-cyan-300 mt-1">새로 선택된 파일: {editHostFile.name}</p>
+                )}
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-white/10">
+                <button
+                  type="button"
+                  onClick={() => setEditHostModal(null)}
+                  className="px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-gray-300 text-sm font-bold transition-colors"
+                >
+                  취소
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold text-sm shadow-lg flex items-center gap-1.5 transition-all"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  <span>{loading ? '저장 중...' : '호스트 정보 수정 저장'}</span>
                 </button>
               </div>
             </form>

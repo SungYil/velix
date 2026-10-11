@@ -321,7 +321,24 @@ const db = {
                   id: res.lastInsertRowid, name: args[0], gender: args[1], phone: args[2], email: args[3],
                   residence: args[4], sns: args[5], bio: args[6], file_url: args[7], file_name: args[8], files_json: args[9] || null, created_at: now
                 });
-              } else if (sql.includes('creators')) {
+              } else if (sql.includes('UPDATE') && sql.includes('creators')) {
+                const targetId = args[9];
+                const idx = store.creators.findIndex((c: any) => String(c.id) === String(targetId));
+                if (idx !== -1) {
+                  store.creators[idx] = {
+                    ...store.creators[idx],
+                    name: args[0],
+                    stage_name: args[1],
+                    category: args[2],
+                    platform: args[3],
+                    tag: args[4],
+                    image: args[5],
+                    description: args[6],
+                    display_order: args[7] || 0,
+                    link_url: args[8] || '',
+                  };
+                }
+              } else if (sql.includes('INSERT') && sql.includes('creators')) {
                 store.creators.push({
                   id: res.lastInsertRowid, name: args[0], stage_name: args[1], category: args[2],
                   platform: args[3], tag: args[4], image: args[5], description: args[6],
@@ -389,6 +406,23 @@ const db = {
           store.faqs.push({
             id: lastId, question: args[0], answer: args[1], category: args[2], order_index: args[3], created_at: now
           });
+        } else if (sql.includes('UPDATE') && sql.includes('creators')) {
+          const targetId = args[9];
+          const idx = store.creators.findIndex((c: any) => String(c.id) === String(targetId));
+          if (idx !== -1) {
+            store.creators[idx] = {
+              ...store.creators[idx],
+              name: args[0],
+              stage_name: args[1],
+              category: args[2],
+              platform: args[3],
+              tag: args[4],
+              image: args[5],
+              description: args[6],
+              display_order: args[7] || 0,
+              link_url: args[8] || '',
+            };
+          }
         } else if (sql.includes('creators')) {
           store.creators.push({
             id: lastId, name: args[0], stage_name: args[1], category: args[2],
