@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import ScrollReveal from '@/components/ScrollReveal';
 import Link from 'next/link';
-import { Sparkles, ArrowRight, ExternalLink } from 'lucide-react';
+import { Sparkles, ArrowRight, ExternalLink, Plus } from 'lucide-react';
 import { CREATORS_DATA, CreatorItem } from '@/data/creators';
 
 function getDisplayUrl(url: string) {
@@ -184,6 +184,85 @@ export default function CreatorsPage() {
             </div>
           </ScrollReveal>
         ))}
+
+        {/* Plus / More Creators Card */}
+        <ScrollReveal direction="up" delay={(creators.length % 3) * 0.1}>
+          <Link
+            href="/creator/apply"
+            className="group rounded-3xl p-6 glass-panel border border-cyan-500/20 hover:border-cyan-400/50 transition-all duration-500 bg-[#080e1e]/80 hover:bg-[#0c1428] hover:shadow-2xl hover:shadow-cyan-500/10 flex flex-col justify-between h-full relative overflow-hidden block"
+            title="소속 크리에이터 지원하기"
+          >
+            {/* Background ambient glow on hover */}
+            <div className="absolute -top-20 -right-20 w-44 h-44 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none group-hover:bg-cyan-500/20 transition-all" />
+
+            <div className="space-y-6">
+              {/* Profile Image Frame with Plus Icon */}
+              <div className="relative mx-auto w-48 h-48 sm:w-52 sm:h-52">
+                <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-blue-600 via-cyan-400 to-purple-600 p-[3px] shadow-xl group-hover:scale-105 group-hover:shadow-cyan-500/30 transition-all duration-500">
+                  <div className="w-full h-full rounded-full overflow-hidden bg-gradient-to-b from-[#0c152e] via-[#091024] to-[#060913] relative flex flex-col items-center justify-center border border-white/5">
+                    {/* Background subtle radial rings */}
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(6,182,212,0.15)_0%,transparent_70%)]" />
+                    <div className="w-20 h-20 rounded-full bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center group-hover:scale-110 group-hover:bg-cyan-500/20 transition-all duration-500 shadow-lg shadow-cyan-500/20">
+                      <Plus className="w-10 h-10 text-cyan-400 group-hover:rotate-90 transition-transform duration-500" strokeWidth={2.5} />
+                    </div>
+                    <span className="text-[11px] font-extrabold tracking-widest text-cyan-300 mt-2 uppercase">
+                      AND MORE
+                    </span>
+                  </div>
+                </div>
+
+                {/* Live Badge */}
+                <div className="absolute bottom-1 right-3 px-3 py-1 rounded-full bg-[#060913]/90 border border-cyan-500/40 text-[11px] font-extrabold text-cyan-300 flex items-center gap-1.5 shadow-lg backdrop-blur-md">
+                  <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+                  <span>MORE</span>
+                </div>
+              </div>
+
+              {/* Info Text */}
+              <div className="text-center space-y-2 pt-2">
+                <div className="flex items-center justify-center gap-2">
+                  <span className="text-xs font-black tracking-widest text-cyan-400 uppercase">
+                    VELIX CREATORS
+                  </span>
+                  <span className="w-1 h-1 rounded-full bg-gray-500" />
+                  <span className="text-xs text-gray-400 font-medium">
+                    ALL PLATFORMS
+                  </span>
+                </div>
+
+                <h3 className="text-2xl font-black text-white group-hover:text-cyan-300 transition-colors">
+                  더 많은 소속 호스트 +
+                </h3>
+
+                <div className="inline-block px-3 py-1 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-xs font-semibold text-cyan-300">
+                  다채로운 라이브 소통 &amp; 상시 활동
+                </div>
+
+                <p className="text-xs sm:text-sm text-gray-300 leading-relaxed font-light pt-2 px-2">
+                  수많은 정상급 라이브 스트리머들이 VELIX MEDIA와 함께 활발히 소통하며 성장해 나가고 있습니다.
+                </p>
+
+                <div className="pt-2">
+                  <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-gradient-to-r from-blue-600/30 via-cyan-600/30 to-blue-600/30 group-hover:from-blue-600 group-hover:to-cyan-600 text-cyan-300 group-hover:text-white text-xs font-bold border border-cyan-500/40 transition-all shadow-md">
+                    <span>다음 주인공 지원하기</span>
+                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Tag & Footer */}
+            <div className="pt-6 mt-6 border-t border-white/10 flex items-center justify-between text-xs text-gray-400">
+              <span className="text-cyan-400/80 font-mono text-[11px]">
+                #NextCreator #WithVELIX
+              </span>
+              <span className="text-cyan-400 group-hover:text-cyan-300 transition-colors font-bold flex items-center gap-1">
+                <span>JOIN US</span>
+                <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+              </span>
+            </div>
+          </Link>
+        </ScrollReveal>
       </div>
 
       {/* Bottom CTA for Applying */}
